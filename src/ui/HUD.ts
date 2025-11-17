@@ -3,11 +3,11 @@
  * Manages in-game UI elements like health, currency, wave info
  */
 export class HUD {
-  private container: HTMLElement;
-  private healthElement: HTMLElement;
-  private currencyElement: HTMLElement;
-  private waveElement: HTMLElement;
-  private buildMenu: HTMLElement;
+  private container!: HTMLElement;
+  private healthElement!: HTMLElement;
+  private currencyElement!: HTMLElement;
+  private waveElement!: HTMLElement;
+  private buildMenu!: HTMLElement;
 
   constructor() {
     this.createHUD();
