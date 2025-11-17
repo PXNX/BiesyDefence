@@ -1,18 +1,6 @@
 import type { GameState } from '@/game/core/types'
 import { distanceBetween, normalize } from '@/game/utils/math'
 
-const SUPPORT_SLOW_FACTOR = 0.62
-
-const getSupportSlowMultiplier = (state: GameState, enemyPosition: GameState['enemies'][number]['position']): number => {
-  return state.towers.some(
-    (tower) =>
-      tower.type === 'support' &&
-      distanceBetween(tower.position, enemyPosition) <= tower.range
-  )
-    ? SUPPORT_SLOW_FACTOR
-    : 1
-}
-
 export const updateEnemies = (state: GameState, deltaSeconds: number): void => {
   const path = state.path
   state.enemies.forEach((enemy) => {
@@ -20,14 +8,21 @@ export const updateEnemies = (state: GameState, deltaSeconds: number): void => {
       return
     }
 
+    // Chapter 2 Balance: Update and manage timed slow effects
+    enemy.slowEffects = enemy.slowEffects.filter(effect => {
+      effect.remainingTime -= deltaSeconds
+      return effect.remainingTime > 0
+    })
+    
+    // Calculate effective speed multiplier from active slow effects
+    const activeSlowEffect = enemy.slowEffects.find(effect => effect.remainingTime > 0)
+    enemy.speedMultiplier = activeSlowEffect ? activeSlowEffect.multiplier : 1
+
     const nextIndex = Math.min(enemy.pathIndex + 1, path.length - 1)
     const targetNode = path[nextIndex]
     if (!targetNode) {
       return
     }
-
-    const supportModifier = getSupportSlowMultiplier(state, enemy.position)
-    enemy.speedMultiplier = supportModifier
 
     if (enemy.pathIndex >= path.length - 1) {
       if (!enemy.reachedGoal) {
@@ -45,7 +40,7 @@ export const updateEnemies = (state: GameState, deltaSeconds: number): void => {
       y: targetNode.y - enemy.position.y,
     }
 
-    const travelDistance = enemy.stats.speed * supportModifier * deltaSeconds
+    const travelDistance = enemy.stats.speed * enemy.speedMultiplier * deltaSeconds
     const distToTarget = distanceBetween(enemy.position, targetNode)
     if (distToTarget <= travelDistance) {
       enemy.position.x = targetNode.x

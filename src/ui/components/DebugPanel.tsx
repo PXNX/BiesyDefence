@@ -31,8 +31,16 @@ export function DebugPanel({
 
   const fpsLabel = Number.isFinite(fps) ? fps : 0
 
+  // Only render in development mode
+  if (import.meta.env.DEV !== true) {
+    return null
+  }
+
   return (
     <div className="debug-panel">
+      <div className="dev-mode-warning">
+        <strong>⚠️ Development Mode Only</strong>
+      </div>
       <div className="debug-row">
         <span>Debug FPS</span>
         <strong>{fpsLabel.toFixed(1)}</strong>

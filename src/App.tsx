@@ -6,6 +6,8 @@ import { GameControls } from '@/ui/components/GameControls'
 import { GameHUD } from '@/ui/components/GameHUD'
 import { DebugPanel } from '@/ui/components/DebugPanel'
 import { TowerPicker } from '@/ui/components/TowerPicker'
+import { audioManager } from '@/game/audio/AudioManager'
+import type { AudioConfig } from '@/game/audio/AudioManager'
 
 const initialTower: TowerType = 'indica'
 
@@ -17,8 +19,20 @@ function App() {
   const [feedback, setFeedback] = useState<string | null>(null)
   const [showHowToPlay, setShowHowToPlay] = useState(false)
   const [quickWaveIndex, setQuickWaveIndex] = useState(0)
+  const [audioConfig, setAudioConfig] = useState<AudioConfig>({
+    masterVolume: 1.0,
+    sfxVolume: 0.8,
+    musicVolume: 0.6,
+    muted: false
+  })
 
   useEffect(() => {
+    const initializeAudio = async () => {
+      await audioManager.initialize()
+      setAudioConfig(audioManager.getConfig())
+    }
+    initializeAudio()
+
     const controller = new GameController()
     controllerRef.current = controller
     const unsubscribe = controller.subscribe(setSnapshot)
@@ -29,6 +43,7 @@ function App() {
     return () => {
       unsubscribe()
       controller.destroy()
+      audioManager.destroy()
     }
   }, [])
 
@@ -71,6 +86,10 @@ function App() {
   const handleStart = () => controllerRef.current?.start()
   const handlePause = () => controllerRef.current?.pause()
   const handleReset = () => controllerRef.current?.reset()
+  const handleSpeedChange = (speed: number) => {
+    controllerRef.current?.setGameSpeed(speed)
+    setFeedback(`Game speed set to ${speed}x`)
+  }
   const handleNextWave = () => {
     const controller = controllerRef.current
     if (!controller) {
@@ -111,6 +130,79 @@ function App() {
     setShowHowToPlay((prev) => !prev)
   }
 
+  // Audio control handlers
+  const handleMasterVolumeChange = (volume: number) => {
+    audioManager.setMasterVolume(volume)
+    setAudioConfig(audioManager.getConfig())
+  }
+
+  const handleSfxVolumeChange = (volume: number) => {
+    audioManager.setSfxVolume(volume)
+    setAudioConfig(audioManager.getConfig())
+  }
+
+  const handleMusicVolumeChange = (volume: number) => {
+    audioManager.setMusicVolume(volume)
+    setAudioConfig(audioManager.getConfig())
+  }
+
+  const handleToggleMute = () => {
+    audioManager.setMuted(!audioConfig.muted)
+    setAudioConfig(audioManager.getConfig())
+  }
+
+  // Keyboard shortcuts and accessibility
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Ignore if typing in input fields
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+        return
+      }
+
+      switch (event.code) {
+        case 'Space':
+          event.preventDefault()
+          if (snapshot?.status === 'running') {
+            handlePause()
+          } else {
+            handleStart()
+          }
+          break
+        case 'KeyR':
+          event.preventDefault()
+          handleReset()
+          break
+        case 'KeyN':
+          event.preventDefault()
+          if (snapshot?.nextWaveAvailable) {
+            handleNextWave()
+          }
+          break
+        case 'Digit1':
+          event.preventDefault()
+          handleSpeedChange(1)
+          break
+        case 'Digit2':
+          event.preventDefault()
+          handleSpeedChange(2)
+          break
+        case 'Digit3':
+          event.preventDefault()
+          handleSpeedChange(4)
+          break
+        case 'Escape':
+          event.preventDefault()
+          // Cancel tower selection (reset to first available tower)
+          handleSelectTower('indica')
+          setFeedback('Tower selection cancelled')
+          break
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [snapshot, handleStart, handlePause, handleReset, handleNextWave, handleSpeedChange])
+
   const handleRetry = () => {
     const controller = controllerRef.current
     if (!controller) {
@@ -142,12 +234,24 @@ function App() {
           onNextWave={handleNextWave}
           onReset={handleReset}
           nextWaveAvailable={snapshot?.nextWaveAvailable ?? false}
+          gameSpeed={snapshot?.gameSpeed ?? 1}
+          onSpeedChange={handleSpeedChange}
+          audioConfig={audioConfig}
+          onMasterVolumeChange={handleMasterVolumeChange}
+          onSfxVolumeChange={handleSfxVolumeChange}
+          onMusicVolumeChange={handleMusicVolumeChange}
+          onToggleMute={handleToggleMute}
         />
       </header>
 
       <main className="main-stage">
         <section className="tower-column">
-          <TowerPicker selected={selectedTower} onSelect={handleSelectTower} feedback={feedback} />
+          <TowerPicker
+            selected={selectedTower}
+            onSelect={handleSelectTower}
+            feedback={feedback}
+            currentMoney={snapshot?.money ?? 0}
+          />
           <DebugPanel
             showRanges={snapshot?.showRanges ?? false}
             showHitboxes={snapshot?.showHitboxes ?? false}
@@ -190,9 +294,27 @@ function App() {
           </div>
           {showHowToPlay && (
             <div className="how-to-panel">
-              <p>– Indica towers hit hard; Sativa towers keep the line clean.</p>
-              <p>– Support towers slow pests so your shooters stay on target.</p>
-              <p>– Money comes from kills, lives drop if pests reach the end.</p>
+              <h4>🎮 How to Play</h4>
+              <div className="how-to-section">
+                <h5>🏗️ Tower Strategy</h5>
+                <p>• <strong>Indica:</strong> Heavy damage, slow fire rate - best for tough enemies</p>
+                <p>• <strong>Sativa:</strong> Fast fire rate, lower damage - keeps enemies at bay</p>
+                <p>• <strong>Support:</strong> Slows enemies down, no direct damage - pairs with shooters</p>
+              </div>
+              <div className="how-to-section">
+                <h5>💰 Economy & Survival</h5>
+                <p>• Earn money by defeating enemies</p>
+                <p>• Lose lives when enemies reach the end</p>
+                <p>• Build strategically before starting waves</p>
+              </div>
+              <div className="how-to-section">
+                <h5>⌨️ Keyboard Shortcuts</h5>
+                <p>• <strong>Space:</strong> Start/Pause game</p>
+                <p>• <strong>1, 2, 3:</strong> Change game speed (1x, 2x, 4x)</p>
+                <p>• <strong>N:</strong> Start next wave</p>
+                <p>• <strong>R:</strong> Reset game</p>
+                <p>• <strong>Esc:</strong> Cancel tower selection</p>
+              </div>
             </div>
           )}
         </div>

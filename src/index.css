@@ -237,6 +237,337 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+  align-items: center;
+}
+
+.controls .game-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.controls .speed-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 1rem;
+  padding-left: 1rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.controls .audio-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 1rem;
+  padding-left: 1rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.audio-toggle {
+  background: rgba(3, 19, 4, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 0.5rem;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.audio-toggle:hover {
+  background: rgba(3, 19, 4, 0.9);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.audio-toggle.muted {
+  opacity: 0.6;
+  border-color: rgba(255, 100, 100, 0.3);
+}
+
+.volume-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.volume-control {
+  display: flex;
+/* Responsive Design Improvements */
+@media (max-width: 1200px) {
+  .app-shell {
+    padding: 1.5rem 1rem 2rem;
+  }
+  
+  .main-stage {
+    grid-template-columns: 280px 1fr;
+    gap: 1rem;
+  }
+  
+  .audio-controls {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .volume-controls {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 992px) {
+  .app-header {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .main-stage {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+  
+  .tower-column {
+    order: 2;
+  }
+  
+  .canvas-wrapper {
+    order: 1;
+  }
+  
+  .canvas-wrapper canvas {
+    height: 60vh;
+  }
+  
+  .controls {
+    justify-content: center;
+  }
+  
+  .controls .speed-controls,
+  .controls .audio-controls {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 0.75rem;
+    margin-top: 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-shell {
+    padding: 1rem 0.75rem 1.5rem;
+  }
+  
+  .tower-column {
+    padding: 0 0.75rem;
+  }
+  
+  .canvas-wrapper {
+    margin: 0 0.75rem;
+    padding: 0.75rem;
+  }
+  
+  .canvas-wrapper canvas {
+    height: 50vh;
+  }
+  
+  .controls .game-controls {
+    justify-content: center;
+  }
+  
+  .volume-controls {
+    justify-content: center;
+  }
+  
+  .volume-control {
+    min-width: 50px;
+  }
+  
+  .volume-control input[type="range"] {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-shell {
+    padding: 0.75rem 0.5rem 1rem;
+  }
+  
+  .tower-column {
+    padding: 0 0.5rem;
+  }
+  
+  .canvas-wrapper {
+    margin: 0 0.5rem;
+    padding: 0.5rem;
+    border-radius: 16px;
+  }
+  
+  .canvas-wrapper canvas {
+    height: 45vh;
+    border-radius: 12px;
+  }
+  
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .controls .game-controls {
+    flex-direction: column;
+  }
+  
+  .controls button {
+    padding: 0.75rem 1rem;
+  }
+  
+  .speed-controls,
+  .audio-controls {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+  
+  .volume-controls {
+    flex-direction: row;
+    justify-content: space-around;
+  }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  .controls button {
+    padding: 0.8rem 1.2rem;
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .audio-toggle {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .volume-control input[type="range"] {
+    height: 44px;
+    width: 80px;
+  }
+  
+  .volume-control input[type="range"]::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* High-DPI display support */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .canvas-wrapper canvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Dark mode enhancements */
+@media (prefers-color-scheme: dark) {
+  :root {
+    background-color: #000000;
+  }
+  
+  body {
+    background: radial-gradient(circle at top, rgba(50, 100, 50, 0.15), transparent 45%), #000000;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .overlay-panel {
+    backdrop-filter: none;
+  }
+}
+
+/* Focus improvements for accessibility */
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #7dd08a;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .controls {
+    border: 1px solid #ffffff;
+  }
+  
+  .audio-toggle {
+    border: 2px solid #ffffff;
+  }
+  
+  .volume-control input[type="range"] {
+    background: #ffffff;
+  }
+}
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 60px;
+}
+
+.volume-control label {
+  font-size: 0.75rem;
+  color: #97a98b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.volume-control input[type="range"] {
+  width: 60px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.volume-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #7dd08a;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.volume-control input[type="range"]::-webkit-slider-thumb:hover {
+  background: #8df7c5;
+  transform: scale(1.1);
+}
+
+.volume-control input[type="range"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.volume-control input[type="range"]:disabled::-webkit-slider-thumb {
+  background: #555;
+  cursor: not-allowed;
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .controls button {

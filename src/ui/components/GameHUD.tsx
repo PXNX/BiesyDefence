@@ -24,37 +24,71 @@ export function GameHUD({ snapshot }: GameHUDProps) {
 
   return (
     <div className="hud">
-      <div className="hud-row">
-        <span>Money</span>
-        <strong>${snapshot.money}</strong>
+      <div className="hud-section primary-stats">
+        <div className="hud-row money-row">
+          <span className="hud-label">💰 Money</span>
+          <strong className="money-amount">${snapshot.money}</strong>
+        </div>
+        <div className="hud-row lives-row">
+          <span className="hud-label">❤️ Lives</span>
+          <strong className="lives-amount">{snapshot.lives}</strong>
+        </div>
       </div>
-      <div className="hud-row">
-        <span>Lives</span>
-        <strong>{snapshot.lives}</strong>
+      
+      <div className="hud-section game-stats">
+        <div className="hud-row wave-row">
+          <span className="hud-label">🌊 Wave</span>
+          <strong>{snapshot.wave.current} / {snapshot.wave.total}</strong>
+          {snapshot.wave.queued > 0 && (
+            <span className="queued-info">{snapshot.wave.queued} pending</span>
+          )}
+        </div>
+        
+        <div className="hud-row speed-row">
+          <span className="hud-label">⚡ Speed</span>
+          <strong>{snapshot.gameSpeed}x</strong>
+        </div>
+        
+        <div className="hud-row performance-row">
+          <span className="hud-label">FPS</span>
+          <strong className={fpsDisplay < 30 ? 'low-fps' : ''}>{fpsDisplay.toFixed(1)}</strong>
+        </div>
       </div>
-      <div className="hud-row">
-        <span>FPS</span>
-        <strong>{fpsDisplay.toFixed(1)}</strong>
+
+      <div className="hud-section status-section">
+        <div className={`status-pill status-${snapshot.status}`}>
+          {snapshot.status === 'running' && '🎮 PLAYING'}
+          {snapshot.status === 'paused' && '⏸️ PAUSED'}
+          {snapshot.status === 'idle' && '⏳ READY'}
+          {snapshot.status === 'won' && '🏆 VICTORY'}
+          {snapshot.status === 'lost' && '💀 DEFEATED'}
+        </div>
+        
+        <div className="wave-phase-indicator">
+          <span className="phase-label">Wave State:</span>
+          <span className={`phase-value phase-${snapshot.wavePhase}`}>
+            {phaseLabels[snapshot.wavePhase]}
+          </span>
+        </div>
       </div>
-      <div className="hud-row">
-        <span>
-          Wave {snapshot.wave.current} / {snapshot.wave.total}
-        </span>
-        <strong>{snapshot.wave.queued} queued</strong>
-      </div>
-      <div className="hud-row">
-        <span>Wave state</span>
-        <strong>{phaseLabels[snapshot.wavePhase]}</strong>
-      </div>
-      <div className={`status-pill status-${snapshot.status}`}>
-        {snapshot.status.toUpperCase()}
-      </div>
-      {snapshot.nextWaveAvailable && <div className="next-wave-ready">Next wave ready</div>}
+
+      {snapshot.nextWaveAvailable && (
+        <div className="next-wave-ready">
+          🚀 Next wave available - Press N or click Next Wave
+        </div>
+      )}
+      
       {snapshot.nextSpawnCountdown !== null && snapshot.nextSpawnDelay !== null && (
         <div className="spawn-ticker">
-          <span>Next spawn in {snapshot.nextSpawnCountdown.toFixed(1)} s</span>
-          <div className="spawn-ticker-bar">
-            <div style={{ width: `${Math.min(Math.max(spawnProgress, 0), 1) * 100}%` }} />
+          <span className="spawn-label">Next enemy in:</span>
+          <div className="spawn-timer">
+            <span className="spawn-countdown">{snapshot.nextSpawnCountdown.toFixed(1)}s</span>
+            <div className="spawn-ticker-bar">
+              <div
+                className="spawn-progress"
+                style={{ width: `${Math.min(Math.max(spawnProgress, 0), 1) * 100}%` }}
+              />
+            </div>
           </div>
         </div>
       )}

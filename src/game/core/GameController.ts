@@ -39,6 +39,7 @@ export class GameController {
   private hoverState: CanvasHighlight | null = null
   private lastHoverWorld: Vector2 | null = null
   private previewTowerType: TowerType = 'indica'
+  private gameSpeed: number = 1
   private debugSettings = {
     showRanges: false,
     showHitboxes: false,
@@ -46,9 +47,49 @@ export class GameController {
   private fps = 0
   private fpsAccumulator = 0
   private fpsFrames = 0
+  // Focus management
+  private isWindowFocused = true
+  // Notification debouncing
+  private lastNotificationTime = 0
+  private readonly notificationThrottleMs = 33 // ~30 FPS for UI updates
+  // Delta clamping for spiral of death prevention
+  private readonly maxDeltaMs = 250 // Maximum delta time to prevent spiral
+  private readonly fixedStep = 1000 / 60
 
   constructor() {
     this.state = createInitialState()
+    // Add window focus handling
+    this.setupWindowFocusHandlers()
+  }
+
+  private setupWindowFocusHandlers() {
+    // Handle window blur/focus events
+    window.addEventListener('blur', () => {
+      this.isWindowFocused = false
+      if (this.running && this.state.status === 'running') {
+        this.pause()
+      }
+    })
+
+    window.addEventListener('focus', () => {
+      this.isWindowFocused = true
+      // Optionally resume automatically (comment out if manual resume preferred)
+      // if (this.state.status === 'paused') {
+      //   this.start()
+      // }
+    })
+
+    // Handle visibility change for additional browser compatibility
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        this.isWindowFocused = false
+        if (this.running && this.state.status === 'running') {
+          this.pause()
+        }
+      } else {
+        this.isWindowFocused = true
+      }
+    })
   }
 
   public subscribe(callback: (snapshot: GameSnapshot) => void) {
@@ -125,6 +166,11 @@ export class GameController {
     } else {
       this.render()
     }
+  }
+
+  public setGameSpeed(speed: number) {
+    this.gameSpeed = Math.max(0.25, Math.min(8, speed)) // Clamp between 0.25x and 8x
+    this.notify()
   }
 
   public updateHover(screenX: number, screenY: number) {
@@ -223,8 +269,6 @@ export class GameController {
     this.render()
   }
 
-  private readonly fixedStep = 1000 / 60
-
   private loop = (timestamp: number) => {
     if (!this.running) {
       return
@@ -234,14 +278,28 @@ export class GameController {
       return
     }
 
-    const delta = timestamp - this.lastTimestamp
+    // Delta clamping to prevent spiral of death
+    let delta = timestamp - this.lastTimestamp
     this.lastTimestamp = timestamp
+    
+    // Clamp delta to prevent excessive accumulation during tab switches or performance drops
+    delta = Math.min(delta, this.maxDeltaMs)
+    
     this.accumulator += delta
     this.updateFps(delta)
 
-    while (this.accumulator >= this.fixedStep) {
+    // Fixed-step update loop with safety check
+    let iterations = 0
+    const maxIterations = 10 // Prevent infinite loops
+    while (this.accumulator >= this.fixedStep && iterations < maxIterations) {
       this.fixedUpdate(this.fixedStep)
       this.accumulator -= this.fixedStep
+      iterations++
+    }
+
+    // Optional: Handle remaining accumulated time (can cause visual stuttering but prevents spiraling)
+    if (iterations >= maxIterations) {
+      this.accumulator = 0 // Drop excess accumulated time
     }
 
     this.render()
@@ -254,7 +312,7 @@ export class GameController {
       return
     }
 
-    const deltaSeconds = deltaMs / 1000
+    const deltaSeconds = (deltaMs / 1000) * this.gameSpeed
     updateWaves(this.state, deltaSeconds)
     updateEnemies(this.state, deltaSeconds)
     updateTowers(this.state, deltaSeconds)
@@ -340,8 +398,16 @@ export class GameController {
   }
 
   private notify() {
+    const currentTime = performance.now()
+    
+    // Throttle notifications to reduce excessive React re-renders
+    if (currentTime - this.lastNotificationTime < this.notificationThrottleMs) {
+      return
+    }
+    
     const snapshot = this.createSnapshot()
     this.subscribers.forEach((callback) => callback(snapshot))
+    this.lastNotificationTime = currentTime
   }
 
   private createSnapshot(): GameSnapshot {
@@ -379,6 +445,7 @@ export class GameController {
       fps: fpsValue,
       showRanges: this.debugSettings.showRanges,
       showHitboxes: this.debugSettings.showHitboxes,
+      gameSpeed: this.gameSpeed,
     }
   }
 

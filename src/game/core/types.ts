@@ -28,6 +28,27 @@ export interface MapData {
 
 export type TowerType = 'indica' | 'sativa' | 'support'
 export type EnemyType = 'pest' | 'runner'
+// Chapter 2 Balance: Future enemy types for extended gameplay
+// armored_pest: resistant to Sativa, requires Indica for optimal efficiency
+// swift_runner: resistant to Support slow, high reward, tests economic management
+export type FutureEnemyType = EnemyType | 'armored_pest' | 'swift_runner'
+export type EnemyTypeWithFuture = EnemyType | FutureEnemyType
+
+// Chapter 2 Balance: Tower upgrade system preparation (levels 1-3)
+export interface TowerUpgrade {
+  level: 1 | 2 | 3
+  cost: number
+  statMultiplier: number // Applied to damage, range, fireRate
+  description: string
+}
+
+// TODO: Implement tower upgrade mechanics
+export interface TowerUpgradeSystem {
+  canUpgrade: boolean
+  upgradeCost: number
+  currentLevel: 1 | 2 | 3
+  nextLevel: 1 | 2 | 3 | null
+}
 
 export interface EnemyStats {
   speed: number
@@ -50,6 +71,13 @@ export interface Enemy {
   reachedGoal: boolean
   rewardClaimed: boolean
   speedMultiplier: number
+  // TODO: Chapter 2 Balance - Support tower slow effect system
+  slowEffects: {
+    duration: number
+    remainingTime: number
+    multiplier: number
+    appliedBy: string // tower id
+  }[]
 }
 
 export interface Tower {
@@ -140,6 +168,7 @@ export interface GameSnapshot {
   fps: number
   showRanges: boolean
   showHitboxes: boolean
+  gameSpeed: number
 }
 
 export interface ViewportSize {

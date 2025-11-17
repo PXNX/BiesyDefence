@@ -13,6 +13,7 @@ import {
   INITIAL_LIVES,
   INITIAL_MONEY,
   PATH_GRID_NODES,
+  MapManager,
 } from '@/game/config/constants'
 import { WAVE_SCHEDULES } from '@/game/config/waves'
 
@@ -87,7 +88,53 @@ const buildWaves = (): Wave[] => {
   }))
 }
 
-export const createInitialState = (): GameState => {
+// Chapter 6 Future Expansion: Enhanced state creation with map and difficulty support
+export const createInitialState = (options?: {
+  mapId?: string
+  difficulty?: 'easy' | 'normal' | 'hard'
+  useNewSystem?: boolean
+}): GameState => {
+  const mapManager = MapManager.getInstance()
+  
+  // Use new map system if requested or if mapId/difficulty specified
+  if (options?.useNewSystem || options?.mapId || options?.difficulty) {
+    const mapId = options.mapId || 'default'
+    const difficulty = options.difficulty || 'normal'
+    
+    try {
+      // Load map using new system
+      const mapData = mapManager.loadMap(mapId, difficulty)
+      const difficultyConfig = mapManager.getCurrentDifficultyConfig()
+      
+      // Apply difficulty modifiers
+      const initialResources = mapManager.applyDifficultyModifiers({
+        initialMoney: INITIAL_MONEY,
+        initialLives: difficultyConfig.initialLives,
+      })
+      
+      return {
+        map: mapData,
+        path: mapData.pathNodes.map(gridToWorld),
+        enemies: [],
+        towers: [],
+        projectiles: [],
+        resources: {
+          money: initialResources.initialMoney,
+          lives: initialResources.initialLives,
+        },
+        waves: buildWaves(),
+        currentWaveIndex: 0,
+        status: 'idle',
+        wavePhase: 'idle',
+        particles: [],
+      }
+    } catch (error) {
+      console.warn(`Failed to load map '${mapId}', falling back to default:`, error)
+      // Fall back to legacy system
+    }
+  }
+  
+  // Legacy system (backward compatibility)
   const pathNodes = PATH_GRID_NODES.map(gridToWorld)
   return {
     map: buildMap(pathNodes),
@@ -105,4 +152,33 @@ export const createInitialState = (): GameState => {
     wavePhase: 'idle',
     particles: [],
   }
+}
+
+// Chapter 6 Future Expansion: Enhanced state creation with progress integration
+export const createProgressAwareState = (playerProgress?: {
+  preferredDifficulty?: 'easy' | 'normal' | 'hard'
+  unlockedMaps?: string[]
+}): GameState => {
+  const mapManager = MapManager.getInstance()
+  
+  // Determine map and difficulty from progress
+  const preferredDifficulty = playerProgress?.preferredDifficulty || 'normal'
+  const unlockedMaps = playerProgress?.unlockedMaps || ['default']
+  const selectedMap = unlockedMaps[0] || 'default'
+  
+  return createInitialState({
+    mapId: selectedMap,
+    difficulty: preferredDifficulty,
+    useNewSystem: true,
+  })
+}
+
+// Chapter 6 Future Expansion: Difficulty-aware resource adjustment
+export const adjustResourcesForDifficulty = (
+  baseResources: { money: number; lives: number },
+  difficulty: 'easy' | 'normal' | 'hard'
+): { money: number; lives: number } => {
+  const mapManager = MapManager.getInstance()
+  mapManager.setDifficulty(difficulty)
+  return mapManager.applyDifficultyModifiers(baseResources)
 }

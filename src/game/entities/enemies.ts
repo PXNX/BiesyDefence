@@ -20,6 +20,30 @@ export const ENEMY_PROFILES: Record<EnemyType, EnemyStats> = {
   },
 }
 
+// TODO: Chapter 2 Balance - Future enemy types for extended gameplay
+// armored_pest: High health (80), low speed (70), resistant to Sativa towers
+// swift_runner: Very high speed (200), medium health (25), resistant to Support slow
+export const FUTURE_ENEMY_PROFILES: Record<Exclude<FutureEnemyType, EnemyType>, EnemyStats> = {
+  // TODO: Implement armored_pest profile
+  armored_pest: {
+    speed: 70,
+    health: 80,
+    reward: 20,
+    damageToLives: 1,
+    color: '#8b5a2b', // Brown
+    radius: 10,
+  },
+  // TODO: Implement swift_runner profile
+  swift_runner: {
+    speed: 200,
+    health: 25,
+    reward: 22,
+    damageToLives: 1,
+    color: '#00bfff', // Deep sky blue
+    radius: 7,
+  },
+}
+
 export const createEnemy = (type: EnemyType, spawnPosition: Vector2): Enemy => {
   const stats = ENEMY_PROFILES[type]
   return {
@@ -34,5 +58,7 @@ export const createEnemy = (type: EnemyType, spawnPosition: Vector2): Enemy => {
     reachedGoal: false,
     rewardClaimed: false,
     speedMultiplier: 1,
+    // Chapter 2 Balance: Initialize support tower slow effects array
+    slowEffects: [],
   }
 }
