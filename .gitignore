@@ -94,3 +94,114 @@ public
 # Temporary folders
 tmp/
 temp/
+
+# AI Assistant Files (All Variants)
+.roo/
+AGENTS.md
+*.agent.md
+agents.md
+AGENT_GUIDE.md
+CODE_ASSISTANT.md
+AI_ASSISTANT.md
+.claude/
+.cursor/
+.github/copilot/
+.github/ai/
+.vscode/cursor/
+.vscode/claude/
+.vscode/copilot/
+
+# Additional AI Assistant Patterns
+**/.roo/
+**/AGENTS.md
+**/*.agent.md
+**/agents.md
+**/AGENT_GUIDE.md
+**/CODE_ASSISTANT.md
+**/AI_ASSISTANT.md
+
+# Additional Node.js artifacts
+.fuse_hidden*
+*.swp
+*.swo
+*~
+
+# Editor backup files
+BACKUP*/
+*.orig
+
+# Local development
+.cache/
+.vercel
+.netlify
+
+# Additional Frameworks & Tools
+.expo/
+.flutter/
+.astro/
+.svelte-kit/
+.vitepress/cache
+.vuepress/cache
+.docus/docs/.vite
+.hydrogen/cache
+.remix/
+.solid/
+.svelte/
+.11ty/
+.eleventy/
+.jekyll-cache/
+.lektor/
+.mkdocs/
+.sphinx/
+.hugo/
+.jekyll/
+.gitbook/
+.docusaurus/
+.vitest/
+
+# Security & Secrets
+.env.local.backup
+.env.production.backup
+.env.staging.backup
+.env.development.backup
+.secrets/
+.credentials/
+.keys/
+.certificates/
+.ssl/
+.p12
+.pfx
+.pem
+.key
+.csr
+.crt
+.openssl/
+
+# Testing & Coverage
+.nyc_output/
+.coverage/
+.c8/
+.playwright/
+.cypress/
+.testcafe/
+.k6/
+.artillery/
+.locust/
+.jmeter/
+.postman/
+.insomnia/
+.burp/
+.zap/
+
+# Performance & Monitoring
+.lighthouse/
+.webpack/
+.esbuild/
+.rollup/
+.parcel/
+.terser/
+.uglify/
+.minified/
+.bundled/
+.bundle-report/
+.sourcemaps/

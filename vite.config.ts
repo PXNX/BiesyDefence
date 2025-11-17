@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import legacy from '@vitejs/plugin-legacy'
+import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 
 export default defineConfig({
@@ -18,12 +19,10 @@ export default defineConfig({
     },
   },
   plugins: [
+    react(),
     legacy({
       targets: ['defaults', 'not IE 11'],
       additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
     }),
   ],
-  optimizeDeps: {
-    include: ['three'],
-  },
 })
