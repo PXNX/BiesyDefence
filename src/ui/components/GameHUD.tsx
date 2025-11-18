@@ -2,7 +2,6 @@ import type { GameSnapshot } from '@/game/core/types'
 
 interface GameHUDProps {
   snapshot: GameSnapshot | null
-  onRequestReset: () => void
 }
 
 const phaseLabels: Record<GameSnapshot['wavePhase'], string> = {
@@ -26,7 +25,7 @@ function HudLabel({ iconClass, label }: HudLabelProps) {
   )
 }
 
-export function GameHUD({ snapshot, onRequestReset }: GameHUDProps) {
+export function GameHUD({ snapshot }: GameHUDProps) {
   if (!snapshot) {
     const skeletonWidths = [90, 68, 76, 52]
     return (
@@ -133,7 +132,6 @@ export function GameHUD({ snapshot, onRequestReset }: GameHUDProps) {
             🚀 Next wave available - Press N or click Next Wave
           </div>
         )}
-        
         {safeSnapshot.nextSpawnCountdown !== null && safeSnapshot.nextSpawnDelay !== null && (
           <div className="spawn-ticker">
             <span className="spawn-label">Next enemy in:</span>
@@ -150,55 +148,7 @@ export function GameHUD({ snapshot, onRequestReset }: GameHUDProps) {
         )}
       </div>
 
-      {/* Game Over Overlay */}
-      {safeSnapshot.status === 'lost' && (
-        <div className="game-overlay game-over-overlay">
-          <div className="overlay-content">
-            <h2 className="overlay-title">💀 Game Over</h2>
-            <p className="overlay-message">All lives have been lost!</p>
-            <div className="overlay-stats">
-              <div className="stat-row">
-                <span>Final Score:</span>
-                <strong>{safeSnapshot.score.toLocaleString()}</strong>
-              </div>
-              <div className="stat-row">
-                <span>Waves Completed:</span>
-                <strong>{safeSnapshot.wave.current - 1}</strong>
-              </div>
-            </div>
-            <button className="overlay-button retry-button" onClick={onRequestReset}>
-              🔄 Try Again
-            </button>
-          </div>
-        </div>
-      )}
-      
-      {/* Victory Overlay */}
-      {safeSnapshot.status === 'won' && (
-        <div className="game-overlay victory-overlay">
-          <div className="overlay-content">
-            <h2 className="overlay-title">🏆 Victory!</h2>
-            <p className="overlay-message">All waves have been defeated!</p>
-            <div className="overlay-stats">
-              <div className="stat-row">
-                <span>Final Score:</span>
-                <strong>{safeSnapshot.score.toLocaleString()}</strong>
-              </div>
-              <div className="stat-row">
-                <span>Lives Remaining:</span>
-                <strong>{safeSnapshot.lives}</strong>
-              </div>
-              <div className="stat-row">
-                <span>Waves Completed:</span>
-                <strong>{safeSnapshot.wave.current}</strong>
-              </div>
-            </div>
-            <button className="overlay-button victory-button" onClick={onRequestReset}>
-              🎮 Play Again
-            </button>
-          </div>
-        </div>
-      )}
     </>
   )
 }
+

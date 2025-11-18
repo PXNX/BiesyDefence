@@ -1,4 +1,5 @@
-import type { ChangeEvent } from 'react'
+import { useState } from 'react'
+import type { ChangeEvent, CSSProperties } from 'react'
 import type { GameStatus } from '@/game/core/types'
 import type { AudioConfig } from '@/game/audio/AudioManager'
 
@@ -16,6 +17,7 @@ interface GameControlsProps {
   onSfxVolumeChange: (volume: number) => void
   onMusicVolumeChange: (volume: number) => void
   onToggleMute: () => void
+  isBusy: boolean
 }
 
 interface VolumeSliderProps {
@@ -35,6 +37,22 @@ function VolumeSlider({
   ariaLabel,
   onChange,
 }: VolumeSliderProps) {
+  const [isAdjusting, setIsAdjusting] = useState(false)
+
+  const sliderStyle = {
+    '--volume-level': `${value * 100}%`,
+  } as CSSProperties
+
+  const beginAdjusting = () => {
+    if (!disabled) {
+      setIsAdjusting(true)
+    }
+  }
+
+  const endAdjusting = () => {
+    setIsAdjusting(false)
+  }
+
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     onChange(parseFloat(event.target.value))
   }
@@ -53,6 +71,14 @@ function VolumeSlider({
           onChange={handleChange}
           disabled={disabled}
           aria-label={ariaLabel}
+          onMouseDown={beginAdjusting}
+          onMouseUp={endAdjusting}
+          onTouchStart={beginAdjusting}
+          onTouchEnd={endAdjusting}
+          onFocus={beginAdjusting}
+          onBlur={endAdjusting}
+          data-adjusting={isAdjusting}
+          style={sliderStyle}
         />
         <span className="volume-value" aria-live="polite">
           {Math.round(value * 100)}%
@@ -76,29 +102,47 @@ export function GameControls({
   onSfxVolumeChange,
   onMusicVolumeChange,
   onToggleMute,
+  isBusy,
 }: GameControlsProps) {
   const canStart = status !== 'running'
   const startLabel = status === 'lost' || status === 'won' ? 'Restart Game' : 'Start / Resume'
 
   const speedOptions = [1, 2, 4]
+  const shouldDisableActions = isBusy
 
   return (
-    <div className="controls">
+    <div className="controls" aria-busy={isBusy}>
       <div className="game-controls">
-        <button className="primary" onClick={onStart} disabled={!canStart}>
+        <button
+          className="primary"
+          onClick={onStart}
+          disabled={!canStart || shouldDisableActions}
+        >
           {startLabel}
         </button>
-        <button className="secondary" onClick={onPause} disabled={status !== 'running'}>
+        <button
+          className="secondary"
+          onClick={onPause}
+          disabled={status !== 'running' || shouldDisableActions}
+        >
           Pause
         </button>
-        <button className="secondary" onClick={onNextWave} disabled={!nextWaveAvailable}>
+        <button
+          className="secondary"
+          onClick={onNextWave}
+          disabled={!nextWaveAvailable || shouldDisableActions}
+        >
           Next Wave
         </button>
-        <button className="ghost" onClick={onReset}>
+        <button className="ghost" onClick={onReset} disabled={shouldDisableActions}>
           Reset
         </button>
       </div>
-      
+      {isBusy && (
+        <p className="controls-busy" role="status" aria-live="polite">
+          Updating prototype state...
+        </p>
+      )}
       <div className="speed-controls" role="group" aria-label="Game speed controls">
         <span className="speed-label">Speed:</span>
         {speedOptions.map((speed) => (
@@ -108,6 +152,7 @@ export function GameControls({
             onClick={() => onSpeedChange(speed)}
             aria-pressed={gameSpeed === speed}
             aria-label={`Set game speed to ${speed}x`}
+            disabled={shouldDisableActions}
           >
             {speed}x
           </button>
@@ -120,39 +165,39 @@ export function GameControls({
             className={`audio-toggle ${audioConfig.muted ? 'muted' : ''}`}
             onClick={onToggleMute}
             aria-label={audioConfig.muted ? 'Unmute audio' : 'Mute audio'}
+            disabled={isBusy}
           >
             {audioConfig.muted ? '🔇' : '🔊'}
           </button>
         </div>
-        
-      <div className="volume-controls">
-        <VolumeSlider
-          id="master-volume"
-          label="Master"
-          value={audioConfig.masterVolume}
-          onChange={onMasterVolumeChange}
-          disabled={audioConfig.muted}
-          ariaLabel="Master volume"
-        />
+        <div className="volume-controls">
+          <VolumeSlider
+            id="master-volume"
+            label="Master"
+            value={audioConfig.masterVolume}
+            onChange={onMasterVolumeChange}
+            disabled={audioConfig.muted || isBusy}
+            ariaLabel="Master volume"
+          />
 
-        <VolumeSlider
-          id="sfx-volume"
-          label="SFX"
-          value={audioConfig.sfxVolume}
-          onChange={onSfxVolumeChange}
-          disabled={audioConfig.muted}
-          ariaLabel="Sound effects volume"
-        />
+          <VolumeSlider
+            id="sfx-volume"
+            label="SFX"
+            value={audioConfig.sfxVolume}
+            onChange={onSfxVolumeChange}
+            disabled={audioConfig.muted || isBusy}
+            ariaLabel="Sound effects volume"
+          />
 
-        <VolumeSlider
-          id="music-volume"
-          label="Music"
-          value={audioConfig.musicVolume}
-          onChange={onMusicVolumeChange}
-          disabled={audioConfig.muted}
-          ariaLabel="Music volume"
-        />
-      </div>
+          <VolumeSlider
+            id="music-volume"
+            label="Music"
+            value={audioConfig.musicVolume}
+            onChange={onMusicVolumeChange}
+            disabled={audioConfig.muted || isBusy}
+            ariaLabel="Music volume"
+          />
+        </div>
       </div>
     </div>
   )

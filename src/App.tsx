@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 import { GameController } from '@/game/core/GameController'
-import type { GameSnapshot, TowerType } from '@/game/core/types'
+import type { GameSnapshot, GameStatus, TowerType } from '@/game/core/types'
 import { GameControls } from '@/ui/components/GameControls'
 import { GameHUD } from '@/ui/components/GameHUD'
 import { DebugPanel } from '@/ui/components/DebugPanel'
@@ -11,6 +11,8 @@ import type { AudioConfig } from '@/game/audio/AudioManager'
 import { ErrorBoundary } from '@/ui/components/ErrorBoundary'
 
 const initialTower: TowerType = 'indica'
+
+type AppPhase = 'loading' | 'idle' | 'playing' | 'gameover' | 'resetting'
 
 function App() {
   const controllerRef = useRef<GameController | null>(null)
@@ -29,6 +31,12 @@ function App() {
     muted: false
   })
   const [isAudioReady, setIsAudioReady] = useState(false)
+  const snapshotStatus = snapshot?.status
+  const [appPhase, setAppPhase] = useState<AppPhase>('loading')
+  const [resetPending, setResetPending] = useState(false)
+  const [liveAnnouncement, setLiveAnnouncement] = useState<string | null>(null)
+  const prevStatusRef = useRef<GameStatus | null>(null)
+  const announcementTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
     const initializeAudio = async () => {
@@ -77,6 +85,95 @@ function App() {
     controllerRef.current?.setPreviewTowerType(selectedTower)
   }, [selectedTower])
 
+  useEffect(() => {
+    if (!snapshotStatus || !isAudioReady) {
+      setAppPhase('loading')
+      return
+    }
+
+    if (resetPending) {
+      setAppPhase('resetting')
+      return
+    }
+
+    if (snapshotStatus === 'won' || snapshotStatus === 'lost') {
+      setAppPhase('gameover')
+      return
+    }
+
+    if (snapshotStatus === 'running' || snapshotStatus === 'paused') {
+      setAppPhase('playing')
+      return
+    }
+
+    setAppPhase('idle')
+  }, [snapshotStatus, isAudioReady, resetPending])
+
+  useEffect(() => {
+    if (!resetPending || !snapshotStatus) {
+      return
+    }
+
+    if (snapshotStatus === 'idle' || snapshotStatus === 'running') {
+      setResetPending(false)
+    }
+  }, [resetPending, snapshotStatus])
+
+  useEffect(() => {
+    if (!snapshot) {
+      prevStatusRef.current = null
+      setLiveAnnouncement(null)
+      return
+    }
+
+    const previousStatus = prevStatusRef.current
+    const currentStatus = snapshot.status
+
+    if (previousStatus === currentStatus) {
+      return
+    }
+
+    prevStatusRef.current = currentStatus
+
+    let message: string | null = null
+    if (currentStatus === 'won') {
+      message = 'Victory! The prototype loop is cleared.'
+    } else if (currentStatus === 'lost') {
+      message = 'Game over! Reset to defend again.'
+    } else if (currentStatus === 'running' && previousStatus !== 'running') {
+      message = `Wave ${snapshot.wave.current} launched.`
+    }
+
+    if (!message) {
+      return
+    }
+
+    setLiveAnnouncement(message)
+    if (announcementTimerRef.current) {
+      window.clearTimeout(announcementTimerRef.current)
+    }
+
+    announcementTimerRef.current = window.setTimeout(() => {
+      setLiveAnnouncement(null)
+      announcementTimerRef.current = null
+    }, 4000)
+
+    return () => {
+      if (announcementTimerRef.current) {
+        window.clearTimeout(announcementTimerRef.current)
+        announcementTimerRef.current = null
+      }
+    }
+  }, [snapshot])
+
+  useEffect(() => {
+    return () => {
+      if (announcementTimerRef.current) {
+        window.clearTimeout(announcementTimerRef.current)
+      }
+    }
+  }, [])
+
   const handleCanvasClick = (event: MouseEvent<HTMLCanvasElement>) => {
     const controller = controllerRef.current
     if (!controller) {
@@ -102,7 +199,11 @@ function App() {
 
   const handleStart = useCallback(() => controllerRef.current?.start(), [])
   const handlePause = useCallback(() => controllerRef.current?.pause(), [])
-  const handleReset = useCallback(() => controllerRef.current?.resetGame(), [])
+  const handleReset = useCallback(() => {
+    setResetPending(true)
+    setAppPhase('resetting')
+    controllerRef.current?.resetGame()
+  }, [setResetPending, setAppPhase])
   const handleSpeedChange = useCallback(
     (speed: number) => {
       controllerRef.current?.setGameSpeed(speed)
@@ -171,6 +272,20 @@ function App() {
     setAudioConfig(audioManager.getConfig())
   }
 
+  const handleRetry = useCallback(() => {
+    const controller = controllerRef.current
+    if (!controller) {
+      return
+    }
+
+    setResetPending(true)
+    setAppPhase('resetting')
+
+    controller.resetGame()
+    controller.start()
+    setFeedback('Resetting the loop...')
+  }, [setFeedback, setAppPhase, setResetPending])
+
   // Keyboard shortcuts and accessibility
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -212,31 +327,42 @@ function App() {
           break
         case 'Escape':
           event.preventDefault()
-          // Cancel tower selection (reset to first available tower)
-          handleSelectTower('indica')
-          setFeedback('Tower selection cancelled')
+          if (showGameOverOverlay) {
+            handleRetry()
+          } else {
+            // Cancel tower selection (reset to first available tower)
+            handleSelectTower('indica')
+            setFeedback('Tower selection cancelled')
+          }
           break
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [snapshot, handleStart, handlePause, handleReset, handleNextWave, handleSpeedChange])
+  }, [
+    snapshot,
+    handleStart,
+    handlePause,
+    handleReset,
+    handleNextWave,
+    handleSpeedChange,
+    handleRetry,
+    showGameOverOverlay,
+  ])
 
-  const handleRetry = useCallback(() => {
-    const controller = controllerRef.current
-    if (!controller) {
-      return
-    }
-
-    controller.resetGame()
-    controller.start()
-    setFeedback('Resetting the loop...')
-  }, [setFeedback])
-
-  const showStartOverlay = snapshot?.status === 'idle'
+  const showStartOverlay = snapshotStatus === 'idle' && appPhase === 'idle'
   const showGameOverOverlay =
     snapshot?.status === 'won' || snapshot?.status === 'lost'
+  const isAppBusy = appPhase === 'loading' || appPhase === 'resetting'
+  const canvasStatusMessage = !isAudioReady
+    ? 'Loading audio...'
+    : appPhase === 'resetting'
+    ? 'Resetting the prototype...'
+    : !snapshot
+    ? 'Preparing the battle map...'
+    : undefined
+  const isCanvasBusy = Boolean(canvasStatusMessage)
 
   useEffect(() => {
     const activeOverlay = showStartOverlay
@@ -288,13 +414,16 @@ function App() {
   return (
     <ErrorBoundary onReset={handleRetry}>
       <div className="app-shell">
+        <div className="sr-live" role="status" aria-live="polite" aria-atomic="true">
+          {liveAnnouncement ?? ''}
+        </div>
       <header className="app-header">
         <div>
           <p className="eyebrow">Cannabis Cultivation Defense</p>
           <h1>Phased Bio-Defense</h1>
           <p className="subtitle">Alpha prototype - Phase 1+2 build</p>
         </div>
-        <GameHUD snapshot={snapshot} onRequestReset={handleRetry} />
+        <GameHUD snapshot={snapshot} />
         <GameControls
           status={snapshot?.status ?? 'idle'}
           onStart={handleStart}
@@ -304,6 +433,7 @@ function App() {
           nextWaveAvailable={snapshot?.nextWaveAvailable ?? false}
           gameSpeed={snapshot?.gameSpeed ?? 1}
           onSpeedChange={handleSpeedChange}
+          isBusy={isAppBusy}
           audioConfig={audioConfig}
           onMasterVolumeChange={handleMasterVolumeChange}
           onSfxVolumeChange={handleSfxVolumeChange}
@@ -334,11 +464,11 @@ function App() {
           />
         </section>
 
-      <section className="canvas-wrapper" aria-busy={!isAudioReady}>
-        {!isAudioReady && (
+      <section className="canvas-wrapper" aria-busy={isCanvasBusy}>
+        {canvasStatusMessage && (
           <div className="canvas-loading" role="status" aria-live="polite">
             <span className="spinner" aria-hidden="true" />
-            <span>Loading audio...</span>
+            <span>{canvasStatusMessage}</span>
           </div>
         )}
         <canvas
