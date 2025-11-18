@@ -64,11 +64,17 @@ export class GameController {
   private lastKnownWaveIndex = -1
   private lastKnownStatus: GameStatus = 'idle'
   private enemyPositionCache = new Map<string, { x: number; y: number; isDead: boolean }>()
+  private boundCanvasClick: (event: MouseEvent) => void
+  private boundMouseMove: (event: MouseEvent) => void
+  private boundMouseLeave: () => void
 
   constructor() {
     this.state = createInitialState()
     // Add window focus handling
     this.setupWindowFocusHandlers()
+    this.boundCanvasClick = this.handleCanvasClick.bind(this)
+    this.boundMouseMove = this.handleMouseMove.bind(this)
+    this.boundMouseLeave = this.handleMouseLeave.bind(this)
   }
 
   private setupWindowFocusHandlers() {
@@ -110,6 +116,12 @@ export class GameController {
   }
 
   public setCanvas(canvas: HTMLCanvasElement) {
+    if (this.canvas) {
+      this.canvas.removeEventListener('click', this.boundCanvasClick)
+      this.canvas.removeEventListener('mousemove', this.boundMouseMove)
+      this.canvas.removeEventListener('mouseleave', this.boundMouseLeave)
+    }
+
     this.canvas = canvas
     this.context = canvas.getContext('2d') ?? undefined
     if (!this.context) {
@@ -123,9 +135,9 @@ export class GameController {
     this.render()
 
     // Tower placement mouse events
-    this.canvas!.addEventListener('click', this.handleCanvasClick.bind(this))
-    this.canvas!.addEventListener('mousemove', this.handleMouseMove.bind(this))
-    this.canvas!.addEventListener('mouseleave', this.handleMouseLeave.bind(this))
+    this.canvas.addEventListener('click', this.boundCanvasClick)
+    this.canvas.addEventListener('mousemove', this.boundMouseMove)
+    this.canvas.addEventListener('mouseleave', this.boundMouseLeave)
   }
 
   public start() {
@@ -162,6 +174,11 @@ export class GameController {
   public destroy() {
     this.stopLoop()
     window.removeEventListener('resize', this.resizeCanvas)
+    if (this.canvas) {
+      this.canvas.removeEventListener('click', this.boundCanvasClick)
+      this.canvas.removeEventListener('mousemove', this.boundMouseMove)
+      this.canvas.removeEventListener('mouseleave', this.boundMouseLeave)
+    }
     this.context = undefined
     this.canvas = undefined
   }
@@ -1095,8 +1112,12 @@ export class GameController {
   }
 
   private handleCanvasClick(e: MouseEvent): void {
+    if (!this.canvas) {
+      return
+    }
+
     e.preventDefault()
-    const rect = this.canvas!.getBoundingClientRect()
+    const rect = this.canvas.getBoundingClientRect()
     const screenX = e.clientX - rect.left
     const screenY = e.clientY - rect.top
     this.onCanvasClick(screenX, screenY)
@@ -1108,7 +1129,11 @@ export class GameController {
   }
 
   private handleMouseMove(e: MouseEvent): void {
-    const rect = this.canvas!.getBoundingClientRect()
+    if (!this.canvas) {
+      return
+    }
+
+    const rect = this.canvas.getBoundingClientRect()
     const screenX = e.clientX - rect.left
     const screenY = e.clientY - rect.top
     this.updateHover(screenX, screenY)

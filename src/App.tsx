@@ -31,6 +31,7 @@ function App() {
     muted: false
   })
   const [isAudioReady, setIsAudioReady] = useState(false)
+  const [audioContextUnlocked, setAudioContextUnlocked] = useState(false)
   const snapshotStatus = snapshot?.status
   const [appPhase, setAppPhase] = useState<AppPhase>('loading')
   const [resetPending, setResetPending] = useState(false)
@@ -59,6 +60,19 @@ function App() {
       audioManager.destroy()
     }
   }, [])
+
+  const unlockAudioContext = useCallback(async () => {
+    if (audioContextUnlocked) {
+      return
+    }
+
+    try {
+      await audioManager.resumeOnGesture()
+      setAudioContextUnlocked(true)
+    } catch (error) {
+      console.warn('Audio context resume failed', error)
+    }
+  }, [audioContextUnlocked])
 
   useEffect(() => {
     if (!snapshot) {
@@ -175,6 +189,7 @@ function App() {
   }, [])
 
   const handleCanvasClick = (event: MouseEvent<HTMLCanvasElement>) => {
+    void unlockAudioContext()
     const controller = controllerRef.current
     if (!controller) {
       return
@@ -197,13 +212,17 @@ function App() {
     setFeedback(null)
   }
 
-  const handleStart = useCallback(() => controllerRef.current?.start(), [])
+  const handleStart = useCallback(async () => {
+    await unlockAudioContext()
+    controllerRef.current?.start()
+  }, [unlockAudioContext])
   const handlePause = useCallback(() => controllerRef.current?.pause(), [])
-  const handleReset = useCallback(() => {
+  const handleReset = useCallback(async () => {
+    await unlockAudioContext()
     setResetPending(true)
     setAppPhase('resetting')
     controllerRef.current?.resetGame()
-  }, [setResetPending, setAppPhase])
+  }, [setResetPending, setAppPhase, unlockAudioContext])
   const handleSpeedChange = useCallback(
     (speed: number) => {
       controllerRef.current?.setGameSpeed(speed)
@@ -211,7 +230,8 @@ function App() {
     },
     [setFeedback]
   )
-  const handleNextWave = useCallback(() => {
+  const handleNextWave = useCallback(async () => {
+    await unlockAudioContext()
     const controller = controllerRef.current
     if (!controller) {
       return
@@ -223,7 +243,7 @@ function App() {
     } else {
       setFeedback('Wave not ready yet.')
     }
-  }, [setFeedback])
+  }, [setFeedback, unlockAudioContext])
 
   const handleToggleRanges = () => {
     controllerRef.current?.toggleShowRanges()
@@ -238,6 +258,7 @@ function App() {
   }
 
   const handleQuickStartWave = () => {
+    void unlockAudioContext()
     const controller = controllerRef.current
     if (!controller) {
       return
@@ -253,26 +274,31 @@ function App() {
 
   // Audio control handlers
   const handleMasterVolumeChange = (volume: number) => {
+    void unlockAudioContext()
     audioManager.setMasterVolume(volume)
     setAudioConfig(audioManager.getConfig())
   }
 
   const handleSfxVolumeChange = (volume: number) => {
+    void unlockAudioContext()
     audioManager.setSfxVolume(volume)
     setAudioConfig(audioManager.getConfig())
   }
 
   const handleMusicVolumeChange = (volume: number) => {
+    void unlockAudioContext()
     audioManager.setMusicVolume(volume)
     setAudioConfig(audioManager.getConfig())
   }
 
   const handleToggleMute = () => {
+    void unlockAudioContext()
     audioManager.setMuted(!audioConfig.muted)
     setAudioConfig(audioManager.getConfig())
   }
 
-  const handleRetry = useCallback(() => {
+  const handleRetry = useCallback(async () => {
+    await unlockAudioContext()
     const controller = controllerRef.current
     if (!controller) {
       return
@@ -284,7 +310,20 @@ function App() {
     controller.resetGame()
     controller.start()
     setFeedback('Resetting the loop...')
-  }, [setFeedback, setAppPhase, setResetPending])
+  }, [setFeedback, setAppPhase, setResetPending, unlockAudioContext])
+
+  const showStartOverlay = snapshotStatus === 'idle' && appPhase === 'idle'
+  const showGameOverOverlay =
+    snapshot?.status === 'won' || snapshot?.status === 'lost'
+  const isAppBusy = appPhase === 'loading' || appPhase === 'resetting'
+  const canvasStatusMessage = !isAudioReady
+    ? 'Loading audio...'
+    : appPhase === 'resetting'
+    ? 'Resetting the prototype...'
+    : !snapshot
+    ? 'Preparing the battle map...'
+    : undefined
+  const isCanvasBusy = Boolean(canvasStatusMessage)
 
   // Keyboard shortcuts and accessibility
   useEffect(() => {
@@ -350,19 +389,6 @@ function App() {
     handleRetry,
     showGameOverOverlay,
   ])
-
-  const showStartOverlay = snapshotStatus === 'idle' && appPhase === 'idle'
-  const showGameOverOverlay =
-    snapshot?.status === 'won' || snapshot?.status === 'lost'
-  const isAppBusy = appPhase === 'loading' || appPhase === 'resetting'
-  const canvasStatusMessage = !isAudioReady
-    ? 'Loading audio...'
-    : appPhase === 'resetting'
-    ? 'Resetting the prototype...'
-    : !snapshot
-    ? 'Preparing the battle map...'
-    : undefined
-  const isCanvasBusy = Boolean(canvasStatusMessage)
 
   useEffect(() => {
     const activeOverlay = showStartOverlay

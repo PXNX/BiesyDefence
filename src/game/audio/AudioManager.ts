@@ -44,13 +44,8 @@ export class AudioManager {
       // Apply initial volume settings
       this.updateVolume()
       
-      // Resume context if suspended (required by some browsers)
-      if (this.audioContext.state === 'suspended') {
-        await this.audioContext.resume()
-      }
-      
-      // Load sound effects
-      await this.loadAllSoundEffects()
+    // Load sound effects
+    await this.loadAllSoundEffects()
       
       console.log('AudioManager initialized successfully')
     } catch (error) {
@@ -250,6 +245,16 @@ export class AudioManager {
     }
     
     return buffer
+  }
+
+  async resumeOnGesture(): Promise<void> {
+    if (!this.audioContext) {
+      return
+    }
+
+    if (this.audioContext.state === 'suspended') {
+      await this.audioContext.resume()
+    }
   }
 
   playSoundEffect(name: string, volume: number = 1.0, pitch: number = 1.0): void {
