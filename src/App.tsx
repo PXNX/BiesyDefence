@@ -2,8 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 import { GameController } from '@/game/core/GameController'
 import type { GameSnapshot, GameStatus, TowerType } from '@/game/core/types'
-import { GameControls } from '@/ui/components/GameControls'
-import { GameHUD } from '@/ui/components/GameHUD'
+import { TopHUD } from '@/ui/components/TopHUD'
 import { DebugPanel } from '@/ui/components/DebugPanel'
 import { TowerPicker } from '@/ui/components/TowerPicker'
 import { audioManager } from '@/game/audio/AudioManager'
@@ -444,22 +443,14 @@ function App() {
           {liveAnnouncement ?? ''}
         </div>
       <header className="app-header">
-        <GameHUD snapshot={snapshot} muted={audioConfig.muted} onToggleMute={handleToggleMute} />
-        <GameControls
-          status={snapshot?.status ?? 'idle'}
-          onStart={handleStart}
-          onPause={handlePause}
-          onNextWave={handleNextWave}
-          onReset={handleReset}
-          nextWaveAvailable={snapshot?.nextWaveAvailable ?? false}
+        <TopHUD
+          snapshot={snapshot}
           gameSpeed={snapshot?.gameSpeed ?? 1}
-          onSpeedChange={handleSpeedChange}
-          isBusy={isAppBusy}
           audioConfig={audioConfig}
-          onMasterVolumeChange={handleMasterVolumeChange}
-          onSfxVolumeChange={handleSfxVolumeChange}
-          onMusicVolumeChange={handleMusicVolumeChange}
+          onPause={handlePause}
+          onSpeedChange={handleSpeedChange}
           onToggleMute={handleToggleMute}
+          onMasterVolumeChange={handleMasterVolumeChange}
         />
       </header>
 
