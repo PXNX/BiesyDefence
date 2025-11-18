@@ -444,12 +444,7 @@ function App() {
           {liveAnnouncement ?? ''}
         </div>
       <header className="app-header">
-        <div>
-          <p className="eyebrow">Cannabis Cultivation Defense</p>
-          <h1>Phased Bio-Defense</h1>
-          <p className="subtitle">Alpha prototype - Phase 1+2 build</p>
-        </div>
-        <GameHUD snapshot={snapshot} />
+        <GameHUD snapshot={snapshot} muted={audioConfig.muted} onToggleMute={handleToggleMute} />
         <GameControls
           status={snapshot?.status ?? 'idle'}
           onStart={handleStart}

@@ -4,6 +4,21 @@
   color: #f7f2e7;
   font-family: 'Space Grotesk', system-ui, sans-serif;
   background-color: #010b04;
+
+  /* Bio-Neon Theme CSS Vars */
+  --bg-primary: #010409;
+  --bg-secondary: rgba(3, 19, 6, 0.8);
+  --accent-neon-green: #7DF5A3;
+  --accent-bio-purple: #C3B1F4;
+  --accent-glow: #A8FF7F;
+  --danger-red: #FF6B6B;
+  --warning-orange: #FFD93D;
+  --success-emerald: #6FF98E;
+  --text-primary: #F7F2E7;
+  --text-secondary: #B9CFB1;
+  --glow-green: 0 0 20px #7DF5A3;
+  --gradient-bio: linear-gradient(135deg, #7DF5A3, #C3B1F4);
+  --shadow-neon: 0 0 30px rgba(125, 245, 163, 0.5);
 }
 
 *,
@@ -213,38 +228,28 @@ body {
   }
 }
 
-.status-pill {
-  padding: 0.4rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
-.status-running {
-  background: rgba(120, 235, 143, 0.25);
-  color: #94ffab;
+@keyframes float {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) rotate(360deg);
+    opacity: 0;
+  }
 }
 
-.status-paused {
-  background: rgba(255, 214, 102, 0.25);
-  color: #ffe38e;
-}
-
-.status-idle {
-  background: rgba(184, 184, 184, 0.25);
-  color: #b9b9b9;
-}
-
-.status-won {
-  background: rgba(110, 223, 173, 0.25);
-  color: #b1f7d7;
-}
-
-.status-lost {
-  background: rgba(255, 90, 90, 0.25);
-  color: #ffb2b2;
-}
 
 .next-wave-ready {
   font-size: 0.75rem;
@@ -1144,4 +1149,37 @@ input:focus-visible {
     font-size: 0.95rem;
     min-width: 120px;
   }
+}
+
+
+/* ================== AAA UI Redesign Styles ================== */
+
+/* Top Bar - Unified HUD + Controls */
+.top-bar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 2rem;
+  padding: 1rem 2rem;
+  background: var(--bg-secondary);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 2px solid var(--accent-neon-green);
+  box-shadow: var(--shadow-neon);
+  align-items: center;
+}
+
+/* Top Bar Refinement v2 Styles */
+
+.hud {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-bottom: 2px solid var(--accent-neon-green);
+  box-shadow: var(--shadow-neon);
 }

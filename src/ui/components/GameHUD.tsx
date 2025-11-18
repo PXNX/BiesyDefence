@@ -2,14 +2,10 @@ import type { GameSnapshot } from '@/game/core/types'
 
 interface GameHUDProps {
   snapshot: GameSnapshot | null
+  muted: boolean
+  onToggleMute: () => void
 }
 
-const phaseLabels: Record<GameSnapshot['wavePhase'], string> = {
-  idle: 'Ready',
-  active: 'Engaged',
-  completed: 'Cleared',
-  finalized: 'Finalized',
-}
 
 interface HudLabelProps {
   iconClass: string
@@ -25,7 +21,7 @@ function HudLabel({ iconClass, label }: HudLabelProps) {
   )
 }
 
-export function GameHUD({ snapshot }: GameHUDProps) {
+export function GameHUD({ snapshot, muted, onToggleMute }: GameHUDProps) {
   if (!snapshot) {
     const skeletonWidths = [90, 68, 76, 52]
     return (
@@ -71,7 +67,7 @@ export function GameHUD({ snapshot }: GameHUDProps) {
   return (
     <>
       <div className="hud">
-        <div className="hud-section primary-stats">
+        <div className="primaries-glow">
           <div className={`hud-row money-row ${moneyLow ? 'warning' : ''}`}>
             <HudLabel iconClass="hud-icon-money" label="Money" />
             <strong className="money-amount">${safeSnapshot.money}</strong>
@@ -83,13 +79,9 @@ export function GameHUD({ snapshot }: GameHUDProps) {
             {livesCritical && <span className="critical-indicator">❗</span>}
             {livesLow && !livesCritical && <span className="warning-indicator">⚠️</span>}
           </div>
-          <div className="hud-row score-row">
-            <HudLabel iconClass="hud-icon-score" label="Score" />
-            <strong className="score-amount">{safeSnapshot.score.toLocaleString()}</strong>
-          </div>
         </div>
         
-        <div className="hud-section game-stats">
+        <div className="secondary-row">
           <div className="hud-row wave-row">
             <HudLabel iconClass="hud-icon-wave" label="Wave" />
             <strong>{safeSnapshot.wave.current} / {safeSnapshot.wave.total}</strong>
@@ -97,35 +89,13 @@ export function GameHUD({ snapshot }: GameHUDProps) {
               <span className="queued-info">{safeSnapshot.wave.queued} pending</span>
             )}
           </div>
-          
-          <div className="hud-row speed-row">
-            <HudLabel iconClass="hud-icon-speed" label="Speed" />
-            <strong>{safeSnapshot.gameSpeed}x</strong>
+          <div className="hud-row score-row">
+            <HudLabel iconClass="hud-icon-score" label="Score" />
+            <strong className="score-amount">{safeSnapshot.score.toLocaleString()}</strong>
           </div>
           
-          <div className={`hud-row performance-row ${fpsLow ? 'warning' : ''}`}>
-            <span className="hud-label">FPS</span>
-            <strong className={fpsLow ? 'low-fps' : ''}>{fpsDisplay.toFixed(1)}</strong>
-            {fpsLow && <span className="warning-indicator">⚠️</span>}
-          </div>
         </div>
 
-        <div className="hud-section status-section">
-          <div className={`status-pill status-${safeSnapshot.status}`}>
-            {safeSnapshot.status === 'running' && '🎮 PLAYING'}
-            {safeSnapshot.status === 'paused' && '⏸️ PAUSED'}
-            {safeSnapshot.status === 'idle' && '⏳ READY'}
-            {safeSnapshot.status === 'won' && '🏆 VICTORY'}
-            {safeSnapshot.status === 'lost' && '💀 DEFEATED'}
-          </div>
-          
-          <div className="wave-phase-indicator">
-            <span className="phase-label">Wave State:</span>
-            <span className={`phase-value phase-${safeSnapshot.wavePhase}`}>
-              {phaseLabels[safeSnapshot.wavePhase]}
-            </span>
-          </div>
-        </div>
 
         {safeSnapshot.nextWaveAvailable && (
           <div className="next-wave-ready">
