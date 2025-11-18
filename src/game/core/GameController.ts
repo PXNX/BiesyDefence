@@ -64,6 +64,7 @@ export class GameController {
   private lastKnownScore = -1
   private lastKnownWaveIndex = -1
   private lastKnownStatus: GameStatus = 'idle'
+  private enemyPositionCache = new Map<string, { x: number; y: number; isDead: boolean }>()
 
   constructor() {
     this.state = createInitialState()
@@ -157,10 +158,6 @@ export class GameController {
     this.state.status = 'paused'
     cancelAnimationFrame(this.rafId)
     this.notify()
-  }
-
-  public reset() {
-    this.resetGame()
   }
 
   public destroy() {
@@ -272,6 +269,10 @@ export class GameController {
   }
 
   public quickSetWave(index: number) {
+    if (this.state.waves.length === 0) {
+      console.warn('Attempted to set wave before wave data was initialized.')
+      return
+    }
     const clamped = Math.max(0, Math.min(index, this.state.waves.length - 1))
     cancelAnimationFrame(this.rafId)
     this.running = false
@@ -339,9 +340,11 @@ export class GameController {
     // Update systems in correct order
     updateWaves(this.state, deltaSeconds, waveCallbacks)
     updateEnemies(this.state, deltaSeconds)
-    
-    // Update spatial grid before tower targeting for optimal performance
-    updateEnemySpatialGrid(this.state.enemies)
+
+    // Update spatial grid only when enemy positions or states actually change
+    if (this.syncEnemyPositions()) {
+      updateEnemySpatialGrid(this.state.enemies)
+    }
     
     updateTowers(this.state, deltaSeconds)
     updateProjectiles(this.state, deltaSeconds)
@@ -460,6 +463,7 @@ export class GameController {
     
     // Reset game state to initial values
     this.state = createInitialState()
+    this.enemyPositionCache.clear()
     
     // Reset tracking variables
     this.lastKnownLives = -1
@@ -789,14 +793,48 @@ export class GameController {
     }
   }
 
+  private syncEnemyPositions(): boolean {
+    let hasMovement = false
+    const seenIds = new Set<string>()
+
+    this.state.enemies.forEach((enemy) => {
+      seenIds.add(enemy.id)
+      const cached = this.enemyPositionCache.get(enemy.id)
+      const hasChange =
+        !cached ||
+        cached.x !== enemy.position.x ||
+        cached.y !== enemy.position.y ||
+        cached.isDead !== enemy.isDead
+
+      if (hasChange) {
+        hasMovement = true
+        this.enemyPositionCache.set(enemy.id, {
+          x: enemy.position.x,
+          y: enemy.position.y,
+          isDead: enemy.isDead,
+        })
+      }
+    })
+
+    for (const cachedId of Array.from(this.enemyPositionCache.keys())) {
+      if (!seenIds.has(cachedId)) {
+        this.enemyPositionCache.delete(cachedId)
+        hasMovement = true
+      }
+    }
+
+    return hasMovement
+  }
+
   private notify() {
     const currentTime = performance.now()
-    
-    // Throttle notifications to reduce excessive React re-renders
-    if (currentTime - this.lastNotificationTime < this.notificationThrottleMs) {
+    const shouldForceUpdate = this.state.status === 'won' || this.state.status === 'lost'
+
+    // Throttle notifications to reduce excessive React re-renders unless the game just ended
+    if (!shouldForceUpdate && currentTime - this.lastNotificationTime < this.notificationThrottleMs) {
       return
     }
-    
+
     // Use the new updateHud method for better error handling
     this.updateHud()
     this.lastNotificationTime = currentTime

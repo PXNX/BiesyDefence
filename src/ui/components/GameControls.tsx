@@ -1,3 +1,4 @@
+import type { ChangeEvent } from 'react'
 import type { GameStatus } from '@/game/core/types'
 import type { AudioConfig } from '@/game/audio/AudioManager'
 
@@ -15,6 +16,50 @@ interface GameControlsProps {
   onSfxVolumeChange: (volume: number) => void
   onMusicVolumeChange: (volume: number) => void
   onToggleMute: () => void
+}
+
+interface VolumeSliderProps {
+  id: string
+  label: string
+  value: number
+  disabled: boolean
+  ariaLabel: string
+  onChange: (volume: number) => void
+}
+
+function VolumeSlider({
+  id,
+  label,
+  value,
+  disabled,
+  ariaLabel,
+  onChange,
+}: VolumeSliderProps) {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    onChange(parseFloat(event.target.value))
+  }
+
+  return (
+    <div className="volume-control">
+      <label htmlFor={id}>{label}</label>
+      <div className="volume-input-row">
+        <input
+          id={id}
+          type="range"
+          min="0"
+          max="1"
+          step="0.1"
+          value={value}
+          onChange={handleChange}
+          disabled={disabled}
+          aria-label={ariaLabel}
+        />
+        <span className="volume-value" aria-live="polite">
+          {Math.round(value * 100)}%
+        </span>
+      </div>
+    </div>
+  )
 }
 
 export function GameControls({
@@ -80,52 +125,34 @@ export function GameControls({
           </button>
         </div>
         
-        <div className="volume-controls">
-          <div className="volume-control">
-            <label htmlFor="master-volume">Master</label>
-            <input
-              id="master-volume"
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              value={audioConfig.masterVolume}
-              onChange={(e) => onMasterVolumeChange(parseFloat(e.target.value))}
-              disabled={audioConfig.muted}
-              aria-label="Master volume"
-            />
-          </div>
-          
-          <div className="volume-control">
-            <label htmlFor="sfx-volume">SFX</label>
-            <input
-              id="sfx-volume"
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              value={audioConfig.sfxVolume}
-              onChange={(e) => onSfxVolumeChange(parseFloat(e.target.value))}
-              disabled={audioConfig.muted}
-              aria-label="Sound effects volume"
-            />
-          </div>
-          
-          <div className="volume-control">
-            <label htmlFor="music-volume">Music</label>
-            <input
-              id="music-volume"
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              value={audioConfig.musicVolume}
-              onChange={(e) => onMusicVolumeChange(parseFloat(e.target.value))}
-              disabled={audioConfig.muted}
-              aria-label="Music volume"
-            />
-          </div>
-        </div>
+      <div className="volume-controls">
+        <VolumeSlider
+          id="master-volume"
+          label="Master"
+          value={audioConfig.masterVolume}
+          onChange={onMasterVolumeChange}
+          disabled={audioConfig.muted}
+          ariaLabel="Master volume"
+        />
+
+        <VolumeSlider
+          id="sfx-volume"
+          label="SFX"
+          value={audioConfig.sfxVolume}
+          onChange={onSfxVolumeChange}
+          disabled={audioConfig.muted}
+          ariaLabel="Sound effects volume"
+        />
+
+        <VolumeSlider
+          id="music-volume"
+          label="Music"
+          value={audioConfig.musicVolume}
+          onChange={onMusicVolumeChange}
+          disabled={audioConfig.muted}
+          ariaLabel="Music volume"
+        />
+      </div>
       </div>
     </div>
   )

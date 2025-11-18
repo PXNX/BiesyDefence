@@ -5,6 +5,43 @@ All notable changes to BiesyDefence will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.3] - 2025-11-20 - UI/UX Patch
+
+### ?? Accessibility & Feedback
+
+- **ENHANCED**: [`src/App.tsx`](src/App.tsx) overlays now carry the proper `role="dialog"` attributes, trap focus inside when visible, and announce the canvas as busy while audio initialization completes so screen readers are kept in sync with the UI.
+- **ENHANCED**: [`src/ui/components/GameControls.tsx`](src/ui/components/GameControls.tsx) introduces a reusable `VolumeSlider` widget that pairs each range input with its percentage output, giving players instant numeric confirmation when audio levels change.
+
+### ?? UI/UX Polish
+
+- **ENHANCED**: [`src/index.css`](src/index.css) consolidates the `.volume-control` rules, flattens the responsive sections, and adds the loading spinner overlay, keeping the layout consistent while audio warms up.
+- **FIXED**: [`src/ui/components/TowerPicker.tsx`](src/ui/components/TowerPicker.tsx) now only surfaces the “Insufficient funds” warning for towers that are both unaffordable and not already selected, removing confusing feedback while a tower is staged.
+
+## [1.11.2] - 2025-11-19 - Functional Patch
+
+### ?? Reliability Fixes
+
+- **FIXED**: Added an `ErrorBoundary` around the core layout, memoized keyboard shortcuts, and auto-clear the feedback toast so stale messages and unhandled errors no longer freeze the UI; this also let us wire HUD resets directly through the new `onRequestReset` prop instead of `CustomEvent`s.
+- **FIXED**: `GameHUD` now renders a skeleton loader while waiting for its first snapshot, keeping the overlay sections visible even before data arrives.
+
+### ?? Gameplay Systems
+
+- **FIXED**: `GameController` only refreshes the enemy spatial grid when enemies actually move or change state, and `reset()` was consolidated into `resetGame()` so there is just one entry point for full state resets.
+- **ENHANCED**: Introduced a concrete `TowerUpgradeSystem` along with upgrade preview UI in `TowerPicker`, so the previously unused interfaces now control an explicit upgrade path.
+- **CLEANUP**: Removed the old `updateEnemiesEnhanced()` helper while keeping all of its diagnostics inside `updateEnemies()`.
+
+## [1.11.1] - 2025-11-19 - Stability Patch
+
+### ?? Critical Fixes
+
+- **FIXED**: [`src/App.tsx`](src/App.tsx) now memoizes the keyboard handlers referenced by the shortcut effect and exposes `handleRetry` via `GameHUD`’s new `onRequestReset` prop, eliminating the startup ReferenceError and the previous `CustomEvent` wiring.
+- **FIXED**: [`src/ui/components/GameHUD.tsx`](src/ui/components/GameHUD.tsx) relies on the `onRequestReset` callback instead of `window.dispatchEvent`, and [`src/ui/components/TowerPicker.tsx`](src/ui/components/TowerPicker.tsx) keeps the selection action gated behind `isAffordable` so unaffordable towers can’t trigger inconsistent feedback.
+
+### ?? Rendering & Systems Hardening
+
+- **FIXED**: [`src/game/core/GameController.ts`](src/game/core/GameController.ts) guards `quickSetWave()` when no wave data has been loaded and bypasses the HUD throttle when the status shifts to `won`/`lost`, ensuring the final state is delivered to the UI.
+- **FIXED**: [`src/game/rendering/CanvasRenderer.ts`](src/game/rendering/CanvasRenderer.ts) sanitizes projectile colors before building gradients so invalid color strings can no longer crash the canvas renderer.
+
 ## [1.11.0] - 2025-11-18 - Prompt 6: Tower Placement via Mouse
 
 ### 🎮 Interactive Tower Placement System

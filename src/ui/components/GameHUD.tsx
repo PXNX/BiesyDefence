@@ -2,6 +2,7 @@ import type { GameSnapshot } from '@/game/core/types'
 
 interface GameHUDProps {
   snapshot: GameSnapshot | null
+  onRequestReset: () => void
 }
 
 const phaseLabels: Record<GameSnapshot['wavePhase'], string> = {
@@ -11,9 +12,20 @@ const phaseLabels: Record<GameSnapshot['wavePhase'], string> = {
   finalized: 'Finalized',
 }
 
-export function GameHUD({ snapshot }: GameHUDProps) {
+export function GameHUD({ snapshot, onRequestReset }: GameHUDProps) {
   if (!snapshot) {
-    return null
+    const skeletonWidths = [90, 68, 76, 52]
+    return (
+      <div className="hud hud-skeleton" role="status" aria-live="polite">
+        {skeletonWidths.map((width, index) => (
+          <span
+            key={`skeleton-${index}`}
+            className="hud-skeleton-line"
+            style={{ width: `${width}%` }}
+          />
+        ))}
+      </div>
+    )
   }
 
   // Enhanced validation and sanitization with comprehensive error handling
@@ -140,14 +152,7 @@ export function GameHUD({ snapshot }: GameHUDProps) {
                 <strong>{safeSnapshot.wave.current - 1}</strong>
               </div>
             </div>
-            <button
-              className="overlay-button retry-button"
-              onClick={() => {
-                // This will be connected to GameController.resetGame()
-                // For now, we'll dispatch a custom event
-                window.dispatchEvent(new CustomEvent('resetGame'))
-              }}
-            >
+            <button className="overlay-button retry-button" onClick={onRequestReset}>
               🔄 Try Again
             </button>
           </div>
@@ -174,14 +179,7 @@ export function GameHUD({ snapshot }: GameHUDProps) {
                 <strong>{safeSnapshot.wave.current}</strong>
               </div>
             </div>
-            <button
-              className="overlay-button victory-button"
-              onClick={() => {
-                // This will be connected to GameController.resetGame()
-                // For now, we'll dispatch a custom event
-                window.dispatchEvent(new CustomEvent('resetGame'))
-              }}
-            >
+            <button className="overlay-button victory-button" onClick={onRequestReset}>
               🎮 Play Again
             </button>
           </div>

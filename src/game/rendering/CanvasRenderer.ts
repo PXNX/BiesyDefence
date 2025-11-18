@@ -8,6 +8,36 @@ import type {
 } from '@/game/core/types'
 import { palette } from '@/assets/theme'
 
+const hexColorRegex = /^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/
+
+const ensureValidRgb = (rawColor?: string) => {
+  const cleaned = rawColor?.trim() ?? ''
+  const match = hexColorRegex.exec(cleaned)
+
+  if (!match) {
+    const fallback = palette.projectile
+    return ensureValidRgb(fallback)
+  }
+
+  let hex = match[1]
+  if (hex.length === 3) {
+    hex = hex
+      .split('')
+      .map((char) => `${char}${char}`)
+      .join('')
+  }
+
+  const value = parseInt(hex, 16)
+  return {
+    r: (value >> 16) & 0xff,
+    g: (value >> 8) & 0xff,
+    b: value & 0xff,
+  }
+}
+
+const formatRgba = (color: { r: number; g: number; b: number }, alpha: number) =>
+  `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`
+
 const createGradientBackground = (ctx: CanvasRenderingContext2D, width: number, height: number): void => {
   const gradient = ctx.createLinearGradient(0, 0, 0, height)
   gradient.addColorStop(0, '#021402')
@@ -296,11 +326,11 @@ export class CanvasRenderer {
 
       // Enhanced projectile trail
       const trailGradient = ctx.createLinearGradient(origin.x, origin.y, current.x, current.y)
-      // Ensure proper hex color format for gradient stops
-      const baseColor = projectile.color.startsWith('#') ? projectile.color.slice(1) : projectile.color
-      trailGradient.addColorStop(0, `#${baseColor}00`)
-      trailGradient.addColorStop(0.5, `#${baseColor}CC`)
-      trailGradient.addColorStop(1, `#${baseColor}FF`)
+      const gradientColor = ensureValidRgb(projectile.color)
+      const colorStop = (alpha: number) => formatRgba(gradientColor, alpha)
+      trailGradient.addColorStop(0, colorStop(0))
+      trailGradient.addColorStop(0.5, colorStop(0.8))
+      trailGradient.addColorStop(1, colorStop(1))
       
       ctx.strokeStyle = trailGradient
       ctx.lineWidth = 4

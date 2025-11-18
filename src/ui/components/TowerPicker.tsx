@@ -1,6 +1,7 @@
 import { TOWER_PROFILES } from '@/game/config/constants'
 import type { TowerProfile } from '@/game/config/constants'
 import type { TowerType } from '@/game/core/types'
+import { createTowerUpgradeSystem } from '@/game/systems/TowerUpgradeSystem'
 
 interface TowerPickerProps {
   selected: TowerType
@@ -10,6 +11,9 @@ interface TowerPickerProps {
 }
 
 export function TowerPicker({ selected, onSelect, feedback, currentMoney }: TowerPickerProps) {
+  const upgradeSummary = createTowerUpgradeSystem(selected, 1)
+  const nextUpgrade = upgradeSummary.nextUpgrade
+
   return (
     <div className="tower-picker">
       <div className="tower-picker-header">
@@ -23,6 +27,7 @@ export function TowerPicker({ selected, onSelect, feedback, currentMoney }: Towe
           ([type, profile]) => {
           const isSelected = selected === type
           const isAffordable = currentMoney >= profile.cost
+          const showAffordabilityWarning = !isAffordable && !isSelected
           return (
             <button
               type="button"
@@ -31,9 +36,6 @@ export function TowerPicker({ selected, onSelect, feedback, currentMoney }: Towe
               onClick={() => {
                 if (isAffordable) {
                   onSelect(type)
-                } else {
-                  // Provide feedback for insufficient funds
-                  onSelect(type) // Still select for visual feedback
                 }
               }}
               disabled={!isAffordable}
@@ -51,7 +53,7 @@ export function TowerPicker({ selected, onSelect, feedback, currentMoney }: Towe
                 <span>Damage: {profile.damage}</span>
                 <span>Fire: {profile.fireRate.toFixed(2)}s</span>
               </div>
-              {!isAffordable && (
+              {showAffordabilityWarning && (
                 <div className="affordability-warning">
                   Insufficient funds
                 </div>
@@ -59,6 +61,19 @@ export function TowerPicker({ selected, onSelect, feedback, currentMoney }: Towe
             </button>
           )
         })}
+      </div>
+      <div className="tower-upgrade-preview" aria-live="polite">
+        <span className="upgrade-label">Upgrade preview - Level {upgradeSummary.currentLevel}</span>
+        {nextUpgrade ? (
+          <div className="upgrade-preview-detail">
+            <strong>
+              Level {nextUpgrade.level} - ${upgradeSummary.upgradeCost}
+            </strong>
+            <span>{nextUpgrade.description}</span>
+          </div>
+        ) : (
+          <div className="upgrade-preview-detail upgrade-maxed">Fully upgraded</div>
+        )}
       </div>
       {feedback && (
         <p className={`tower-feedback ${feedback.includes('Insufficient') ? 'error' : 'success'}`}>

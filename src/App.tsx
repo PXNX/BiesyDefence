@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 import { GameController } from '@/game/core/GameController'
 import type { GameSnapshot, TowerType } from '@/game/core/types'
@@ -8,12 +8,15 @@ import { DebugPanel } from '@/ui/components/DebugPanel'
 import { TowerPicker } from '@/ui/components/TowerPicker'
 import { audioManager } from '@/game/audio/AudioManager'
 import type { AudioConfig } from '@/game/audio/AudioManager'
+import { ErrorBoundary } from '@/ui/components/ErrorBoundary'
 
 const initialTower: TowerType = 'indica'
 
 function App() {
   const controllerRef = useRef<GameController | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const startOverlayRef = useRef<HTMLDivElement | null>(null)
+  const gameOverOverlayRef = useRef<HTMLDivElement | null>(null)
   const [snapshot, setSnapshot] = useState<GameSnapshot | null>(null)
   const [selectedTower, setSelectedTower] = useState<TowerType>(initialTower)
   const [feedback, setFeedback] = useState<string | null>(null)
@@ -25,11 +28,13 @@ function App() {
     musicVolume: 0.6,
     muted: false
   })
+  const [isAudioReady, setIsAudioReady] = useState(false)
 
   useEffect(() => {
     const initializeAudio = async () => {
       await audioManager.initialize()
       setAudioConfig(audioManager.getConfig())
+      setIsAudioReady(true)
     }
     initializeAudio()
 
@@ -55,6 +60,18 @@ function App() {
     const maxIndex = Math.max(snapshot.wave.total - 1, 0)
     setQuickWaveIndex((prev) => Math.min(prev, maxIndex))
   }, [snapshot?.wave.total])
+
+  useEffect(() => {
+    if (!feedback) {
+      return
+    }
+
+    const timer = window.setTimeout(() => {
+      setFeedback(null)
+    }, 4000)
+
+    return () => clearTimeout(timer)
+  }, [feedback])
 
   useEffect(() => {
     controllerRef.current?.setPreviewTowerType(selectedTower)
@@ -83,14 +100,17 @@ function App() {
     setFeedback(null)
   }
 
-  const handleStart = () => controllerRef.current?.start()
-  const handlePause = () => controllerRef.current?.pause()
-  const handleReset = () => controllerRef.current?.resetGame()
-  const handleSpeedChange = (speed: number) => {
-    controllerRef.current?.setGameSpeed(speed)
-    setFeedback(`Game speed set to ${speed}x`)
-  }
-  const handleNextWave = () => {
+  const handleStart = useCallback(() => controllerRef.current?.start(), [])
+  const handlePause = useCallback(() => controllerRef.current?.pause(), [])
+  const handleReset = useCallback(() => controllerRef.current?.resetGame(), [])
+  const handleSpeedChange = useCallback(
+    (speed: number) => {
+      controllerRef.current?.setGameSpeed(speed)
+      setFeedback(`Game speed set to ${speed}x`)
+    },
+    [setFeedback]
+  )
+  const handleNextWave = useCallback(() => {
     const controller = controllerRef.current
     if (!controller) {
       return
@@ -102,7 +122,7 @@ function App() {
     } else {
       setFeedback('Wave not ready yet.')
     }
-  }
+  }, [setFeedback])
 
   const handleToggleRanges = () => {
     controllerRef.current?.toggleShowRanges()
@@ -203,40 +223,78 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [snapshot, handleStart, handlePause, handleReset, handleNextWave, handleSpeedChange])
 
-  // Handle custom reset event from HUD overlays
-  useEffect(() => {
-    const handleResetGame = () => {
-      handleRetry()
-    }
-
-    window.addEventListener('resetGame', handleResetGame)
-    return () => window.removeEventListener('resetGame', handleResetGame)
-  }, [handleRetry])
-
-  const handleRetry = () => {
+  const handleRetry = useCallback(() => {
     const controller = controllerRef.current
     if (!controller) {
       return
     }
 
-    controller.reset()
+    controller.resetGame()
     controller.start()
     setFeedback('Resetting the loop...')
-  }
+  }, [setFeedback])
 
   const showStartOverlay = snapshot?.status === 'idle'
   const showGameOverOverlay =
     snapshot?.status === 'won' || snapshot?.status === 'lost'
 
+  useEffect(() => {
+    const activeOverlay = showStartOverlay
+      ? startOverlayRef.current
+      : showGameOverOverlay
+      ? gameOverOverlayRef.current
+      : null
+
+    if (!activeOverlay) {
+      return
+    }
+
+    const focusableSelectors =
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    const focusableElements = Array.from(
+      activeOverlay.querySelectorAll<HTMLElement>(focusableSelectors)
+    )
+    const firstElement = focusableElements[0] ?? activeOverlay
+    const lastElement = focusableElements[focusableElements.length - 1] ?? activeOverlay
+
+    firstElement?.focus()
+
+    const handleTrap = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') {
+        return
+      }
+
+      if (focusableElements.length === 0) {
+        return
+      }
+
+      if (event.shiftKey) {
+        if (document.activeElement === firstElement) {
+          event.preventDefault()
+          lastElement?.focus()
+        }
+      } else if (document.activeElement === lastElement) {
+        event.preventDefault()
+        firstElement?.focus()
+      }
+    }
+
+    activeOverlay.addEventListener('keydown', handleTrap)
+    return () => {
+      activeOverlay.removeEventListener('keydown', handleTrap)
+    }
+  }, [showStartOverlay, showGameOverOverlay])
+
   return (
-    <div className="app-shell">
+    <ErrorBoundary onReset={handleRetry}>
+      <div className="app-shell">
       <header className="app-header">
         <div>
           <p className="eyebrow">Cannabis Cultivation Defense</p>
           <h1>Phased Bio-Defense</h1>
           <p className="subtitle">Alpha prototype - Phase 1+2 build</p>
         </div>
-        <GameHUD snapshot={snapshot} />
+        <GameHUD snapshot={snapshot} onRequestReset={handleRetry} />
         <GameControls
           status={snapshot?.status ?? 'idle'}
           onStart={handleStart}
@@ -276,21 +334,38 @@ function App() {
           />
         </section>
 
-        <section className="canvas-wrapper">
-          <canvas
-            ref={canvasRef}
-            onClick={handleCanvasClick}
-            onMouseMove={handleCanvasMove}
-            onMouseLeave={handleCanvasLeave}
-          />
-        </section>
+      <section className="canvas-wrapper" aria-busy={!isAudioReady}>
+        {!isAudioReady && (
+          <div className="canvas-loading" role="status" aria-live="polite">
+            <span className="spinner" aria-hidden="true" />
+            <span>Loading audio...</span>
+          </div>
+        )}
+        <canvas
+          ref={canvasRef}
+          onClick={handleCanvasClick}
+          onMouseMove={handleCanvasMove}
+          onMouseLeave={handleCanvasLeave}
+        />
+      </section>
       </main>
 
-      <div className={`overlay-panel start-overlay ${showStartOverlay ? 'visible' : ''}`}>
-        <div className="overlay-card">
+      <div
+        className={`overlay-panel start-overlay ${showStartOverlay ? 'visible' : ''}`}
+        aria-hidden={!showStartOverlay}
+      >
+        <div
+          ref={startOverlayRef}
+          className="overlay-card"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="start-overlay-title"
+          aria-describedby="start-overlay-desc"
+          tabIndex={-1}
+        >
           <p className="eyebrow">Seed the Defense</p>
-          <h2>Play the prototype loop</h2>
-          <p className="overlay-subtext">
+          <h2 id="start-overlay-title">Play the prototype loop</h2>
+          <p id="start-overlay-desc" className="overlay-subtext">
             Place towers, control the tempo, and push waves back. Deploy towers tactically before
             releasing each wave.
           </p>
@@ -330,11 +405,24 @@ function App() {
         </div>
       </div>
 
-      <div className={`overlay-panel gameover-overlay ${showGameOverOverlay ? 'visible' : ''}`}>
-        <div className="overlay-card">
+      <div
+        className={`overlay-panel gameover-overlay ${showGameOverOverlay ? 'visible' : ''}`}
+        aria-hidden={!showGameOverOverlay}
+      >
+        <div
+          ref={gameOverOverlayRef}
+          className="overlay-card"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="gameover-overlay-title"
+          aria-describedby="gameover-overlay-desc"
+          tabIndex={-1}
+        >
           <p className="eyebrow">{snapshot?.status === 'won' ? 'Trophy' : 'Warning'}</p>
-          <h2>{snapshot?.status === 'won' ? 'Garden Secured' : 'Garden Lost'}</h2>
-          <p className="overlay-subtext">
+          <h2 id="gameover-overlay-title">
+            {snapshot?.status === 'won' ? 'Garden Secured' : 'Garden Lost'}
+          </h2>
+          <p id="gameover-overlay-desc" className="overlay-subtext">
             {snapshot?.status === 'won'
               ? 'You stood strong through the planned waves. Restart to test balance.'
               : 'The path was breached. Reset the prototype when you are ready to retry.'}
@@ -345,6 +433,7 @@ function App() {
         </div>
       </div>
     </div>
+  </ErrorBoundary>
   )
 }
 

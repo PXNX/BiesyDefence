@@ -83,13 +83,10 @@ The `updateEnemies()` function handles:
 - Goal detection
 - Lives reduction
 
-#### Enhanced Movement System
-**File**: [`src/game/systems/EnemySystem.ts`](../../src/game/systems/EnemySystem.ts:65-120)
+#### Streamlined Movement Pipeline
+**File**: [`src/game/systems/EnemySystem.ts`](../../src/game/systems/EnemySystem.ts:4-63)
 
-The `updateEnemiesEnhanced()` function provides:
-- Better debugging output
-- Cleaner separation of concerns
-- Enhanced goal detection logic
+The `updateEnemies()` function now embodies the entire movement pipeline. It continues to offer clean state handling, thorough goal detection, and helpful logging (the debugging ideas initially scoped for `updateEnemiesEnhanced()` were absorbed here), eliminating any unused duplicate implementations.
 
 ### 2. GameState Lives Management
 
