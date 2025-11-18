@@ -3,6 +3,12 @@ import type { TowerProfile } from '@/game/config/constants'
 import type { TowerType } from '@/game/core/types'
 import { createTowerUpgradeSystem } from '@/game/systems/TowerUpgradeSystem'
 
+const TOWER_ART_PATHS: Record<TowerType, string> = {
+  indica: '/towers/tower_indica_level1.png',
+  sativa: '/towers/tower_sativa_level1.png',
+  support: '/towers/tower_support_level1.png',
+}
+
 interface TowerPickerProps {
   selected: TowerType
   onSelect: (type: TowerType) => void
@@ -32,16 +38,29 @@ export function TowerPicker({ selected, onSelect, feedback, currentMoney }: Towe
             const isAffordable = currentMoney >= profile.cost
             const isLocked = !isAffordable
             const showAffordabilityWarning = isLocked && !isSelected
+
             return (
               <button
                 type="button"
                 key={type}
-                className={`tower-card ${isSelected ? 'selected' : ''} ${isLocked ? 'locked' : 'affordable'}`}
+                className={`tower-card ${isSelected ? 'selected' : ''} ${
+                  isLocked ? 'locked' : 'affordable'
+                }`}
                 onClick={() => onSelect(type)}
                 aria-pressed={isSelected}
                 aria-disabled={isLocked}
-                aria-label={`${profile.name} tower - Cost: $${profile.cost} ${isAffordable ? '(Affordable)' : '(Insufficient funds)'}`}
+                aria-label={`${profile.name} tower - Cost: $${profile.cost} ${
+                  isAffordable ? '(Affordable)' : '(Insufficient funds)'
+                }`}
               >
+                <div className="tower-card-art">
+                  <img
+                    src={TOWER_ART_PATHS[type]}
+                    alt={`${profile.name} preview`}
+                    loading="lazy"
+                    draggable={false}
+                  />
+                </div>
                 <div className="tower-card-meta">
                   <span className="tower-card-name">{profile.name}</span>
                   <span className={`tower-card-cost ${!isAffordable ? 'insufficient' : ''}`}>
@@ -66,7 +85,8 @@ export function TowerPicker({ selected, onSelect, feedback, currentMoney }: Towe
                 )}
               </button>
             )
-          })}
+          }
+        )}
       </div>
       <div className="tower-upgrade-preview" aria-live="polite">
         <span className="upgrade-label">Upgrade preview - Level {upgradeSummary.currentLevel}</span>
