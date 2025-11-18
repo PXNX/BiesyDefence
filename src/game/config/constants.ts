@@ -13,6 +13,7 @@ export const CELL_SIZE = 70
 // This forces players to make strategic early-game decisions about tower placement
 export const INITIAL_MONEY = 150
 export const INITIAL_LIVES = 20
+export const INITIAL_SCORE = 0
 
 export const PATH_GRID_NODES = [
   { x: 0, y: 3 },

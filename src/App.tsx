@@ -85,7 +85,7 @@ function App() {
 
   const handleStart = () => controllerRef.current?.start()
   const handlePause = () => controllerRef.current?.pause()
-  const handleReset = () => controllerRef.current?.reset()
+  const handleReset = () => controllerRef.current?.resetGame()
   const handleSpeedChange = (speed: number) => {
     controllerRef.current?.setGameSpeed(speed)
     setFeedback(`Game speed set to ${speed}x`)
@@ -202,6 +202,16 @@ function App() {
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [snapshot, handleStart, handlePause, handleReset, handleNextWave, handleSpeedChange])
+
+  // Handle custom reset event from HUD overlays
+  useEffect(() => {
+    const handleResetGame = () => {
+      handleRetry()
+    }
+
+    window.addEventListener('resetGame', handleResetGame)
+    return () => window.removeEventListener('resetGame', handleResetGame)
+  }, [handleRetry])
 
   const handleRetry = () => {
     const controller = controllerRef.current

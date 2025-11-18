@@ -5,6 +5,7 @@ import {
   TileType,
   Vector2,
   Wave,
+  Tower,
 } from '@/game/core/types'
 import {
   CELL_SIZE,
@@ -12,10 +13,13 @@ import {
   GRID_WIDTH,
   INITIAL_LIVES,
   INITIAL_MONEY,
+  INITIAL_SCORE,
   PATH_GRID_NODES,
   MapManager,
+  TOWER_PROFILES,
 } from '@/game/config/constants'
 import { WAVE_SCHEDULES } from '@/game/config/waves'
+import { createEntityId } from '@/game/utils/id'
 
 const gridKey = (x: number, y: number) => `${x}:${y}`
 
@@ -88,6 +92,58 @@ const buildWaves = (): Wave[] => {
   }))
 }
 
+/**
+ * Create initial hardcoded towers for testing
+ * Places 2 towers strategically near the path but not on it
+ */
+const createInitialTowers = (map: MapData): Tower[] => {
+  const towers: Tower[] = []
+  
+  // Tower 1: Indica tower positioned near the first corner of the path
+  const indicaProfile = TOWER_PROFILES.indica
+  const indicaGridKey = '2:2' // Grid position (2,2) - near path start but not on path
+  const indicaTile = map.tileLookup.get(indicaGridKey)
+  
+  if (indicaTile && indicaTile.type !== 'path') {
+    towers.push({
+      id: createEntityId('tower'),
+      type: 'indica',
+      position: { ...indicaTile.center },
+      gridKey: indicaGridKey,
+      range: indicaProfile.range,
+      fireRate: indicaProfile.fireRate,
+      damage: indicaProfile.damage,
+      projectileSpeed: indicaProfile.projectileSpeed,
+      cooldown: 0,
+      color: indicaProfile.color,
+      cost: indicaProfile.cost,
+    })
+  }
+  
+  // Tower 2: Sativa tower positioned near the middle section of the path
+  const sativaProfile = TOWER_PROFILES.sativa
+  const sativaGridKey = '6:3' // Grid position (6,3) - near path middle but not on path
+  const sativaTile = map.tileLookup.get(sativaGridKey)
+  
+  if (sativaTile && sativaTile.type !== 'path') {
+    towers.push({
+      id: createEntityId('tower'),
+      type: 'sativa',
+      position: { ...sativaTile.center },
+      gridKey: sativaGridKey,
+      range: sativaProfile.range,
+      fireRate: sativaProfile.fireRate,
+      damage: sativaProfile.damage,
+      projectileSpeed: sativaProfile.projectileSpeed,
+      cooldown: 0,
+      color: sativaProfile.color,
+      cost: sativaProfile.cost,
+    })
+  }
+  
+  return towers
+}
+
 // Chapter 6 Future Expansion: Enhanced state creation with map and difficulty support
 export const createInitialState = (options?: {
   mapId?: string
@@ -112,15 +168,18 @@ export const createInitialState = (options?: {
         initialLives: difficultyConfig.initialLives,
       })
       
+      const initialTowers = createInitialTowers(mapData)
+      
       return {
         map: mapData,
         path: mapData.pathNodes.map(gridToWorld),
         enemies: [],
-        towers: [],
+        towers: initialTowers,
         projectiles: [],
         resources: {
           money: initialResources.initialMoney,
           lives: initialResources.initialLives,
+          score: INITIAL_SCORE,
         },
         waves: buildWaves(),
         currentWaveIndex: 0,
@@ -136,15 +195,19 @@ export const createInitialState = (options?: {
   
   // Legacy system (backward compatibility)
   const pathNodes = PATH_GRID_NODES.map(gridToWorld)
+  const map = buildMap(pathNodes)
+  const initialTowers = createInitialTowers(map)
+  
   return {
-    map: buildMap(pathNodes),
+    map,
     path: pathNodes,
     enemies: [],
-    towers: [],
+    towers: initialTowers,
     projectiles: [],
     resources: {
       money: INITIAL_MONEY,
       lives: INITIAL_LIVES,
+      score: INITIAL_SCORE,
     },
     waves: buildWaves(),
     currentWaveIndex: 0,

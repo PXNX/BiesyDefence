@@ -1,19 +1,34 @@
-import type { GameState } from '@/game/core/types'
-import { createEnemy } from '@/game/entities/enemies'
+import type { GameState, EnemyType } from '@/game/core/types'
 
 const hasActiveEnemies = (state: GameState): boolean => {
   return state.enemies.some((enemy) => !enemy.isDead && !enemy.reachedGoal)
 }
 
-export const updateWaves = (state: GameState, deltaSeconds: number): void => {
+export interface WaveSpawnRequest {
+  type: EnemyType
+  spawnPosition: { x: number; y: number }
+}
+
+export interface WaveSystemCallbacks {
+  onEnemySpawn: (request: WaveSpawnRequest) => void
+  onWaveCompleted: (waveIndex: number) => void
+  onAllWavesCompleted: () => void
+}
+
+export const updateWaves = (
+  state: GameState,
+  deltaSeconds: number,
+  callbacks?: WaveSystemCallbacks
+): void => {
   if (state.status !== 'running' || state.wavePhase !== 'active') {
     return
   }
 
   const wave = state.waves[state.currentWaveIndex]
   if (!wave) {
-    state.status = 'won'
     state.wavePhase = 'finalized'
+    // Note: Victory/defeat status is now handled by GameController.checkVictoryCondition()
+    callbacks?.onAllWavesCompleted()
     return
   }
 
@@ -28,7 +43,13 @@ export const updateWaves = (state: GameState, deltaSeconds: number): void => {
     if (wave.timer >= spawn.delay) {
       wave.timer -= spawn.delay
       const origin = state.map.pathNodes[0]
-      state.enemies.push(createEnemy(spawn.type, origin))
+      
+      // Use callback to signal spawn request instead of directly creating enemy
+      callbacks?.onEnemySpawn({
+        type: spawn.type,
+        spawnPosition: origin
+      })
+      
       wave.nextIndex += 1
       continue
     }
@@ -43,9 +64,47 @@ export const updateWaves = (state: GameState, deltaSeconds: number): void => {
 
   if (state.currentWaveIndex >= state.waves.length - 1) {
     state.wavePhase = 'finalized'
-    state.status = state.resources.lives > 0 ? 'won' : 'lost'
+    // Note: Victory/defeat status is now handled by GameController.checkVictoryCondition()
+    callbacks?.onAllWavesCompleted()
     return
   }
 
   state.wavePhase = 'completed'
+  callbacks?.onWaveCompleted(state.currentWaveIndex)
+}
+
+/**
+ * Get wave status information for UI integration
+ */
+export const getWaveStatus = (state: GameState) => {
+  const currentWave = state.waves[state.currentWaveIndex]
+  if (!currentWave) {
+    return {
+      currentWave: state.currentWaveIndex + 1,
+      totalWaves: state.waves.length,
+      enemiesRemaining: 0,
+      enemiesInCurrentWave: 0,
+      isWaveActive: false,
+      isWaveCompleted: state.wavePhase === 'completed',
+      isAllWavesCompleted: state.wavePhase === 'finalized'
+    }
+  }
+
+  const enemiesInCurrentWave = currentWave.spawnQueue.length
+  const enemiesSpawned = currentWave.nextIndex
+  const enemiesRemaining = enemiesInCurrentWave - enemiesSpawned
+  const activeEnemies = state.enemies.filter(e => !e.isDead && !e.reachedGoal).length
+
+  return {
+    currentWave: state.currentWaveIndex + 1,
+    totalWaves: state.waves.length,
+    enemiesRemaining: enemiesRemaining + activeEnemies,
+    enemiesInCurrentWave,
+    enemiesSpawned,
+    activeEnemies,
+    isWaveActive: state.wavePhase === 'active',
+    isWaveCompleted: state.wavePhase === 'completed',
+    isAllWavesCompleted: state.wavePhase === 'finalized',
+    nextSpawnDelay: currentWave.spawnQueue[currentWave.nextIndex]?.delay || null
+  }
 }

@@ -118,6 +118,7 @@ export interface Particle {
 export interface Resources {
   money: number
   lives: number
+  score: number
 }
 
 export interface WaveSpawn {
@@ -152,6 +153,7 @@ export interface GameState {
 export interface GameSnapshot {
   money: number
   lives: number
+  score: number
   status: GameStatus
   enemyCount: number
   towerCount: number

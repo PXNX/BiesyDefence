@@ -16,73 +16,102 @@ export function GameHUD({ snapshot }: GameHUDProps) {
     return null
   }
 
+  // Enhanced validation and sanitization with comprehensive error handling
+  const safeSnapshot = {
+    ...snapshot,
+    money: Math.max(0, Number.isFinite(snapshot.money) ? snapshot.money : 0),
+    lives: Math.max(0, Number.isFinite(snapshot.lives) ? snapshot.lives : 0),
+    score: Math.max(0, Number.isFinite(snapshot.score) ? snapshot.score : 0),
+    fps: Number.isFinite(snapshot.fps) ? snapshot.fps : 0,
+    gameSpeed: Math.max(0.25, Math.min(8, Number.isFinite(snapshot.gameSpeed) ? snapshot.gameSpeed : 1)),
+    wave: {
+      current: Math.max(1, Number.isFinite(snapshot.wave.current) ? snapshot.wave.current : 1),
+      total: Math.max(1, Number.isFinite(snapshot.wave.total) ? snapshot.wave.total : 1),
+      queued: Math.max(0, Number.isFinite(snapshot.wave.queued) ? snapshot.wave.queued : 0),
+    }
+  }
+
+  // Determine visual states based on data changes
+  const livesCritical = safeSnapshot.lives <= 3 && safeSnapshot.lives > 0
+  const livesLow = safeSnapshot.lives <= 10 && safeSnapshot.lives > 3
+  const moneyLow = safeSnapshot.money < 50
+  const fpsLow = safeSnapshot.fps < 30 && safeSnapshot.fps > 0
+
   const spawnProgress =
-    snapshot.nextSpawnCountdown !== null && snapshot.nextSpawnDelay
-      ? 1 - Math.max(snapshot.nextSpawnCountdown / (snapshot.nextSpawnDelay ?? 1), 0)
+    safeSnapshot.nextSpawnCountdown !== null && safeSnapshot.nextSpawnDelay
+      ? 1 - Math.max(safeSnapshot.nextSpawnCountdown / (safeSnapshot.nextSpawnDelay ?? 1), 0)
       : 0
-  const fpsDisplay = Number.isFinite(snapshot.fps) ? snapshot.fps : 0
+  const fpsDisplay = safeSnapshot.fps
 
   return (
     <div className="hud">
       <div className="hud-section primary-stats">
-        <div className="hud-row money-row">
+        <div className={`hud-row money-row ${moneyLow ? 'warning' : ''}`}>
           <span className="hud-label">💰 Money</span>
-          <strong className="money-amount">${snapshot.money}</strong>
+          <strong className="money-amount">${safeSnapshot.money}</strong>
+          {moneyLow && <span className="warning-indicator">⚠️</span>}
         </div>
-        <div className="hud-row lives-row">
+        <div className={`hud-row lives-row ${livesCritical ? 'critical' : livesLow ? 'warning' : ''}`}>
           <span className="hud-label">❤️ Lives</span>
-          <strong className="lives-amount">{snapshot.lives}</strong>
+          <strong className="lives-amount">{safeSnapshot.lives}</strong>
+          {livesCritical && <span className="critical-indicator">🚨</span>}
+          {livesLow && !livesCritical && <span className="warning-indicator">⚠️</span>}
+        </div>
+        <div className="hud-row score-row">
+          <span className="hud-label">⭐ Score</span>
+          <strong className="score-amount">{safeSnapshot.score.toLocaleString()}</strong>
         </div>
       </div>
       
       <div className="hud-section game-stats">
         <div className="hud-row wave-row">
           <span className="hud-label">🌊 Wave</span>
-          <strong>{snapshot.wave.current} / {snapshot.wave.total}</strong>
-          {snapshot.wave.queued > 0 && (
-            <span className="queued-info">{snapshot.wave.queued} pending</span>
+          <strong>{safeSnapshot.wave.current} / {safeSnapshot.wave.total}</strong>
+          {safeSnapshot.wave.queued > 0 && (
+            <span className="queued-info">{safeSnapshot.wave.queued} pending</span>
           )}
         </div>
         
         <div className="hud-row speed-row">
           <span className="hud-label">⚡ Speed</span>
-          <strong>{snapshot.gameSpeed}x</strong>
+          <strong>{safeSnapshot.gameSpeed}x</strong>
         </div>
         
-        <div className="hud-row performance-row">
+        <div className={`hud-row performance-row ${fpsLow ? 'warning' : ''}`}>
           <span className="hud-label">FPS</span>
-          <strong className={fpsDisplay < 30 ? 'low-fps' : ''}>{fpsDisplay.toFixed(1)}</strong>
+          <strong className={fpsLow ? 'low-fps' : ''}>{fpsDisplay.toFixed(1)}</strong>
+          {fpsLow && <span className="warning-indicator">⚠️</span>}
         </div>
       </div>
 
       <div className="hud-section status-section">
-        <div className={`status-pill status-${snapshot.status}`}>
-          {snapshot.status === 'running' && '🎮 PLAYING'}
-          {snapshot.status === 'paused' && '⏸️ PAUSED'}
-          {snapshot.status === 'idle' && '⏳ READY'}
-          {snapshot.status === 'won' && '🏆 VICTORY'}
-          {snapshot.status === 'lost' && '💀 DEFEATED'}
+        <div className={`status-pill status-${safeSnapshot.status}`}>
+          {safeSnapshot.status === 'running' && '🎮 PLAYING'}
+          {safeSnapshot.status === 'paused' && '⏸️ PAUSED'}
+          {safeSnapshot.status === 'idle' && '⏳ READY'}
+          {safeSnapshot.status === 'won' && '🏆 VICTORY'}
+          {safeSnapshot.status === 'lost' && '💀 DEFEATED'}
         </div>
         
         <div className="wave-phase-indicator">
           <span className="phase-label">Wave State:</span>
-          <span className={`phase-value phase-${snapshot.wavePhase}`}>
-            {phaseLabels[snapshot.wavePhase]}
+          <span className={`phase-value phase-${safeSnapshot.wavePhase}`}>
+            {phaseLabels[safeSnapshot.wavePhase]}
           </span>
         </div>
       </div>
 
-      {snapshot.nextWaveAvailable && (
+      {safeSnapshot.nextWaveAvailable && (
         <div className="next-wave-ready">
           🚀 Next wave available - Press N or click Next Wave
         </div>
       )}
       
-      {snapshot.nextSpawnCountdown !== null && snapshot.nextSpawnDelay !== null && (
+      {safeSnapshot.nextSpawnCountdown !== null && safeSnapshot.nextSpawnDelay !== null && (
         <div className="spawn-ticker">
           <span className="spawn-label">Next enemy in:</span>
           <div className="spawn-timer">
-            <span className="spawn-countdown">{snapshot.nextSpawnCountdown.toFixed(1)}s</span>
+            <span className="spawn-countdown">{safeSnapshot.nextSpawnCountdown.toFixed(1)}s</span>
             <div className="spawn-ticker-bar">
               <div
                 className="spawn-progress"
@@ -93,5 +122,69 @@ export function GameHUD({ snapshot }: GameHUDProps) {
         </div>
       )}
     </div>
+
+    {/* Game Over Overlay */}
+    {safeSnapshot.status === 'lost' && (
+      <div className="game-overlay game-over-overlay">
+        <div className="overlay-content">
+          <h2 className="overlay-title">💀 Game Over</h2>
+          <p className="overlay-message">All lives have been lost!</p>
+          <div className="overlay-stats">
+            <div className="stat-row">
+              <span>Final Score:</span>
+              <strong>{safeSnapshot.score.toLocaleString()}</strong>
+            </div>
+            <div className="stat-row">
+              <span>Waves Completed:</span>
+              <strong>{safeSnapshot.wave.current - 1}</strong>
+            </div>
+          </div>
+          <button 
+            className="overlay-button retry-button"
+            onClick={() => {
+              // This will be connected to GameController.resetGame()
+              // For now, we'll dispatch a custom event
+              window.dispatchEvent(new CustomEvent('resetGame'))
+            }}
+          >
+            🔄 Try Again
+          </button>
+        </div>
+      </div>
+    )}
+    
+    {/* Victory Overlay */}
+    {safeSnapshot.status === 'won' && (
+      <div className="game-overlay victory-overlay">
+        <div className="overlay-content">
+          <h2 className="overlay-title">🏆 Victory!</h2>
+          <p className="overlay-message">All waves have been defeated!</p>
+          <div className="overlay-stats">
+            <div className="stat-row">
+              <span>Final Score:</span>
+              <strong>{safeSnapshot.score.toLocaleString()}</strong>
+            </div>
+            <div className="stat-row">
+              <span>Lives Remaining:</span>
+              <strong>{safeSnapshot.lives}</strong>
+            </div>
+            <div className="stat-row">
+              <span>Waves Completed:</span>
+              <strong>{safeSnapshot.wave.current}</strong>
+            </div>
+          </div>
+          <button 
+            className="overlay-button victory-button"
+            onClick={() => {
+              // This will be connected to GameController.resetGame()
+              // For now, we'll dispatch a custom event
+              window.dispatchEvent(new CustomEvent('resetGame'))
+            }}
+          >
+            🎮 Play Again
+          </button>
+        </div>
+      </div>
+    )}
   )
 }

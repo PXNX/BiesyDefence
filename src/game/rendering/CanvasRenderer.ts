@@ -296,9 +296,11 @@ export class CanvasRenderer {
 
       // Enhanced projectile trail
       const trailGradient = ctx.createLinearGradient(origin.x, origin.y, current.x, current.y)
-      trailGradient.addColorStop(0, projectile.color + '00')
-      trailGradient.addColorStop(0.5, projectile.color + 'CC')
-      trailGradient.addColorStop(1, projectile.color + 'FF')
+      // Ensure proper hex color format for gradient stops
+      const baseColor = projectile.color.startsWith('#') ? projectile.color.slice(1) : projectile.color
+      trailGradient.addColorStop(0, `#${baseColor}00`)
+      trailGradient.addColorStop(0.5, `#${baseColor}CC`)
+      trailGradient.addColorStop(1, `#${baseColor}FF`)
       
       ctx.strokeStyle = trailGradient
       ctx.lineWidth = 4
