@@ -222,8 +222,6 @@ export const createProgressAwareState = (playerProgress?: {
   preferredDifficulty?: 'easy' | 'normal' | 'hard'
   unlockedMaps?: string[]
 }): GameState => {
-  const mapManager = MapManager.getInstance()
-  
   // Determine map and difficulty from progress
   const preferredDifficulty = playerProgress?.preferredDifficulty || 'normal'
   const unlockedMaps = playerProgress?.unlockedMaps || ['default']

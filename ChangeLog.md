@@ -5,6 +5,18 @@ All notable changes to BiesyDefence will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.4] - 2025-11-20 - Asset & Lint Stabilization
+
+### 🎨 HUD / UI Assets
+
+- **ENHANCED**: [`src/ui/components/GameHUD.tsx`](src/ui/components/GameHUD.tsx) now renders a `HudLabel` helper so the stat rows can host the new `assets/ui/icons/*` textures, and `src/index.css` sets those sprites plus the button/overlay textures (`assets/ui/buttons/*`) with hover/disabled states to produce a cohesive, textured HUD surface.
+
+### 🧹 Lint & Systems Hardening
+
+- **FIXED**: `.eslintrc.json` now understands Jest globals, relaxes `no-unused-vars` for unused arguments, and disables `no-console` for the demo/game/localization/UI folders so the existing telemetry output stays active without failing the lint run.
+- **ENHANCED**: Sanitized the renderer switch cases (`src/game/rendering/CanvasRenderer.ts`, `src/game/rendering/OptimizedCanvasRenderer.ts`), rewired the wave loop (`src/game/systems/WaveSystem.ts`), and made the pooled-object utilities, debounced input helper, and translation subscriber types explicit so ESLint no longer reports `no-case-declarations`/`no-undef`/`no-unused-vars` noise.
+- **CLEANED**: Dropped unused imports/props across `GameController`, `GameStateFactory`, `MapManager`, progression helpers, and debug panels while leaving the demo wiring intact, which helped satisfy the stricter lint settings and kept the demo logging in place.
+
 ## [1.11.3] - 2025-11-20 - UI/UX Patch
 
 ### ?? Accessibility & Feedback

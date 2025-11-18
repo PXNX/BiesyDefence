@@ -2,7 +2,6 @@ import type {
   AchievementProgress,
   AchievementDefinition,
   AchievementCategory,
-  AchievementReward,
 } from './PlayerProgress'
 import { createLogger } from '@/game/utils/logger'
 

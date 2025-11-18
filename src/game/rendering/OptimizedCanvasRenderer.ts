@@ -67,7 +67,7 @@ class RenderCache {
   }
 
   // Object culling check
-  isVisible(position: Vector2, worldToScreen: (pos: Vector2) => Vector2, viewport: ViewportSize): boolean {
+  isVisible(position: Vector2, worldToScreen: (_pos: Vector2) => Vector2, viewport: ViewportSize): boolean {
     const screenPos = worldToScreen(position)
     return (
       screenPos.x >= -this.cullingMargin &&
@@ -77,14 +77,6 @@ class RenderCache {
     )
   }
 
-  // Batch rendering helpers
-  beginBatch(ctx: CanvasRenderingContext2D) {
-    ctx.beginPath()
-  }
-
-  endBatch(ctx: CanvasRenderingContext2D) {
-    // Batch operations are handled by beginPath/closePath pattern
-  }
 }
 
 // Spatial partitioning for efficient entity management
@@ -157,10 +149,9 @@ export class OptimizedCanvasRenderer {
 
   private drawTowerSilhouette(ctx: CanvasRenderingContext2D, x: number, y: number, tileSize: number, towerType: TowerType, color: string): void {
     const size = tileSize / 3.2
-    const accentColor = palette.accentStrong
     
     switch (towerType) {
-      case 'indica':
+      case 'indica': {
         const indicaSize = size * 1.1
         ctx.fillStyle = color
         ctx.fillRect(x - indicaSize / 2, y - indicaSize / 2, indicaSize, indicaSize)
@@ -169,8 +160,8 @@ export class OptimizedCanvasRenderer {
         ctx.lineWidth = 2
         ctx.strokeRect(x - indicaSize / 2, y - indicaSize / 2, indicaSize, indicaSize)
         break
-        
-      case 'sativa':
+      }
+      case 'sativa': {
         ctx.fillStyle = color
         ctx.beginPath()
         ctx.arc(x, y, size, 0, Math.PI * 2)
@@ -181,8 +172,8 @@ export class OptimizedCanvasRenderer {
         ctx.arc(x - size * 0.3, y - size * 0.3, size * 0.4, 0, Math.PI * 2)
         ctx.fill()
         break
-        
-      case 'support':
+      }
+      case 'support': {
         const triangleSize = size * 1.3
         ctx.fillStyle = color
         ctx.beginPath()
@@ -200,6 +191,7 @@ export class OptimizedCanvasRenderer {
         ctx.closePath()
         ctx.fill()
         break
+      }
     }
   }
 
@@ -207,13 +199,13 @@ export class OptimizedCanvasRenderer {
     const accentColor = palette.accentStrong
     
     switch (towerType) {
-      case 'indica':
+      case 'indica': {
         ctx.fillStyle = accentColor
         ctx.fillRect(x - tileSize / 8, y - tileSize / 3, tileSize / 4, tileSize / 6)
         ctx.fillRect(x - tileSize / 8, y + tileSize / 6, tileSize / 4, tileSize / 8)
         break
-        
-      case 'sativa':
+      }
+      case 'sativa': {
         ctx.strokeStyle = accentColor
         ctx.lineWidth = 3
         ctx.beginPath()
@@ -224,8 +216,8 @@ export class OptimizedCanvasRenderer {
         ctx.arc(x, y, tileSize / 6, 0, Math.PI * 2)
         ctx.stroke()
         break
-        
-      case 'support':
+      }
+      case 'support': {
         ctx.fillStyle = accentColor
         ctx.beginPath()
         ctx.moveTo(x, y - tileSize / 4)
@@ -241,6 +233,7 @@ export class OptimizedCanvasRenderer {
         ctx.closePath()
         ctx.fill()
         break
+      }
     }
   }
 
@@ -337,7 +330,7 @@ export class OptimizedCanvasRenderer {
   }
 
   // Optimized particle rendering with proper culling and alpha handling
-  private drawParticlesOptimized(ctx: CanvasRenderingContext2D, particles: any[], worldToScreen: (pos: Vector2) => Vector2): void {
+  private drawParticlesOptimized(ctx: CanvasRenderingContext2D, particles: any[], worldToScreen: (_pos: Vector2) => Vector2): void {
     if (particles.length === 0) return
 
     // Batch particles by similar alpha for efficient rendering
@@ -392,7 +385,7 @@ export class OptimizedCanvasRenderer {
   }
 
   // Optimized projectile rendering with trail batching
-  private drawProjectilesOptimized(ctx: CanvasRenderingContext2D, projectiles: any[], worldToScreen: (pos: Vector2) => Vector2): void {
+  private drawProjectilesOptimized(ctx: CanvasRenderingContext2D, projectiles: any[], worldToScreen: (_pos: Vector2) => Vector2): void {
     if (projectiles.length === 0) return
 
     // Group projectiles by similar colors for efficient trail rendering

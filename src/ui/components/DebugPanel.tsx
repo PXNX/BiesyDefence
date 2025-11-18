@@ -9,7 +9,7 @@ interface DebugPanelProps {
   quickWaveIndex: number
   onToggleRanges: () => void
   onToggleHitboxes: () => void
-  onSetQuickWave: (index: number) => void
+  onSetQuickWave: (_index: number) => void
   onQuickStartWave: () => void
 }
 

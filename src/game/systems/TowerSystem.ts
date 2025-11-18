@@ -2,8 +2,7 @@ import type { GameState, Enemy, Tower } from '@/game/core/types'
 import { distanceBetween } from '@/game/utils/math'
 import { createMuzzleParticles } from '@/game/entities/particles'
 import { acquireProjectile } from '@/game/utils/enhancedPool'
-import { audioManager } from '@/game/audio/AudioManager'
-import { findOptimalTargets, updateEnemySpatialGrid } from '@/game/utils/spatialGrid'
+import { findOptimalTargets } from '@/game/utils/spatialGrid'
 import { logger } from '@/game/utils/logger'
 
 // Chapter 5 Performance: Optimized tower targeting with spatial partitioning

@@ -33,28 +33,22 @@ export const updateWaves = (
   }
 
   wave.timer += deltaSeconds
-  while (true) {
-    const spawn = wave.spawnQueue[wave.nextIndex]
-    if (!spawn) {
-      wave.finished = true
-      break
-    }
+  let spawn = wave.spawnQueue[wave.nextIndex]
+  while (spawn && wave.timer >= spawn.delay) {
+    wave.timer -= spawn.delay
+    const origin = state.map.pathNodes[0]
+    
+    callbacks?.onEnemySpawn({
+      type: spawn.type,
+      spawnPosition: origin
+    })
+    
+    wave.nextIndex += 1
+    spawn = wave.spawnQueue[wave.nextIndex]
+  }
 
-    if (wave.timer >= spawn.delay) {
-      wave.timer -= spawn.delay
-      const origin = state.map.pathNodes[0]
-      
-      // Use callback to signal spawn request instead of directly creating enemy
-      callbacks?.onEnemySpawn({
-        type: spawn.type,
-        spawnPosition: origin
-      })
-      
-      wave.nextIndex += 1
-      continue
-    }
-
-    break
+  if (!spawn) {
+    wave.finished = true
   }
 
   const enemiesCleared = wave.finished && !hasActiveEnemies(state)

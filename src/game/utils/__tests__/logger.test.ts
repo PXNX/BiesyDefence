@@ -1,3 +1,5 @@
+/* eslint-env jest */
+
 import { logger } from '../logger'
 
 describe('Logger', () => {
@@ -57,7 +59,9 @@ describe('Logger', () => {
       logger.startFrame()
       // Simulate some work
       const start = Date.now()
-      while (Date.now() - start < 1) {} // 1ms delay
+      while (Date.now() - start < 1) {
+        void 0
+      } // 1ms delay
       logger.endFrame()
       
       const avgFrameTime = logger.getAverageFrameTime()

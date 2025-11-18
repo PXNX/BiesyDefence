@@ -1,8 +1,6 @@
 import React, { memo, useCallback, useState, useEffect } from 'react'
 import type { ChangeEvent } from 'react'
 import { logger } from '@/game/utils/logger'
-import { getPoolStats } from '@/game/utils/enhancedPool'
-import { enemySpatialGrid } from '@/game/utils/spatialGrid'
 
 interface EnhancedDebugPanelProps {
   showRanges: boolean
@@ -13,7 +11,7 @@ interface EnhancedDebugPanelProps {
   quickWaveIndex: number
   onToggleRanges: () => void
   onToggleHitboxes: () => void
-  onSetQuickWave: (index: number) => void
+  onSetQuickWave: (_index: number) => void
   onQuickStartWave: () => void
   // Enhanced performance monitoring props
   renderTime?: number

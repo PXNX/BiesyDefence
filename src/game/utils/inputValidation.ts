@@ -22,7 +22,7 @@ export function debounce<T extends (...args: any[]) => any>(
   func: T,
   delay: number
 ): (...args: Parameters<T>) => void {
-  let timeoutId: NodeJS.Timeout | null = null
+  let timeoutId: ReturnType<typeof setTimeout> | null = null
   
   return (...args: Parameters<T>) => {
     if (timeoutId) {
@@ -205,7 +205,7 @@ export class InputValidator {
   // Sanitize user input
   sanitizeInput(input: string): string {
     return input
-      .replace(/[<>\"']/g, '') // Remove potentially dangerous characters
+      .replace(/[<>"']/g, '') // Remove potentially dangerous characters
       .replace(/\s+/g, ' ') // Normalize whitespace
       .trim()
       .slice(0, 100) // Limit length
@@ -354,7 +354,7 @@ export class InteractionDebouncer {
         type,
         count: newCount,
         threshold,
-        timeWindow
+        timeWindow: this.timeWindow
       }, 'input')
     }
 

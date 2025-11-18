@@ -1,5 +1,5 @@
 import { createEntityId } from '@/game/utils/id'
-import type { Projectile, Vector2, Particle } from '@/game/core/types'
+import type { Projectile, Particle } from '@/game/core/types'
 import { logger } from '@/game/utils/logger'
 
 // Memory management with size limits
@@ -23,14 +23,20 @@ class ObjectPool<T extends { id: string }> {
   private totalCreated = 0
   private peakUsage = 0
   private name: string
+  private config: PoolConfig
+  private createFn: () => T
+  private resetFn: (obj: T) => void
 
   constructor(
-    private config: PoolConfig,
+    config: PoolConfig,
     name: string,
-    private createFn: () => T,
-    private resetFn: (obj: T) => void
+    createFn: () => T,
+    resetFn: (obj: T) => void
   ) {
     this.name = name
+    this.config = config
+    this.createFn = createFn
+    this.resetFn = resetFn
   }
 
   acquire(): T {

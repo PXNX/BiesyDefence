@@ -1,4 +1,4 @@
-import type { Enemy, EnemyStats, EnemyType, Vector2 } from '@/game/core/types'
+import type { Enemy, EnemyStats, EnemyType, FutureEnemyType, Vector2 } from '@/game/core/types'
 import { createEntityId } from '@/game/utils/id'
 
 export const ENEMY_PROFILES: Record<EnemyType, EnemyStats> = {

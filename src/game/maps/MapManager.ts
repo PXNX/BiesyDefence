@@ -1,15 +1,11 @@
 import type {
   MapData,
   MapTile,
-  Vector2,
-  TileType,
 } from '@/game/core/types'
 import type {
   MapConfiguration,
   MapPathNode,
-  MapTileConfig,
   DifficultyLevel,
-  DIFFICULTY_CONFIGS,
 } from './MapConfiguration'
 import { DIFFICULTY_CONFIGS } from './MapConfiguration'
 

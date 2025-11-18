@@ -1,7 +1,6 @@
 import type {
   PlayerProgress,
   SaveFile,
-  SaveDataMetadata,
   AchievementProgress,
 } from './PlayerProgress'
 import { createLogger } from '@/game/utils/logger'
@@ -519,6 +518,7 @@ export class SaveManager {
    * Reset all progress (with confirmation)
    */
   public resetProgress(): void {
+    // eslint-disable-next-line no-alert
     if (!confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
       return
     }

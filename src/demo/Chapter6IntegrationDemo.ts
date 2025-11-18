@@ -81,9 +81,6 @@ export class Chapter6IntegrationDemo {
       recommendedTheme: translationService.getAppropriateTheme(),
     }
     
-    // 5. Setup achievement tracking
-    const achievementSystem = AchievementSystem.getInstance()
-    
     console.log(`📍 Loaded map: ${currentMap?.name}`)
     console.log(`⚖️  Difficulty: ${difficultyConfig.name}`)
     console.log(`🌍 Language: ${languageInfo.currentLanguage}`)
@@ -155,7 +152,6 @@ export class Chapter6IntegrationDemo {
     console.log('🌍 Demonstrating cultural sensitivity features...')
     
     const languageDetector = LanguageDetector.getInstance()
-    const translationService = TranslationService.getInstance()
     
     // Test different regions
     const testRegions = ['US', 'SA', 'CN', 'DE', 'JP']
@@ -257,6 +253,11 @@ export class Chapter6IntegrationDemo {
     
     // 2. Start progressive game
     const gameData = this.startProgressiveGame()
+    console.log('?? Game data snapshot', {
+      wave: gameData.gameState.currentWaveIndex + 1,
+      difficulty: gameData.mapInfo?.difficulty.name,
+      language: gameData.languageInfo.currentLanguage,
+    })
     
     // 3. Simulate gameplay
     console.log('\n🎮 Simulating gameplay...')

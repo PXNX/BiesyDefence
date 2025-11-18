@@ -82,7 +82,6 @@ export const TOWER_PROFILES: Record<TowerType, TowerProfile> = {
  * @deprecated Use MapManager.getInstance().getCurrentMap() for new code
  */
 export function getCurrentMapConfig() {
-  const mapManager = MapManager.getInstance()
   return {
     width: GRID_WIDTH,
     height: GRID_HEIGHT,

@@ -70,10 +70,9 @@ export class CanvasRenderer {
 
   private drawTowerSilhouette(ctx: CanvasRenderingContext2D, x: number, y: number, tileSize: number, towerType: TowerType, color: string): void {
     const size = tileSize / 3.2
-    const accentColor = palette.accentStrong
-    
+
     switch (towerType) {
-      case 'indica':
+      case 'indica': {
         // Square/rectangular shape for sturdy indica towers
         const indicaSize = size * 1.1
         ctx.fillStyle = color
@@ -84,8 +83,8 @@ export class CanvasRenderer {
         ctx.lineWidth = 2
         ctx.strokeRect(x - indicaSize / 2, y - indicaSize / 2, indicaSize, indicaSize)
         break
-        
-      case 'sativa':
+      }
+      case 'sativa': {
         // Circular shape for fast sativa towers
         ctx.fillStyle = color
         ctx.beginPath()
@@ -98,8 +97,8 @@ export class CanvasRenderer {
         ctx.arc(x - size * 0.3, y - size * 0.3, size * 0.4, 0, Math.PI * 2)
         ctx.fill()
         break
-        
-      case 'support':
+      }
+      case 'support': {
         // Triangle shape for control support towers
         const triangleSize = size * 1.3
         ctx.fillStyle = color
@@ -119,6 +118,7 @@ export class CanvasRenderer {
         ctx.closePath()
         ctx.fill()
         break
+      }
     }
   }
 
@@ -126,14 +126,14 @@ export class CanvasRenderer {
     const accentColor = palette.accentStrong
     
     switch (towerType) {
-      case 'indica':
+      case 'indica': {
         // Indica: Heavy bars or bands
         ctx.fillStyle = accentColor
         ctx.fillRect(x - tileSize / 8, y - tileSize / 3, tileSize / 4, tileSize / 6)
         ctx.fillRect(x - tileSize / 8, y + tileSize / 6, tileSize / 4, tileSize / 8)
         break
-        
-      case 'sativa':
+      }
+      case 'sativa': {
         // Sativa: Spinning rings or orbits
         ctx.strokeStyle = accentColor
         ctx.lineWidth = 3
@@ -145,8 +145,8 @@ export class CanvasRenderer {
         ctx.arc(x, y, tileSize / 6, 0, Math.PI * 2)
         ctx.stroke()
         break
-        
-      case 'support':
+      }
+      case 'support': {
         // Support: Concentric triangles
         ctx.fillStyle = accentColor
         ctx.beginPath()
@@ -163,6 +163,7 @@ export class CanvasRenderer {
         ctx.closePath()
         ctx.fill()
         break
+      }
     }
   }
 

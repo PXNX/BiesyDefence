@@ -350,13 +350,14 @@ function getPluralKey(language: string, key: string, count: number): string {
       if (count <= 99) return `${key}_many`
       return `${key}_other`
     
-    case 'ru': // Russian has 3 plural forms
+    case 'ru': { // Russian has 3 plural forms
       const lastDigit = count % 10
       const lastTwoDigits = count % 100
       
       if (lastDigit === 1 && lastTwoDigits !== 11) return `${key}_one`
       if (lastDigit >= 2 && lastDigit <= 4 && (lastTwoDigits < 10 || lastTwoDigits >= 20)) return `${key}_few`
       return `${key}_many`
+    }
     
     case 'en':
     default:

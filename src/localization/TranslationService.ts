@@ -165,6 +165,8 @@ export const THEME_ALTERNATIVES: Record<string, ThemeAlternative> = {
   },
 }
 
+type LanguageChangeCallback = (_language: Language) => void
+
 export class TranslationService {
   private static instance: TranslationService | null = null
   private currentLanguage: Language = 'en'
@@ -181,7 +183,7 @@ export class TranslationService {
     it: {},
   }
   private missingKeys: Set<string> = new Set()
-  private subscribers: Set<(language: Language) => void> = new Set()
+  private subscribers: Set<LanguageChangeCallback> = new Set()
 
   private constructor() {
     this.initializeService()
@@ -340,14 +342,15 @@ export class TranslationService {
         if (count <= 99) return `${key}_many`
         return `${key}_other`
       
-      case 'ru': // Russian has 3 plural forms
+      case 'ru': { // Russian has 3 plural forms
         const lastDigit = count % 10
         const lastTwoDigits = count % 100
         
         if (lastDigit === 1 && lastTwoDigits !== 11) return `${key}_one`
         if (lastDigit >= 2 && lastDigit <= 4 && (lastTwoDigits < 10 || lastTwoDigits >= 20)) return `${key}_few`
         return `${key}_many`
-      
+      }
+    
       case 'en':
       default:
         return count === 1 ? `${key}_one` : `${key}_other`
@@ -414,7 +417,7 @@ export class TranslationService {
   /**
    * Subscribe to language changes
    */
-  public subscribe(callback: (language: Language) => void): () => void {
+  public subscribe(callback: LanguageChangeCallback): () => void {
     this.subscribers.add(callback)
     
     // Return unsubscribe function

@@ -7,7 +7,6 @@ import type {
   TowerType,
   ViewportTransform,
   Vector2,
-  WavePhase,
 } from '@/game/core/types'
 import { TOWER_PROFILES } from '@/game/config/constants'
 import { updateEnemies } from '@/game/systems/EnemySystem'
