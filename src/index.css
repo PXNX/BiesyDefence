@@ -128,6 +128,48 @@ body {
 
 .hud-row strong {
   font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.hud-row-title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  font-size: 0.72rem;
+  color: #9fc4a2;
+}
+
+.hud-icon {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.45));
+}
+
+.hud-icon-money {
+  background-image: url('../assets/ui/icons/money_icon.png');
+}
+
+.hud-icon-lives {
+  background-image: url('../assets/ui/icons/lives_icon.png');
+}
+
+.hud-icon-score {
+  background-image: url('../assets/ui/icons/score_icon.png');
+}
+
+.hud-icon-wave {
+  background-image: url('../assets/ui/icons/wave_icon.png');
+}
+
+.hud-icon-speed {
+  background-image: url('../assets/ui/icons/speed_icon.png');
 }
 
 .hud-skeleton {
@@ -654,27 +696,50 @@ input:focus-visible {
   cursor: pointer;
   font-size: 0.95rem;
   font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #f7f2e7;
+  background-color: #0a150b;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
 }
 
 .controls .primary {
-  background: linear-gradient(120deg, #7dd08a, #64b167);
-  color: #021102;
+  background-image: url('../assets/ui/buttons/button_primary_normal.png');
+  background-color: #16411c;
 }
 
 .controls .secondary {
-  background: rgba(255, 255, 255, 0.05);
-  color: #f7f2e7;
+  background-image: url('../assets/ui/buttons/button_secondary_normal.png');
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
 .controls .ghost {
   background: transparent;
   color: #9fc4a2;
   border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: none;
+}
+
+.controls .primary:not(:disabled):hover {
+  background-image: url('../assets/ui/buttons/button_primary_hover.png');
+  transform: translateY(-1px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.45);
+}
+
+.controls .secondary:not(:disabled):hover {
+  background-image: url('../assets/ui/buttons/button_secondary_hover.png');
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
 }
 
 .controls button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+  filter: grayscale(80%) saturate(0.5);
 }
 
 .tower-picker {
@@ -898,8 +963,15 @@ input:focus-visible {
 }
 
 .overlay-button {
-  background: linear-gradient(120deg, #7dd08a, #64b167);
-  color: #021102;
+  background-image:
+    linear-gradient(120deg, rgba(125, 208, 138, 0.92), rgba(100, 177, 103, 0.92)),
+    url('../assets/ui/buttons/button_primary_normal.png');
+  background-size: cover, cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-blend-mode: overlay;
+  background-color: #0a150b;
+  color: #f7f2e7;
   border: none;
   border-radius: 12px;
   padding: 1rem 2rem;
@@ -908,18 +980,22 @@ input:focus-visible {
   cursor: pointer;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  transition: all 0.2s ease;
   min-width: 150px;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .overlay-button:hover {
-  background: linear-gradient(120deg, #8df7c5, #7dd08a);
+  background-image:
+    linear-gradient(120deg, rgba(141, 247, 197, 0.96), rgba(125, 208, 138, 0.96)),
+    url('../assets/ui/buttons/button_primary_hover.png');
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(125, 208, 138, 0.3);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
 }
 
 .overlay-button:active {
   transform: translateY(0);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.45);
 }
 
 /* Game Over Specific Styles */
@@ -932,13 +1008,17 @@ input:focus-visible {
 }
 
 .game-over-overlay .overlay-button {
-  background: linear-gradient(120deg, #ff5a5a, #e74c3c);
+  background-image:
+    linear-gradient(120deg, rgba(255, 90, 90, 0.95), rgba(231, 76, 60, 0.95)),
+    url('../assets/ui/buttons/button_primary_normal.png');
   color: #ffffff;
 }
 
 .game-over-overlay .overlay-button:hover {
-  background: linear-gradient(120deg, #ff6b6b, #ff5a5a);
-  box-shadow: 0 8px 20px rgba(255, 90, 90, 0.3);
+  background-image:
+    linear-gradient(120deg, rgba(255, 102, 102, 0.95), rgba(255, 90, 90, 0.95)),
+    url('../assets/ui/buttons/button_primary_hover.png');
+  box-shadow: 0 18px 40px rgba(255, 90, 90, 0.35);
 }
 
 /* Victory Specific Styles */
@@ -951,12 +1031,17 @@ input:focus-visible {
 }
 
 .victory-overlay .overlay-button {
-  background: linear-gradient(120deg, #8df7c5, #7dd08a);
+  background-image:
+    linear-gradient(120deg, rgba(141, 247, 197, 0.95), rgba(125, 208, 138, 0.95)),
+    url('../assets/ui/buttons/button_primary_normal.png');
+  box-shadow: 0 14px 32px rgba(125, 208, 138, 0.35);
 }
 
 .victory-overlay .overlay-button:hover {
-  background: linear-gradient(120deg, #a1f8c5, #8df7c5);
-  box-shadow: 0 8px 20px rgba(141, 247, 197, 0.3);
+  background-image:
+    linear-gradient(120deg, rgba(161, 248, 197, 0.95), rgba(141, 247, 197, 0.95)),
+    url('../assets/ui/buttons/button_primary_hover.png');
+  box-shadow: 0 18px 40px rgba(141, 247, 197, 0.35);
 }
 
 /* Animations */

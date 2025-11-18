@@ -12,6 +12,20 @@ const phaseLabels: Record<GameSnapshot['wavePhase'], string> = {
   finalized: 'Finalized',
 }
 
+interface HudLabelProps {
+  iconClass: string
+  label: string
+}
+
+function HudLabel({ iconClass, label }: HudLabelProps) {
+  return (
+    <div className="hud-row-title">
+      <span className={`hud-icon ${iconClass}`} aria-hidden="true" />
+      <span className="hud-label">{label}</span>
+    </div>
+  )
+}
+
 export function GameHUD({ snapshot, onRequestReset }: GameHUDProps) {
   if (!snapshot) {
     const skeletonWidths = [90, 68, 76, 52]
@@ -60,25 +74,25 @@ export function GameHUD({ snapshot, onRequestReset }: GameHUDProps) {
       <div className="hud">
         <div className="hud-section primary-stats">
           <div className={`hud-row money-row ${moneyLow ? 'warning' : ''}`}>
-            <span className="hud-label">💰 Money</span>
+            <HudLabel iconClass="hud-icon-money" label="Money" />
             <strong className="money-amount">${safeSnapshot.money}</strong>
             {moneyLow && <span className="warning-indicator">⚠️</span>}
           </div>
           <div className={`hud-row lives-row ${livesCritical ? 'critical' : livesLow ? 'warning' : ''}`}>
-            <span className="hud-label">❤️ Lives</span>
+            <HudLabel iconClass="hud-icon-lives" label="Lives" />
             <strong className="lives-amount">{safeSnapshot.lives}</strong>
-            {livesCritical && <span className="critical-indicator">🚨</span>}
+            {livesCritical && <span className="critical-indicator">❗</span>}
             {livesLow && !livesCritical && <span className="warning-indicator">⚠️</span>}
           </div>
           <div className="hud-row score-row">
-            <span className="hud-label">⭐ Score</span>
+            <HudLabel iconClass="hud-icon-score" label="Score" />
             <strong className="score-amount">{safeSnapshot.score.toLocaleString()}</strong>
           </div>
         </div>
         
         <div className="hud-section game-stats">
           <div className="hud-row wave-row">
-            <span className="hud-label">🌊 Wave</span>
+            <HudLabel iconClass="hud-icon-wave" label="Wave" />
             <strong>{safeSnapshot.wave.current} / {safeSnapshot.wave.total}</strong>
             {safeSnapshot.wave.queued > 0 && (
               <span className="queued-info">{safeSnapshot.wave.queued} pending</span>
@@ -86,7 +100,7 @@ export function GameHUD({ snapshot, onRequestReset }: GameHUDProps) {
           </div>
           
           <div className="hud-row speed-row">
-            <span className="hud-label">⚡ Speed</span>
+            <HudLabel iconClass="hud-icon-speed" label="Speed" />
             <strong>{safeSnapshot.gameSpeed}x</strong>
           </div>
           
