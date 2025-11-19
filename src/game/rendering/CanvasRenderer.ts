@@ -2,11 +2,100 @@ import type {
   ViewportSize,
   ViewportTransform,
   GameState,
+  MapData,
+  Enemy,
   MapTile,
   Vector2,
   TowerType,
 } from '@/game/core/types'
 import { palette } from '@/assets/theme'
+
+type TextureKey =
+  | 'grassBase'
+  | 'pathStraight'
+  | 'pathCorner'
+  | 'pathCrossroads'
+  | 'pathTJunction'
+  | 'tower-indica'
+  | 'tower-sativa'
+  | 'tower-support'
+
+const TOWER_TEXTURE_BY_TYPE: Record<TowerType, TextureKey> = {
+  indica: 'tower-indica',
+  sativa: 'tower-sativa',
+  support: 'tower-support',
+}
+
+const TEXTURE_PATHS: Record<TextureKey, string> = {
+  grassBase: new URL('../../../assets/textures/grass_base.png', import.meta.url).href,
+  pathStraight: new URL('../../../assets/textures/path_straight.png', import.meta.url).href,
+  pathCorner: new URL('../../../assets/textures/path_corner.png', import.meta.url).href,
+  pathCrossroads: new URL('../../../assets/textures/path_crossroads.png', import.meta.url).href,
+  pathTJunction: new URL('../../../assets/textures/grass_path_tjunction.png', import.meta.url).href,
+  'tower-indica': new URL('../../../assets/towers/tower_indica_level1.png', import.meta.url).href,
+  'tower-sativa': new URL('../../../assets/towers/tower_sativa_level1.png', import.meta.url).href,
+  'tower-support': new URL('../../../assets/towers/tower_support_level1.png', import.meta.url).href,
+}
+
+class TextureCache {
+  private imageCache = new Map<TextureKey, HTMLImageElement | null>()
+  private patternCache = new WeakMap<CanvasRenderingContext2D, Map<TextureKey, CanvasPattern>>()
+
+  private createImage(url: string): HTMLImageElement | null {
+    if (typeof window === 'undefined' || typeof Image === 'undefined') {
+      return null
+    }
+
+    const image = new Image()
+    image.src = url
+
+    if ('decode' in image) {
+      ;(image.decode() as Promise<void>).catch(() => {
+        /** ignore decode timing **/
+      })
+    }
+
+    return image
+  }
+
+  getImage(key: TextureKey): HTMLImageElement | null {
+    if (this.imageCache.has(key)) {
+      return this.imageCache.get(key) ?? null
+    }
+
+    const url = TEXTURE_PATHS[key]
+    if (!url) {
+      this.imageCache.set(key, null)
+      return null
+    }
+
+    const loadedImage = this.createImage(url)
+    this.imageCache.set(key, loadedImage)
+    return loadedImage
+  }
+
+  getPattern(ctx: CanvasRenderingContext2D, key: TextureKey): CanvasPattern | null {
+    const image = this.getImage(key)
+    if (!image || !image.complete || image.naturalWidth === 0) {
+      return null
+    }
+
+    let ctxPatterns = this.patternCache.get(ctx)
+    if (!ctxPatterns) {
+      ctxPatterns = new Map<TextureKey, CanvasPattern>()
+      this.patternCache.set(ctx, ctxPatterns)
+    }
+
+    if (!ctxPatterns.has(key)) {
+      const pattern = ctx.createPattern(image, 'repeat')
+      if (pattern) {
+        ctxPatterns.set(key, pattern)
+      }
+    }
+
+    return ctxPatterns.get(key) ?? null
+  }
+}
 
 const hexColorRegex = /^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/
 
@@ -55,6 +144,8 @@ export interface CanvasHighlight {
 }
 
 export class CanvasRenderer {
+  private textureCache = new TextureCache()
+
   private drawTowerShadow(ctx: CanvasRenderingContext2D, x: number, y: number, tileSize: number): void {
     // Enhanced multi-layer shadow system
     ctx.fillStyle = 'rgba(0,0,0,0.12)'
@@ -167,55 +258,114 @@ export class CanvasRenderer {
     }
   }
 
-  private drawEnhancedEnemy(ctx: CanvasRenderingContext2D, x: number, y: number, enemy: any, tileSize: number): void {
-    // Enhanced enemy differentiation
-    const radius = enemy.stats.radius
+  private drawTowerSprite(ctx: CanvasRenderingContext2D, x: number, y: number, towerType: TowerType, tileSize: number): void {
+    const textureKey = TOWER_TEXTURE_BY_TYPE[towerType]
+    const sprite = this.textureCache.getImage(textureKey)
+    if (!sprite || !sprite.complete || sprite.naturalWidth === 0) {
+      return
+    }
+
+    const spriteSize = tileSize * 0.9
+    ctx.save()
+    ctx.globalAlpha = 0.92
+    ctx.shadowColor = palette.accentStrong
+    ctx.shadowBlur = 20
+    ctx.drawImage(sprite, x - spriteSize / 2, y - spriteSize / 2, spriteSize, spriteSize)
+    ctx.restore()
+  }
+
+  private drawEnhancedEnemy(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    enemy: Enemy,
+    tileSize: number,
+    scale: number
+  ): void {
     const healthPercent = enemy.health / enemy.maxHealth
-    
-    // Base enemy color with enhanced saturation
-    ctx.fillStyle = enemy.stats.color
+    const syncedScale = Math.max(scale, 0.55)
+    const baseRadius = Math.max(6, enemy.stats.radius * syncedScale)
+    const pathPattern = this.textureCache.getPattern(ctx, 'pathStraight')
+
+    ctx.save()
+    ctx.shadowColor = enemy.stats.color
+    ctx.shadowBlur = baseRadius * 0.9
     ctx.beginPath()
-    ctx.arc(x, y, radius, 0, Math.PI * 2)
+    ctx.arc(x, y, baseRadius, 0, Math.PI * 2)
+    ctx.fillStyle = pathPattern ?? enemy.stats.color
     ctx.fill()
-    
-    // Enhanced enemy characteristics
-    if (enemy.stats.type === 'pest') {
-      // Smaller, darker appearance for pests
-      ctx.fillStyle = 'rgba(0,0,0,0.3)'
-      ctx.beginPath()
-      ctx.arc(x + radius * 0.2, y + radius * 0.2, radius * 0.6, 0, Math.PI * 2)
-      ctx.fill()
-    } else if (enemy.stats.type === 'runner') {
-      // Larger, lighter, with speed lines for runners
-      ctx.strokeStyle = 'rgba(255,255,255,0.4)'
-      ctx.lineWidth = 2
-      for (let i = 0; i < 3; i++) {
+    ctx.restore()
+
+    const glowGradient = ctx.createRadialGradient(
+      x,
+      y,
+      baseRadius * 0.2,
+      x,
+      y,
+      baseRadius
+    )
+    glowGradient.addColorStop(0, 'rgba(255,255,255,0.95)')
+    glowGradient.addColorStop(0.6, enemy.stats.color)
+    glowGradient.addColorStop(1, 'rgba(0,0,0,0.25)')
+
+    ctx.fillStyle = glowGradient
+    ctx.beginPath()
+    ctx.arc(x, y, baseRadius * 0.65, 0, Math.PI * 2)
+    ctx.fill()
+
+    ctx.save()
+    ctx.strokeStyle = 'rgba(255,255,255,0.25)'
+    ctx.lineWidth = Math.max(1, baseRadius * 0.12)
+    ctx.beginPath()
+    ctx.arc(x, y, baseRadius * 1.05, 0, Math.PI * 2)
+    ctx.stroke()
+    ctx.restore()
+
+    if (enemy.type === 'pest') {
+      ctx.fillStyle = 'rgba(0,0,0,0.25)'
+      for (let offset = -1; offset <= 1; offset += 1) {
         ctx.beginPath()
-        ctx.moveTo(x - radius * 1.5 - i * 4, y + (i - 1) * 2)
-        ctx.lineTo(x - radius * 0.8 - i * 4, y + (i - 1) * 2)
+        ctx.ellipse(
+          x + offset * baseRadius * 0.25,
+          y,
+          baseRadius * 0.78,
+          baseRadius * 0.35,
+          0,
+          0,
+          Math.PI * 2
+        )
+        ctx.fill()
+      }
+    } else if (enemy.type === 'runner') {
+      ctx.save()
+      ctx.strokeStyle = 'rgba(255,255,255,0.6)'
+      ctx.lineWidth = Math.max(1, baseRadius * 0.15)
+      for (let i = 0; i < 3; i += 1) {
+        const offset = i * baseRadius * 0.18
+        ctx.beginPath()
+        ctx.moveTo(x - baseRadius - offset, y - (i - 1) * 2)
+        ctx.lineTo(x - baseRadius * 0.4 - offset, y - (i - 1) * 2)
         ctx.stroke()
       }
+      ctx.restore()
     }
-    
-    // Enhanced slow effect indicator
+
     if (enemy.speedMultiplier < 1) {
-      ctx.strokeStyle = 'rgba(124, 197, 255, 0.8)'
+      ctx.strokeStyle = 'rgba(124, 197, 255, 0.85)'
       ctx.lineWidth = 3
       ctx.beginPath()
-      ctx.arc(x, y, radius + 6, 0, Math.PI * 2)
+      ctx.arc(x, y, baseRadius + 6, 0, Math.PI * 2)
       ctx.stroke()
-      
-      // Add pulsing inner ring
-      const pulseRadius = radius + 3 + Math.sin(Date.now() * 0.01) * 2
-      ctx.strokeStyle = 'rgba(124, 197, 255, 0.4)'
+
+      const pulseRadius = baseRadius + 3 + Math.sin(Date.now() * 0.012) * 2
+      ctx.strokeStyle = 'rgba(124, 197, 255, 0.35)'
       ctx.lineWidth = 2
       ctx.beginPath()
       ctx.arc(x, y, pulseRadius, 0, Math.PI * 2)
       ctx.stroke()
     }
-    
-    // Enhanced health bar
-    this.drawEnhancedHealthBar(ctx, x, y, radius, tileSize, healthPercent)
+
+    this.drawEnhancedHealthBar(ctx, x, y, baseRadius, tileSize, healthPercent)
   }
 
   private drawEnhancedHealthBar(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, tileSize: number, healthPercent: number): void {
@@ -290,10 +440,10 @@ export class CanvasRenderer {
       y: offsetY + worldY * scale,
     })
 
-    const tileSize = scale
+    const tileSize = map.cellSize * scale
 
     // Draw map tiles and grid
-    this.drawMap(ctx, map, worldToScreen, scale)
+    this.drawMap(ctx, map, worldToScreen, tileSize)
 
     // Draw path with enhanced visual appeal
     this.drawPath(ctx, state.path, worldToScreen, tileSize)
@@ -308,6 +458,7 @@ export class CanvasRenderer {
       
       // Enhanced shadow system for depth perception
       this.drawTowerShadow(ctx, x, y, tileSize)
+      this.drawTowerSprite(ctx, x, y, tower.type, tileSize)
       
       // Draw distinctive tower silhouettes based on type
       this.drawTowerSilhouette(ctx, x, y - 6, tileSize, tower.type, tower.color)
@@ -359,7 +510,7 @@ export class CanvasRenderer {
     // Enhanced enemy rendering
     enemies.forEach((enemy) => {
       const { x, y } = worldToScreen(enemy.position.x, enemy.position.y)
-      this.drawEnhancedEnemy(ctx, x, y, enemy, tileSize)
+      this.drawEnhancedEnemy(ctx, x, y, enemy, tileSize, scale)
     })
 
     if (debugSettings?.showHitboxes) {
@@ -379,26 +530,69 @@ export class CanvasRenderer {
     }
   }
 
-  private drawMap(ctx: CanvasRenderingContext2D, map: any, worldToScreen: Function, scale: number): void {
-    // Enhanced grid system
+  private drawMap(
+    ctx: CanvasRenderingContext2D,
+    map: MapData,
+    worldToScreen: Function,
+    tileSize: number
+  ): void {
+    const topLeft = worldToScreen(0, 0)
+    const bottomRight = worldToScreen(map.worldWidth, map.worldHeight)
+
+    ctx.save()
+    const grassPattern = this.textureCache.getPattern(ctx, 'grassBase')
+    ctx.fillStyle = grassPattern ?? palette.grass
+    ctx.fillRect(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y)
+    ctx.restore()
+
+    this.drawPathTiles(ctx, map, worldToScreen, tileSize)
+
+    ctx.save()
     ctx.strokeStyle = 'rgba(255,255,255,0.08)'
     ctx.lineWidth = 1
-    
-    for (let x = 0; x <= map.worldWidth; x += map.tileSize) {
+
+    for (let x = 0; x <= map.worldWidth; x += map.cellSize) {
       const screenX = worldToScreen(x, 0).x
       ctx.beginPath()
       ctx.moveTo(screenX, worldToScreen(0, 0).y)
       ctx.lineTo(screenX, worldToScreen(0, map.worldHeight).y)
       ctx.stroke()
     }
-    
-    for (let y = 0; y <= map.worldHeight; y += map.tileSize) {
+
+    for (let y = 0; y <= map.worldHeight; y += map.cellSize) {
       const screenY = worldToScreen(0, y).y
       ctx.beginPath()
       ctx.moveTo(worldToScreen(0, y).x, screenY)
       ctx.lineTo(worldToScreen(map.worldWidth, y).x, screenY)
       ctx.stroke()
     }
+
+    ctx.restore()
+  }
+
+  private drawPathTiles(
+    ctx: CanvasRenderingContext2D,
+    map: MapData,
+    worldToScreen: Function,
+    tileSize: number
+  ): void {
+    const pathPattern = this.textureCache.getPattern(ctx, 'pathStraight')
+    ctx.save()
+    ctx.fillStyle = pathPattern ?? palette.path
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)'
+    ctx.lineWidth = Math.max(1, tileSize * 0.02)
+
+    map.tiles.forEach((tile) => {
+      if (tile.type !== 'path') {
+        return
+      }
+
+      const origin = worldToScreen(tile.grid.x * map.cellSize, tile.grid.y * map.cellSize)
+      ctx.fillRect(origin.x, origin.y, tileSize, tileSize)
+      ctx.strokeRect(origin.x + 0.5, origin.y + 0.5, tileSize - 1, tileSize - 1)
+    })
+
+    ctx.restore()
   }
 
   private drawPath(ctx: CanvasRenderingContext2D, path: any[], worldToScreen: Function, tileSize: number): void {
