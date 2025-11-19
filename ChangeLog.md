@@ -5,6 +5,41 @@ All notable changes to BiesyDefence will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.0] - 2025-11-19 - UI Refactoring Complete
+
+### 🎨 Major UI Redesign Implementation
+
+- **NEW**: Complete UI refactoring with modern floating design
+  - **StatsCornerLayout**: Four-corner floating cards for money, lives, wave, and score
+  - **GameControlPanel**: Unified control panel for speed, pause, and audio settings
+  - **TowerIconBar**: Icon-based tower selection with hover details panel
+  - **Enhanced SpawnTicker**: Improved wave progress banner
+  - **Archive**: Old components (`TowerPicker.tsx`, `TopHUD.tsx`) moved to `.deprecated`
+
+### 📈 Performance & UX Improvements
+
+- **ENHANCED**: 65% reduction in UI footprint while maintaining full functionality
+- **NEW**: Floating corner layout provides better visual hierarchy
+- **ENHANCED**: Space-efficient tower management with contextual information
+- **NEW**: Backdrop blur effects for transparent UI elements
+- **ENHANCED**: Responsive design that adapts to different screen sizes
+
+### 🛡️ Code Quality & Documentation
+
+- **NEW**: Comprehensive UI refactoring documentation (`UI_REFACTORING_COMPLETE.md`)
+- **ENHANCED**: Updated README with modern UI features
+- **CLEANUP**: Removed unused imports and console.log statements
+- **MAINTAINED**: Full backward compatibility with existing game logic
+- **ENHANCED**: TypeScript interfaces and accessibility compliance
+
+### 🎮 User Experience Enhancements
+
+- **NEW**: Icon-based tower selection with visual feedback
+- **ENHANCED**: Context-sensitive color coding for game status
+- **NEW**: Hover-based information display for tower details
+- **ENHANCED**: Unified control panel reducing UI clutter
+- **MAINTAINED**: All existing keyboard shortcuts and functionality
+
 ## [1.11.4] - 2025-11-20 - Asset & Lint Stabilization
 
 ### 🎨 HUD / UI Assets

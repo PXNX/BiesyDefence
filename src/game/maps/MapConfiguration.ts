@@ -67,6 +67,7 @@ export interface MapConfiguration {
   height: number
   cellSize: number
   pathNodes: MapPathNode[]
+  randomPath?: boolean
   theme: string
   backgroundColor: string
   pathColor: string

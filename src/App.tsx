@@ -2,8 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 import { GameController } from '@/game/core/GameController'
 import type { GameSnapshot, GameStatus, TowerType } from '@/game/core/types'
-import { TopHUD } from '@/ui/components/TopHUD'
-import { TowerPicker } from '@/ui/components/TowerPicker'
+import { StatsCornerLayout } from '@/ui/components/StatsCornerLayout'
+import { GameControlPanel } from '@/ui/components/GameControlPanel'
+import { SpawnTicker } from '@/ui/components/SpawnTicker'
+import { TowerIconBar } from '@/ui/components/TowerIconBar'
 import { audioManager } from '@/game/audio/AudioManager'
 import type { AudioConfig } from '@/game/audio/AudioManager'
 import { ErrorBoundary } from '@/ui/components/ErrorBoundary'
@@ -434,35 +436,76 @@ function App() {
           {liveAnnouncement ?? ''}
         </div>
       <main className="game-stage">
-        <section className="canvas-scene">
-          <section className="canvas-wrapper" aria-busy={isCanvasBusy}>
-            {canvasStatusMessage && (
-              <div className="canvas-loading" role="status" aria-live="polite">
-                <span className="spinner" aria-hidden="true" />
-                <span>{canvasStatusMessage}</span>
-              </div>
-            )}
-            <canvas ref={canvasRef} onClick={handleCanvasClick} />
+        <section className="canvas-column">
+          <section className="canvas-scene">
+            <section className="canvas-wrapper" aria-busy={isCanvasBusy}>
+              {canvasStatusMessage && (
+                <div className="canvas-loading" role="status" aria-live="polite">
+                  <span className="spinner" aria-hidden="true" />
+                  <span>{canvasStatusMessage}</span>
+                </div>
+              )}
+              <canvas ref={canvasRef} onClick={handleCanvasClick} />
+            </section>
+            <div className="hud-overlay">
+              <StatsCornerLayout
+                snapshot={snapshot}
+              />
+              {snapshot && (
+                <>
+                  <GameControlPanel
+                    speed={snapshot.gameSpeed ?? 1}
+                    onSpeedChange={handleSpeedChange}
+                    isPaused={snapshot.status === 'paused'}
+                    onPauseToggle={handlePause}
+                    audioConfig={audioConfig}
+                    onToggleMute={handleToggleMute}
+                    onMasterVolumeChange={handleMasterVolumeChange}
+                  />
+                  {(snapshot.nextSpawnCountdown !== null && snapshot.nextSpawnDelay !== null) && (
+                    <SpawnTicker
+                      countdown={snapshot.nextSpawnCountdown}
+                      delay={snapshot.nextSpawnDelay}
+                    />
+                  )}
+                </>
+              )}
+            </div>
           </section>
-          <div className="hud-overlay">
-            <TopHUD
-              snapshot={snapshot}
-              gameSpeed={snapshot?.gameSpeed ?? 1}
-              audioConfig={audioConfig}
-              onPause={handlePause}
-              onSpeedChange={handleSpeedChange}
-              onToggleMute={handleToggleMute}
-              onMasterVolumeChange={handleMasterVolumeChange}
-            />
-          </div>
-          <TowerPicker
-            className="tower-dock"
-            selected={selectedTower}
-            onSelect={handleSelectTower}
-            feedback={feedback}
-            currentMoney={snapshot?.money ?? 0}
-          />
         </section>
+        <aside className="tower-sidebar" aria-label="Tower Shop">
+          <div className="tower-sidebar-panel">
+            <div className="tower-sidebar-header">
+              <p className="sidebar-title">Tower Arsenal</p>
+              <div className="tower-sidebar-stats">
+                <div>
+                  <span>Money</span>
+                  <strong>${snapshot?.money ?? 0}</strong>
+                </div>
+                <div>
+                  <span>Lives</span>
+                  <strong>{snapshot?.lives ?? 0}</strong>
+                </div>
+                <div>
+                  <span>Wave</span>
+                  <strong>
+                    {snapshot ? `${snapshot.wave.current}/${snapshot.wave.total}` : '–'}
+                  </strong>
+                </div>
+              </div>
+            </div>
+            <div className="tower-sidebar-body">
+              <TowerIconBar
+                className="tower-sidebar-list"
+                orientation="vertical"
+                selectedTower={selectedTower}
+                onSelectTower={(towerType: string) => handleSelectTower(towerType as TowerType)}
+                feedback={feedback}
+                money={snapshot?.money ?? 0}
+              />
+            </div>
+          </div>
+        </aside>
       </main>
 
       <div

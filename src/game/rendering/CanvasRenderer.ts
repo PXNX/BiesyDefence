@@ -10,15 +10,7 @@ import type {
 } from '@/game/core/types'
 import { palette } from '@/assets/theme'
 
-type TextureKey =
-  | 'grassBase'
-  | 'pathStraight'
-  | 'pathCorner'
-  | 'pathCrossroads'
-  | 'pathTJunction'
-  | 'tower-indica'
-  | 'tower-sativa'
-  | 'tower-support'
+type TextureKey = 'grassBase' | 'woodBase' | 'tower-indica' | 'tower-sativa' | 'tower-support'
 
 const TOWER_TEXTURE_BY_TYPE: Record<TowerType, TextureKey> = {
   indica: 'tower-indica',
@@ -28,10 +20,7 @@ const TOWER_TEXTURE_BY_TYPE: Record<TowerType, TextureKey> = {
 
 const TEXTURE_PATHS: Record<TextureKey, string> = {
   grassBase: new URL('../../../assets/textures/grass_base.png', import.meta.url).href,
-  pathStraight: new URL('../../../assets/textures/path_straight.png', import.meta.url).href,
-  pathCorner: new URL('../../../assets/textures/path_corner.png', import.meta.url).href,
-  pathCrossroads: new URL('../../../assets/textures/path_crossroads.png', import.meta.url).href,
-  pathTJunction: new URL('../../../assets/textures/grass_path_tjunction.png', import.meta.url).href,
+  woodBase: new URL('../../../assets/textures/wood_base.png', import.meta.url).href,
   'tower-indica': new URL('../../../assets/towers/tower_indica_level1.png', import.meta.url).href,
   'tower-sativa': new URL('../../../assets/towers/tower_sativa_level1.png', import.meta.url).href,
   'tower-support': new URL('../../../assets/towers/tower_support_level1.png', import.meta.url).href,
@@ -285,7 +274,7 @@ export class CanvasRenderer {
     const healthPercent = enemy.health / enemy.maxHealth
     const syncedScale = Math.max(scale, 0.55)
     const baseRadius = Math.max(6, enemy.stats.radius * syncedScale)
-    const pathPattern = this.textureCache.getPattern(ctx, 'pathStraight')
+    const pathPattern = this.textureCache.getPattern(ctx, 'woodBase')
 
     ctx.save()
     ctx.shadowColor = enemy.stats.color

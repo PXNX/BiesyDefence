@@ -52,7 +52,7 @@ export class MapManager {
       width: 45,
       height: 30,
       cellSize: 48,
-      pathNodes: [
+      pathNodes: [ 
         { x: 0, y: 14 },
         { x: 10, y: 14 },
         { x: 10, y: 6 },
@@ -64,6 +64,7 @@ export class MapManager {
         { x: 38, y: 24 },
         { x: 44, y: 24 },
       ],
+      randomPath: true,
       theme: 'cannabis',
       backgroundColor: '#09120a',
       pathColor: '#b08b5e',
@@ -135,27 +136,19 @@ export class MapManager {
    * Generate MapData from MapConfiguration
    */
   private generateMapData(mapConfig: MapConfiguration): MapData {
-    const { width, height, cellSize, pathNodes } = mapConfig
-
-    // Calculate world dimensions
+    const { width, height, cellSize } = mapConfig
     const worldWidth = width * cellSize
     const worldHeight = height * cellSize
 
-    // Generate tiles and identify path
+    const { seed, random } = this.createRandomSource()
+    const pathNodes = mapConfig.randomPath ? this.generateRandomPath(mapConfig, random) : mapConfig.pathNodes
+
     const tiles: MapTile[] = []
     const tileLookup = new Map<string, MapTile>()
     const pathGridKeys = new Set<string>()
-    const pathNodesSet = new Set<string>()
 
-    // Mark path nodes
-    pathNodes.forEach(node => {
-      pathNodesSet.add(`${node.x},${node.y}`)
-    })
-
-    // Generate path grid keys for the entire path
     this.generatePathGridKeys(pathNodes, pathGridKeys)
 
-    // Create all tiles
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         const grid = { x, y }
@@ -163,7 +156,7 @@ export class MapManager {
           x: x * cellSize + cellSize / 2,
           y: y * cellSize + cellSize / 2,
         }
-        const key = `${x},${y}`
+        const key = `${x}:${y}`
         const isPath = pathGridKeys.has(key)
 
         const tile: MapTile = {
@@ -203,7 +196,7 @@ export class MapManager {
       const next = pathNodes[i + 1]
 
       // Add current node
-      pathGridKeys.add(`${current.x},${current.y}`)
+    pathGridKeys.add(`${current.x}:${current.y}`)
 
       // Generate intermediate nodes for straight lines
       if (current.x === next.x) {
@@ -211,21 +204,118 @@ export class MapManager {
         const startY = Math.min(current.y, next.y)
         const endY = Math.max(current.y, next.y)
         for (let y = startY; y <= endY; y++) {
-          pathGridKeys.add(`${current.x},${y}`)
+          pathGridKeys.add(`${current.x}:${y}`)
         }
       } else if (current.y === next.y) {
         // Horizontal movement
         const startX = Math.min(current.x, next.x)
         const endX = Math.max(current.x, next.x)
         for (let x = startX; x <= endX; x++) {
-          pathGridKeys.add(`${x},${current.y}`)
+          pathGridKeys.add(`${x}:${current.y}`)
         }
       }
     }
 
     // Add final node
     const lastNode = pathNodes[pathNodes.length - 1]
-    pathGridKeys.add(`${lastNode.x},${lastNode.y}`)
+    pathGridKeys.add(`${lastNode.x}:${lastNode.y}`)
+  }
+
+  private createRandomSource(): { seed: number; random: () => number } {
+    const seed = this.getRandomSeed()
+    let state = seed
+    return {
+      seed,
+      random: () => {
+        state ^= state << 13
+        state ^= state >>> 17
+        state ^= state << 5
+        return (state >>> 0) / 0xffffffff
+      },
+    }
+  }
+
+  private getRandomSeed(): number {
+    const globalCrypto = (globalThis as typeof globalThis & { crypto?: Crypto }).crypto
+    if (globalCrypto?.getRandomValues) {
+      const array = new Uint32Array(1)
+      globalCrypto.getRandomValues(array)
+      return array[0]
+    }
+    return Math.floor(Math.random() * 0xffffffff)
+  }
+
+  private generateRandomPath(
+    mapConfig: MapConfiguration,
+    random: () => number
+  ): MapPathNode[] {
+    const { width, height } = mapConfig
+    const marginY = 3
+    const startY = this.clamp(
+      Math.floor(this.lerp(marginY, height - marginY - 1, random())),
+      marginY,
+      height - marginY - 1
+    )
+    const targetY = this.clamp(
+      Math.floor(this.lerp(marginY + 2, height - marginY, random())),
+      marginY,
+      height - marginY
+    )
+    const checkpoints = [
+      Math.max(6, Math.floor(width * 0.18)),
+      Math.max(12, Math.floor(width * 0.36)),
+      Math.max(20, Math.floor(width * 0.54)),
+      Math.max(28, Math.floor(width * 0.72)),
+      width - 1,
+    ]
+
+    const nodes: MapPathNode[] = [{ x: 0, y: startY }]
+    let lastX = 0
+    let lastY = startY
+
+    for (let i = 0; i < checkpoints.length; i += 1) {
+      const nextCheckpoint = checkpoints[i]
+      const baseSpan = Math.max(3, nextCheckpoint - lastX)
+      const span = Math.min(width - 1 - lastX, baseSpan + Math.floor(random() * 3))
+      const nextX = lastX + Math.max(1, span)
+
+      if (nextX > lastX) {
+        nodes.push({ x: nextX, y: lastY })
+        lastX = nextX
+      }
+
+      if (lastX >= width - 1) {
+        break
+      }
+
+      const direction = random() < 0.5 ? -1 : 1
+      const shift = Math.floor(2 + random() * 4)
+      const verticalTarget = this.clamp(lastY + direction * shift, marginY, height - marginY)
+
+      if (verticalTarget !== lastY) {
+        nodes.push({ x: lastX, y: verticalTarget })
+        lastY = verticalTarget
+      }
+    }
+
+    if (lastX < width - 1) {
+      nodes.push({ x: width - 1, y: lastY })
+      lastX = width - 1
+    }
+
+    if (lastY !== targetY) {
+      nodes.push({ x: lastX, y: targetY })
+    }
+
+    return nodes
+  }
+
+  private clamp(value: number, min: number, max: number): number {
+    return Math.max(min, Math.min(max, value))
+  }
+
+  private lerp(min: number, max: number, t: number): number {
+    return min + (max - min) * t
   }
 
   /**

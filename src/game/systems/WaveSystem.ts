@@ -36,11 +36,27 @@ export const updateWaves = (
   let spawn = wave.spawnQueue[wave.nextIndex]
   while (spawn && wave.timer >= spawn.delay) {
     wave.timer -= spawn.delay
-    const origin = state.map.pathNodes[0]
+    const gridOrigin = state.map.pathNodes[0]
+    if (!gridOrigin) {
+      console.warn('WaveSystem: cannot spawn enemies because path nodes are missing')
+      break
+    }
+
+    const worldOrigin =
+      state.path[0] ?? {
+        x: gridOrigin.x * state.map.cellSize + state.map.cellSize / 2,
+        y: gridOrigin.y * state.map.cellSize + state.map.cellSize / 2,
+      }
+
+    const jitterRadius = Math.max(2, state.map.cellSize * 0.15)
+    const spawnPosition = {
+      x: worldOrigin.x + (Math.random() - 0.5) * jitterRadius * 2,
+      y: worldOrigin.y + (Math.random() - 0.5) * jitterRadius * 2,
+    }
     
     callbacks?.onEnemySpawn({
       type: spawn.type,
-      spawnPosition: origin
+      spawnPosition
     })
     
     wave.nextIndex += 1

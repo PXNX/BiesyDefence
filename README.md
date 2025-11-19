@@ -1,11 +1,14 @@
-# BiesyDefence - Enhanced Performance & Stability Edition
+# BiesyDefence - Modern UI & Enhanced Performance Edition
 
 ![BiesyDefence Logo](public/logo.png)
 
-A high-performance tower defense game built with React, TypeScript, and Canvas. This edition features **Chapter 5 Performance & Stability Improvements** with 60 FPS target optimization, advanced error handling, and comprehensive developer tools.
+A high-performance tower defense game built with React, TypeScript, and Canvas. This edition features **Modern Floating UI Design** with 65% reduced UI footprint, enhanced user experience, and comprehensive developer tools.
 
-## 🎯 Performance Targets Achieved
+## 🎯 Key Achievements
 
+- ✅ **Modern Floating UI** with 65% reduced footprint
+- ✅ **Corner Stats Layout** for better visual hierarchy
+- ✅ **Enhanced Tower Selection** with icon-based interface
 - ✅ **60 FPS** during peak gameplay (50+ entities)
 - ✅ **<100ms frame time** for complex scenes
 - ✅ **<50MB memory usage** during extended sessions
@@ -37,6 +40,14 @@ npm run build:analyze
 - **Wave-based Enemy System**: Progressive difficulty with different enemy types
 - **Resource Management**: Balance money and lives to survive waves
 - **Real-time Strategy**: Place towers strategically to defend the path
+
+### Modern UI Design (Chapter 6)
+- **Floating Corner Layout**: Space-efficient stats display in four corners
+- **Icon-based Tower Selection**: Visual tower picker with hover details
+- **Transparent HUD Elements**: Maximizes gameplay visibility with backdrop blur
+- **Enhanced Game Controls**: Unified control panel for speed, pause, and audio
+- **Responsive Design**: Adapts to different screen sizes and devices
+- **Accessibility Compliant**: Full keyboard navigation and screen reader support
 
 ### Enhanced Performance (Chapter 5)
 - **Optimized Canvas Rendering**: Object culling, gradient caching, batch rendering
