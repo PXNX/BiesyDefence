@@ -4,9 +4,9 @@ import type { TowerType } from '@/game/core/types'
 // These constants now work with the MapManager system for forward compatibility
 import { MapManager } from '@/game/maps/MapManager'
 
-export const GRID_WIDTH = 12
-export const GRID_HEIGHT = 8
-export const CELL_SIZE = 70
+export const GRID_WIDTH = 45
+export const GRID_HEIGHT = 30
+export const CELL_SIZE = 48
 
 // Chapter 2 Balance: ECONOMY REBALANCING
 // Reduced starting money from 200 to 150 to create economic pressure
@@ -16,12 +16,16 @@ export const INITIAL_LIVES = 20
 export const INITIAL_SCORE = 0
 
 export const PATH_GRID_NODES = [
-  { x: 0, y: 3 },
-  { x: 4, y: 3 },
-  { x: 4, y: 1 },
-  { x: 8, y: 1 },
-  { x: 8, y: 5 },
-  { x: 11, y: 5 },
+  { x: 0, y: 14 },
+  { x: 10, y: 14 },
+  { x: 10, y: 6 },
+  { x: 20, y: 6 },
+  { x: 20, y: 20 },
+  { x: 30, y: 20 },
+  { x: 30, y: 10 },
+  { x: 38, y: 10 },
+  { x: 38, y: 24 },
+  { x: 44, y: 24 },
 ]
 
 export interface TowerProfile {

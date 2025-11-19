@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { TOWER_PROFILES } from '@/game/config/constants'
 import type { TowerProfile } from '@/game/config/constants'
 import type { TowerType } from '@/game/core/types'
@@ -9,97 +10,106 @@ const TOWER_ART_PATHS: Record<TowerType, string> = {
   support: '/towers/tower_support_level1.png',
 }
 
+const TOWER_ENTRIES = Object.entries(TOWER_PROFILES) as [TowerType, TowerProfile][]
+
 interface TowerPickerProps {
   selected: TowerType
   onSelect: (type: TowerType) => void
   feedback?: string | null
   currentMoney: number
+  className?: string
 }
 
-export function TowerPicker({ selected, onSelect, feedback, currentMoney }: TowerPickerProps) {
-  const upgradeSummary = createTowerUpgradeSystem(selected, 1)
+export function TowerPicker({
+  selected,
+  onSelect,
+  feedback,
+  currentMoney,
+  className,
+}: TowerPickerProps) {
+  const [expanded, setExpanded] = useState(false)
+  const [hoveredTower, setHoveredTower] = useState<TowerType | null>(null)
+  const activeTower = hoveredTower ?? selected
+  const upgradeSummary = createTowerUpgradeSystem(activeTower, 1)
   const nextUpgrade = upgradeSummary.nextUpgrade
 
-  return (
-    <div className="tower-picker">
-      <div className="tower-picker-header">
-        <h3>Select Tower</h3>
-        <p className="tower-picker-hint">
-          Choose a tower to preview it, then click on the canvas to deploy when you have enough money.
-        </p>
-        <div className="current-money">
-          Money: <strong>${currentMoney}</strong>
-        </div>
-      </div>
-      <div className="tower-picker-grid">
-        {(Object.entries(TOWER_PROFILES) as [TowerType, TowerProfile][]).map(
-          ([type, profile]) => {
-            const isSelected = selected === type
-            const isAffordable = currentMoney >= profile.cost
-            const isLocked = !isAffordable
-            const showAffordabilityWarning = isLocked && !isSelected
+  const wrapperClassName = [
+    'tower-picker',
+    className,
+    expanded ? 'expanded' : '',
+  ]
 
-            return (
-              <button
-                type="button"
-                key={type}
-                className={`tower-card ${isSelected ? 'selected' : ''} ${
-                  isLocked ? 'locked' : 'affordable'
-                }`}
-                onClick={() => onSelect(type)}
-                aria-pressed={isSelected}
-                aria-disabled={isLocked}
-                aria-label={`${profile.name} tower - Cost: $${profile.cost} ${
-                  isAffordable ? '(Affordable)' : '(Insufficient funds)'
-                }`}
-              >
-                <div className="tower-card-art">
-                  <img
-                    src={TOWER_ART_PATHS[type]}
-                    alt={`${profile.name} preview`}
-                    loading="lazy"
-                    draggable={false}
-                  />
-                </div>
-                <div className="tower-card-meta">
-                  <span className="tower-card-name">{profile.name}</span>
-                  <span className={`tower-card-cost ${!isAffordable ? 'insufficient' : ''}`}>
-                    ${profile.cost}
-                  </span>
-                </div>
-                <p className="tower-card-description">{profile.description}</p>
-                <div className="tower-card-stats">
-                  <span>Range: {profile.range}</span>
-                  <span>Damage: {profile.damage}</span>
-                  <span>Fire: {profile.fireRate.toFixed(2)}s</span>
-                </div>
-                {isLocked && (
-                  <div className="tower-card-lock" aria-hidden="true">
-                    Out of Money
-                  </div>
-                )}
-                {showAffordabilityWarning && (
-                  <div className="affordability-warning">
-                    Requires ${profile.cost - currentMoney} more
-                  </div>
-                )}
-              </button>
-            )
-          }
-        )}
+  const handleToggle = () => {
+    setExpanded((prev) => !prev)
+  }
+
+  const profile = TOWER_PROFILES[activeTower]
+
+  return (
+    <div className={wrapperClassName.filter(Boolean).join(' ')}>
+      <div className="tower-dock-row">
+        <div
+          className="tower-dock-icons"
+          role="list"
+          onMouseLeave={() => setHoveredTower(null)}
+        >
+          {TOWER_ENTRIES.map(([type, towerProfile]) => {
+          const isSelected = type === selected
+          const isAffordable = currentMoney >= towerProfile.cost
+          const iconClass = [
+            'tower-dock-icon',
+            isSelected ? 'active' : '',
+            !isAffordable ? 'locked' : '',
+          ]
+
+          return (
+            <button
+              key={type}
+              type="button"
+              className={iconClass.filter(Boolean).join(' ')}
+              aria-pressed={isSelected}
+              aria-label={`${towerProfile.name} - ${isAffordable ? 'Affordable' : 'Locked'}`}
+              aria-disabled={!isAffordable}
+              onClick={() => onSelect(type)}
+              onMouseEnter={() => setHoveredTower(type)}
+              onFocus={() => setHoveredTower(type)}
+              onBlur={() => setHoveredTower(null)}
+            >
+              <img
+                src={TOWER_ART_PATHS[type]}
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                draggable={false}
+              />
+              <span className="tower-dock-icon-cost">${towerProfile.cost}</span>
+            </button>
+          )
+        })}
+        </div>
+        <button
+          type="button"
+          className="tower-dock-toggle"
+          onClick={handleToggle}
+          aria-pressed={expanded}
+        >
+          {expanded ? 'Hide' : 'Details'}
+        </button>
       </div>
-      <div className="tower-upgrade-preview" aria-live="polite">
-        <span className="upgrade-label">Upgrade preview - Level {upgradeSummary.currentLevel}</span>
-        {nextUpgrade ? (
-          <div className="upgrade-preview-detail">
-            <strong>
-              Level {nextUpgrade.level} - ${upgradeSummary.upgradeCost}
-            </strong>
-            <span>{nextUpgrade.description}</span>
-          </div>
-        ) : (
-          <div className="upgrade-preview-detail upgrade-maxed">Fully upgraded</div>
-        )}
+      <div className={`tower-dock-info ${expanded ? 'visible' : ''}`} aria-live="polite">
+        <div className="tower-dock-info-row">
+          <span>{profile.name}</span>
+          <span>${profile.cost}</span>
+        </div>
+        <div className="tower-dock-info-row stats">
+          <span>Range {profile.range}</span>
+          <span>Damage {profile.damage}</span>
+          <span>Fire {profile.fireRate.toFixed(2)}s</span>
+        </div>
+        <div className="tower-dock-info-row upgrade-row">
+          <span>{nextUpgrade ? `Next L${nextUpgrade.level}` : 'Max level'}</span>
+          {nextUpgrade && <span>${upgradeSummary.upgradeCost}</span>}
+        </div>
       </div>
       {feedback && (
         <p className={`tower-feedback ${feedback.includes('Insufficient') ? 'error' : 'success'}`}>

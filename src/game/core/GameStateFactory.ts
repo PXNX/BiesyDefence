@@ -3,9 +3,10 @@ import {
   MapData,
   MapTile,
   TileType,
+  Tower,
+  TowerType,
   Vector2,
   Wave,
-  Tower,
 } from '@/game/core/types'
 import {
   CELL_SIZE,
@@ -92,55 +93,56 @@ const buildWaves = (): Wave[] => {
   }))
 }
 
-/**
- * Create initial hardcoded towers for testing
- * Places 2 towers strategically near the path but not on it
- */
+const DEFAULT_TOWER_PLACEMENTS: { type: TowerType; grid: Vector2 }[] = [
+  { type: 'indica', grid: { x: 5, y: 13 } },
+  { type: 'sativa', grid: { x: 32, y: 16 } },
+]
+
+const findPlacementTile = (map: MapData, anchor: Vector2): MapTile | undefined => {
+  const clamp = (value: number, max: number) => Math.min(Math.max(0, value), max - 1)
+  const maxRadius = 4
+
+  for (let radius = 0; radius <= maxRadius; radius += 1) {
+    for (let dx = -radius; dx <= radius; dx += 1) {
+      for (let dy = -radius; dy <= radius; dy += 1) {
+        const gridX = clamp(anchor.x + dx, map.width)
+        const gridY = clamp(anchor.y + dy, map.height)
+        const tile = map.tileLookup.get(`${gridX}:${gridY}`)
+        if (tile && tile.type !== 'path') {
+          return tile
+        }
+      }
+    }
+  }
+
+  return map.tiles.find((tile) => tile.type !== 'path')
+}
+
 const createInitialTowers = (map: MapData): Tower[] => {
   const towers: Tower[] = []
-  
-  // Tower 1: Indica tower positioned near the first corner of the path
-  const indicaProfile = TOWER_PROFILES.indica
-  const indicaGridKey = '2:2' // Grid position (2,2) - near path start but not on path
-  const indicaTile = map.tileLookup.get(indicaGridKey)
-  
-  if (indicaTile && indicaTile.type !== 'path') {
+
+  DEFAULT_TOWER_PLACEMENTS.forEach(({ type, grid }) => {
+    const profile = TOWER_PROFILES[type]
+    const tile = findPlacementTile(map, grid)
+    if (!tile) {
+      return
+    }
+
     towers.push({
       id: createEntityId('tower'),
-      type: 'indica',
-      position: { ...indicaTile.center },
-      gridKey: indicaGridKey,
-      range: indicaProfile.range,
-      fireRate: indicaProfile.fireRate,
-      damage: indicaProfile.damage,
-      projectileSpeed: indicaProfile.projectileSpeed,
+      type,
+      position: { ...tile.center },
+      gridKey: `${tile.grid.x}:${tile.grid.y}`,
+      range: profile.range,
+      fireRate: profile.fireRate,
+      damage: profile.damage,
+      projectileSpeed: profile.projectileSpeed,
       cooldown: 0,
-      color: indicaProfile.color,
-      cost: indicaProfile.cost,
+      color: profile.color,
+      cost: profile.cost,
     })
-  }
-  
-  // Tower 2: Sativa tower positioned near the middle section of the path
-  const sativaProfile = TOWER_PROFILES.sativa
-  const sativaGridKey = '6:3' // Grid position (6,3) - near path middle but not on path
-  const sativaTile = map.tileLookup.get(sativaGridKey)
-  
-  if (sativaTile && sativaTile.type !== 'path') {
-    towers.push({
-      id: createEntityId('tower'),
-      type: 'sativa',
-      position: { ...sativaTile.center },
-      gridKey: sativaGridKey,
-      range: sativaProfile.range,
-      fireRate: sativaProfile.fireRate,
-      damage: sativaProfile.damage,
-      projectileSpeed: sativaProfile.projectileSpeed,
-      cooldown: 0,
-      color: sativaProfile.color,
-      cost: sativaProfile.cost,
-    })
-  }
-  
+  })
+
   return towers
 }
 
@@ -151,62 +153,36 @@ export const createInitialState = (options?: {
   useNewSystem?: boolean
 }): GameState => {
   const mapManager = MapManager.getInstance()
-  
-  // Use new map system if requested or if mapId/difficulty specified
-  if (options?.useNewSystem || options?.mapId || options?.difficulty) {
-    const mapId = options.mapId || 'default'
-    const difficulty = options.difficulty || 'normal'
-    
-    try {
-      // Load map using new system
-      const mapData = mapManager.loadMap(mapId, difficulty)
-      const difficultyConfig = mapManager.getCurrentDifficultyConfig()
-      
-      // Apply difficulty modifiers
-      const initialResources = mapManager.applyDifficultyModifiers({
-        initialMoney: INITIAL_MONEY,
-        initialLives: difficultyConfig.initialLives,
-      })
-      
-      const initialTowers = createInitialTowers(mapData)
-      
-      return {
-        map: mapData,
-        path: mapData.pathNodes.map(gridToWorld),
-        enemies: [],
-        towers: initialTowers,
-        projectiles: [],
-        resources: {
-          money: initialResources.initialMoney,
-          lives: initialResources.initialLives,
-          score: INITIAL_SCORE,
-        },
-        waves: buildWaves(),
-        currentWaveIndex: 0,
-        status: 'idle',
-        wavePhase: 'idle',
-        particles: [],
-      }
-    } catch (error) {
-      console.warn(`Failed to load map '${mapId}', falling back to default:`, error)
-      // Fall back to legacy system
-    }
+  const mapId = options?.mapId ?? 'default'
+  const difficulty = options?.difficulty ?? 'normal'
+  mapManager.setDifficulty(difficulty)
+
+  let mapData: MapData
+  try {
+    mapData = mapManager.loadMap(mapId, difficulty)
+  } catch (error) {
+    console.warn(`Failed to load map '${mapId}', falling back to legacy layout:`, error)
+    const legacyPathNodes = PATH_GRID_NODES.map(gridToWorld)
+    mapData = buildMap(legacyPathNodes)
   }
-  
-  // Legacy system (backward compatibility)
-  const pathNodes = PATH_GRID_NODES.map(gridToWorld)
-  const map = buildMap(pathNodes)
-  const initialTowers = createInitialTowers(map)
-  
+
+  const difficultyConfig = mapManager.getCurrentDifficultyConfig()
+  const initialResources = mapManager.applyDifficultyModifiers({
+    initialMoney: difficultyConfig.initialMoney ?? INITIAL_MONEY,
+    initialLives: difficultyConfig.initialLives,
+  })
+
+  const initialTowers = createInitialTowers(mapData)
+
   return {
-    map,
-    path: pathNodes,
+    map: mapData,
+    path: mapData.pathNodes.map(gridToWorld),
     enemies: [],
     towers: initialTowers,
     projectiles: [],
     resources: {
-      money: INITIAL_MONEY,
-      lives: INITIAL_LIVES,
+      money: initialResources.initialMoney,
+      lives: initialResources.initialLives,
       score: INITIAL_SCORE,
     },
     waves: buildWaves(),

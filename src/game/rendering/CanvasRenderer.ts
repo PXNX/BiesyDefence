@@ -420,7 +420,8 @@ export class CanvasRenderer {
     state: GameState,
     viewport: ViewportSize,
     highlight?: CanvasHighlight | null,
-    debugSettings?: { showRanges: boolean; showHitboxes: boolean }
+    debugSettings?: { showRanges: boolean; showHitboxes: boolean },
+    camera?: { center: Vector2; zoom: number }
   ): ViewportTransform {
     const { width, height } = viewport
     const { map, towers, enemies, projectiles, particles } = state
@@ -429,11 +430,17 @@ export class CanvasRenderer {
     ctx.clearRect(0, 0, width, height)
     createGradientBackground(ctx, width, height)
 
-    const scale = Math.min(width / map.worldWidth, height / map.worldHeight) * 0.93
+    const baseScale = Math.min(width / map.worldWidth, height / map.worldHeight) * 0.93
+    const zoom = camera?.zoom ?? 1
+    const scale = Math.max(baseScale * zoom, 0.0001)
+    const center = camera?.center ?? {
+      x: map.worldWidth / 2,
+      y: map.worldHeight / 2,
+    }
+    const offsetX = width / 2 - center.x * scale
+    const offsetY = height / 2 - center.y * scale
     const renderedWidth = map.worldWidth * scale
     const renderedHeight = map.worldHeight * scale
-    const offsetX = (width - renderedWidth) / 2
-    const offsetY = (height - renderedHeight) / 2
 
     const worldToScreen = (worldX: number, worldY: number) => ({
       x: offsetX + worldX * scale,

@@ -3,7 +3,6 @@ import type { MouseEvent } from 'react'
 import { GameController } from '@/game/core/GameController'
 import type { GameSnapshot, GameStatus, TowerType } from '@/game/core/types'
 import { TopHUD } from '@/ui/components/TopHUD'
-import { DebugPanel } from '@/ui/components/DebugPanel'
 import { TowerPicker } from '@/ui/components/TowerPicker'
 import { audioManager } from '@/game/audio/AudioManager'
 import type { AudioConfig } from '@/game/audio/AudioManager'
@@ -196,14 +195,6 @@ function App() {
 
     const result = controller.placeTowerFromScreen(event.clientX, event.clientY, selectedTower)
     setFeedback(result.message)
-  }
-
-  const handleCanvasMove = (event: MouseEvent<HTMLCanvasElement>) => {
-    controllerRef.current?.updateHover(event.clientX, event.clientY)
-  }
-
-  const handleCanvasLeave = () => {
-    controllerRef.current?.clearHover()
   }
 
   const handleSelectTower = (type: TowerType) => {
@@ -442,54 +433,36 @@ function App() {
         <div className="sr-live" role="status" aria-live="polite" aria-atomic="true">
           {liveAnnouncement ?? ''}
         </div>
-      <header className="app-header">
-        <TopHUD
-          snapshot={snapshot}
-          gameSpeed={snapshot?.gameSpeed ?? 1}
-          audioConfig={audioConfig}
-          onPause={handlePause}
-          onSpeedChange={handleSpeedChange}
-          onToggleMute={handleToggleMute}
-          onMasterVolumeChange={handleMasterVolumeChange}
-        />
-      </header>
-
-      <main className="main-stage">
-        <section className="tower-column">
+      <main className="game-stage">
+        <section className="canvas-scene">
+          <section className="canvas-wrapper" aria-busy={isCanvasBusy}>
+            {canvasStatusMessage && (
+              <div className="canvas-loading" role="status" aria-live="polite">
+                <span className="spinner" aria-hidden="true" />
+                <span>{canvasStatusMessage}</span>
+              </div>
+            )}
+            <canvas ref={canvasRef} onClick={handleCanvasClick} />
+          </section>
+          <div className="hud-overlay">
+            <TopHUD
+              snapshot={snapshot}
+              gameSpeed={snapshot?.gameSpeed ?? 1}
+              audioConfig={audioConfig}
+              onPause={handlePause}
+              onSpeedChange={handleSpeedChange}
+              onToggleMute={handleToggleMute}
+              onMasterVolumeChange={handleMasterVolumeChange}
+            />
+          </div>
           <TowerPicker
+            className="tower-dock"
             selected={selectedTower}
             onSelect={handleSelectTower}
             feedback={feedback}
             currentMoney={snapshot?.money ?? 0}
           />
-          <DebugPanel
-            showRanges={snapshot?.showRanges ?? false}
-            showHitboxes={snapshot?.showHitboxes ?? false}
-            fps={snapshot?.fps ?? 0}
-            currentWave={snapshot?.wave.current ?? 1}
-            totalWaves={snapshot?.wave.total ?? 1}
-            quickWaveIndex={quickWaveIndex}
-            onToggleRanges={handleToggleRanges}
-            onToggleHitboxes={handleToggleHitboxes}
-            onSetQuickWave={handleSetQuickWave}
-            onQuickStartWave={handleQuickStartWave}
-          />
         </section>
-
-      <section className="canvas-wrapper" aria-busy={isCanvasBusy}>
-        {canvasStatusMessage && (
-          <div className="canvas-loading" role="status" aria-live="polite">
-            <span className="spinner" aria-hidden="true" />
-            <span>{canvasStatusMessage}</span>
-          </div>
-        )}
-        <canvas
-          ref={canvasRef}
-          onClick={handleCanvasClick}
-          onMouseMove={handleCanvasMove}
-          onMouseLeave={handleCanvasLeave}
-        />
-      </section>
       </main>
 
       <div

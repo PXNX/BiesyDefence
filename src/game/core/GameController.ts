@@ -20,6 +20,9 @@ import { createEntityId } from '@/game/utils/id'
 import { releaseProjectile } from '@/game/utils/pool'
 import { updateEnemySpatialGrid } from '@/game/utils/spatialGrid'
 
+const clampValue = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max)
+
 interface PlacementResult {
   success: boolean
   message: string
@@ -64,17 +67,32 @@ export class GameController {
   private lastKnownWaveIndex = -1
   private lastKnownStatus: GameStatus = 'idle'
   private enemyPositionCache = new Map<string, { x: number; y: number; isDead: boolean }>()
-  private boundCanvasClick: (event: MouseEvent) => void
   private boundMouseMove: (event: MouseEvent) => void
   private boundMouseLeave: () => void
+  private boundCanvasMouseDown: (event: MouseEvent) => void
+  private boundCanvasMouseUp: (event: MouseEvent) => void
+  private boundWheel: (event: WheelEvent) => void
+  private boundContextMenu: (event: MouseEvent) => void
+  private isPanning = false
+  private lastPanPoint: { x: number; y: number } | null = null
+  private camera = {
+    center: { x: 0, y: 0 },
+    zoom: 1,
+    minZoom: 0.7,
+    maxZoom: 1.6,
+  }
 
   constructor() {
     this.state = createInitialState()
     // Add window focus handling
     this.setupWindowFocusHandlers()
-    this.boundCanvasClick = this.handleCanvasClick.bind(this)
     this.boundMouseMove = this.handleMouseMove.bind(this)
     this.boundMouseLeave = this.handleMouseLeave.bind(this)
+    this.boundCanvasMouseDown = this.handlePanStart.bind(this)
+    this.boundCanvasMouseUp = this.handlePanEnd.bind(this)
+    this.boundWheel = this.handleWheel.bind(this)
+    this.boundContextMenu = this.handleContextMenu.bind(this)
+    this.resetCamera()
   }
 
   private setupWindowFocusHandlers() {
@@ -107,6 +125,138 @@ export class GameController {
     })
   }
 
+  private resetCamera() {
+    const map = this.state.map
+    this.camera.center = {
+      x: map.worldWidth / 2,
+      y: map.worldHeight / 2,
+    }
+    this.camera.zoom = 1
+  }
+
+  private calculateBaseScale(): number {
+    const map = this.state.map
+    if (this.viewportSize.width === 0 || this.viewportSize.height === 0) {
+      return 1
+    }
+    const fitWidth = this.viewportSize.width / map.worldWidth
+    const fitHeight = this.viewportSize.height / map.worldHeight
+    return Math.min(fitWidth, fitHeight) * 0.93
+  }
+
+  private clampCameraCenter(scale: number): void {
+    const map = this.state.map
+    const { width, height } = this.viewportSize
+    if (!width || !height || !scale) {
+      return
+    }
+
+    const visibleWidth = width / scale
+    const visibleHeight = height / scale
+
+    if (visibleWidth >= map.worldWidth) {
+      this.camera.center.x = map.worldWidth / 2
+    } else {
+      const halfWidth = visibleWidth / 2
+      this.camera.center.x = clampValue(
+        this.camera.center.x,
+        halfWidth,
+        map.worldWidth - halfWidth
+      )
+    }
+
+    if (visibleHeight >= map.worldHeight) {
+      this.camera.center.y = map.worldHeight / 2
+    } else {
+      const halfHeight = visibleHeight / 2
+      this.camera.center.y = clampValue(
+        this.camera.center.y,
+        halfHeight,
+        map.worldHeight - halfHeight
+      )
+    }
+  }
+
+  private handlePanStart(event: MouseEvent): void {
+    if (!this.canvas || event.button !== 1) {
+      return
+    }
+
+    event.preventDefault()
+    this.isPanning = true
+    this.lastPanPoint = { x: event.clientX, y: event.clientY }
+    this.canvas.style.cursor = 'grabbing'
+  }
+
+  private handlePanMove(event: MouseEvent): void {
+    if (!this.isPanning || !this.lastPanPoint) {
+      return
+    }
+
+    const scale =
+      this.viewportTransform?.scale ??
+      Math.max(this.calculateBaseScale() * this.camera.zoom, 0.0001)
+    const deltaX = event.clientX - this.lastPanPoint.x
+    const deltaY = event.clientY - this.lastPanPoint.y
+    this.camera.center.x -= deltaX / scale
+    this.camera.center.y -= deltaY / scale
+    this.lastPanPoint = { x: event.clientX, y: event.clientY }
+    this.render()
+  }
+
+  private handlePanEnd(): void {
+    if (!this.canvas || !this.isPanning) {
+      return
+    }
+
+    this.isPanning = false
+    this.lastPanPoint = null
+    this.canvas.style.cursor = 'grab'
+  }
+
+  private handleWheel(event: WheelEvent): void {
+    if (!this.canvas) {
+      return
+    }
+
+    event.preventDefault()
+    const rect = this.canvas.getBoundingClientRect()
+    const worldBefore = this.screenToWorld(event.clientX, event.clientY)
+    if (!worldBefore) {
+      return
+    }
+
+    const zoomDelta = -event.deltaY * 0.002
+    const nextZoom = clampValue(
+      this.camera.zoom * (1 + zoomDelta),
+      this.camera.minZoom,
+      this.camera.maxZoom
+    )
+
+    if (nextZoom === this.camera.zoom) {
+      return
+    }
+
+    const canvasWidth = rect.width
+    const canvasHeight = rect.height
+    const relativeX = event.clientX - rect.left
+    const relativeY = event.clientY - rect.top
+    this.camera.zoom = nextZoom
+
+    const finalScale = Math.max(this.calculateBaseScale() * this.camera.zoom, 0.0001)
+    const centerOffsetX = relativeX - canvasWidth / 2
+    const centerOffsetY = relativeY - canvasHeight / 2
+    this.camera.center.x = worldBefore.x - centerOffsetX / finalScale
+    this.camera.center.y = worldBefore.y - centerOffsetY / finalScale
+
+    this.render()
+  }
+
+  private handleContextMenu(event: MouseEvent): void {
+    event.preventDefault()
+    this.handlePanEnd()
+  }
+
   public subscribe(callback: (snapshot: GameSnapshot) => void) {
     this.subscribers.add(callback)
     callback(this.createSnapshot())
@@ -117,9 +267,13 @@ export class GameController {
 
   public setCanvas(canvas: HTMLCanvasElement) {
     if (this.canvas) {
-      this.canvas.removeEventListener('click', this.boundCanvasClick)
       this.canvas.removeEventListener('mousemove', this.boundMouseMove)
       this.canvas.removeEventListener('mouseleave', this.boundMouseLeave)
+      this.canvas.removeEventListener('mousedown', this.boundCanvasMouseDown)
+      this.canvas.removeEventListener('mouseup', this.boundCanvasMouseUp)
+      this.canvas.removeEventListener('wheel', this.boundWheel)
+      this.canvas.removeEventListener('contextmenu', this.boundContextMenu)
+      window.removeEventListener('mouseup', this.boundCanvasMouseUp)
     }
 
     this.canvas = canvas
@@ -130,14 +284,19 @@ export class GameController {
 
     canvas.tabIndex = 0
     canvas.style.touchAction = 'none'
+    canvas.style.cursor = 'grab'
     this.resizeCanvas()
     window.addEventListener('resize', this.resizeCanvas)
     this.render()
 
     // Tower placement mouse events
-    this.canvas.addEventListener('click', this.boundCanvasClick)
     this.canvas.addEventListener('mousemove', this.boundMouseMove)
     this.canvas.addEventListener('mouseleave', this.boundMouseLeave)
+    this.canvas.addEventListener('mousedown', this.boundCanvasMouseDown)
+    this.canvas.addEventListener('mouseup', this.boundCanvasMouseUp)
+    this.canvas.addEventListener('wheel', this.boundWheel, { passive: false })
+    this.canvas.addEventListener('contextmenu', this.boundContextMenu)
+    window.addEventListener('mouseup', this.boundCanvasMouseUp)
   }
 
   public start() {
@@ -175,9 +334,13 @@ export class GameController {
     this.stopLoop()
     window.removeEventListener('resize', this.resizeCanvas)
     if (this.canvas) {
-      this.canvas.removeEventListener('click', this.boundCanvasClick)
       this.canvas.removeEventListener('mousemove', this.boundMouseMove)
       this.canvas.removeEventListener('mouseleave', this.boundMouseLeave)
+      this.canvas.removeEventListener('mousedown', this.boundCanvasMouseDown)
+      this.canvas.removeEventListener('mouseup', this.boundCanvasMouseUp)
+      this.canvas.removeEventListener('wheel', this.boundWheel)
+      this.canvas.removeEventListener('contextmenu', this.boundContextMenu)
+      window.removeEventListener('mouseup', this.boundCanvasMouseUp)
     }
     this.context = undefined
     this.canvas = undefined
@@ -480,6 +643,7 @@ export class GameController {
     // Reset game state to initial values
     this.state = createInitialState()
     this.enemyPositionCache.clear()
+    this.resetCamera()
     
     // Reset tracking variables
     this.lastKnownLives = -1
@@ -759,12 +923,20 @@ export class GameController {
       return
     }
 
+    const baseScale = this.calculateBaseScale()
+    const finalScale = Math.max(baseScale * this.camera.zoom, 0.0001)
+    this.clampCameraCenter(finalScale)
+
     const transform = this.renderer.render(
       this.context,
       this.state,
       this.viewportSize,
       this.hoverState,
-      this.debugSettings
+      this.debugSettings,
+      {
+        center: this.camera.center,
+        zoom: this.camera.zoom,
+      }
     )
     this.viewportTransform = transform
   }
@@ -1111,25 +1283,13 @@ export class GameController {
     }
   }
 
-  private handleCanvasClick(e: MouseEvent): void {
+  private handleMouseMove(e: MouseEvent): void {
     if (!this.canvas) {
       return
     }
 
-    e.preventDefault()
-    const rect = this.canvas.getBoundingClientRect()
-    const screenX = e.clientX - rect.left
-    const screenY = e.clientY - rect.top
-    this.onCanvasClick(screenX, screenY)
-  }
-
-  private onCanvasClick(screenX: number, screenY: number): void {
-    const result = this.placeTowerFromScreen(screenX, screenY, this.previewTowerType)
-    console.log(result.message)
-  }
-
-  private handleMouseMove(e: MouseEvent): void {
-    if (!this.canvas) {
+    if (this.isPanning) {
+      this.handlePanMove(e)
       return
     }
 
@@ -1141,5 +1301,6 @@ export class GameController {
 
   private handleMouseLeave(): void {
     this.clearHover()
+    this.handlePanEnd()
   }
 }
