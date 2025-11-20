@@ -21,7 +21,6 @@ const GameControlPanel = ({
   onPauseToggle,
   audioConfig,
   onToggleMute,
-  onMasterVolumeChange,
 }: GameControlPanelProps) => {
   return (
     <div className="game-control-panel" role="toolbar" aria-label="Game Controls">
@@ -33,12 +32,14 @@ const GameControlPanel = ({
           <PauseButton isPaused={isPaused} onClick={onPauseToggle} />
         </div>
         <div className="control-section audio-inline">
-          <AudioMini
-            muted={audioConfig.muted}
-            volume={audioConfig.masterVolume}
-            onToggleMute={onToggleMute}
-            onVolumeChange={onMasterVolumeChange}
-          />
+          <button
+            type="button"
+            className={`audio-toggle-only ${audioConfig.muted ? 'muted' : ''}`}
+            onClick={onToggleMute}
+            aria-label={audioConfig.muted ? 'Unmute audio' : 'Mute audio'}
+          >
+            {audioConfig.muted ? '🔇' : '🔊'}
+          </button>
         </div>
       </div>
       
@@ -128,75 +129,29 @@ const GameControlPanel = ({
           transform: translateY(-1px);
         }
 
-        .control-section .audio-mini {
-          display: flex;
-          align-items: center;
-          gap: 0.375rem;
+        .audio-toggle-only {
           background: rgba(90, 138, 90, 0.12);
-          border: 1px solid rgba(90, 138, 90, 0.18);
-          border-radius: 6px;
-          padding: 0.375rem;
-        }
-
-        .control-section .audio-toggle {
-          background: none;
-          border: none;
-          color: #90EE90;
-          font-size: 0.875rem;
-          cursor: pointer;
-          padding: 0.1875rem;
-          border-radius: 4px;
-          transition: all 0.2s ease;
-        }
-
-        .control-section .audio-toggle:hover {
-          background: rgba(90, 138, 90, 0.2);
-        }
-
-        .control-section .audio-toggle.muted {
-          color: rgba(144, 238, 144, 0.5);
-        }
-
-        .control-section .mini-volume-slider {
-          appearance: none;
-          background: rgba(90, 138, 90, 0.15);
           border: 1px solid rgba(90, 138, 90, 0.2);
-          border-radius: 3px;
-          height: 3px;
-          outline: none;
-          width: 45px;
+          color: #90EE90;
+          font-size: 0.95rem;
           cursor: pointer;
-          position: relative;
+          padding: 0.25rem 0.4rem;
+          border-radius: 6px;
+          transition: all 0.2s ease;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 36px;
         }
 
-        .control-section .mini-volume-slider::-webkit-slider-thumb {
-          appearance: none;
-          background: #4ADE80;
-          border: none;
-          border-radius: 50%;
-          width: 10px;
-          height: 10px;
-          cursor: pointer;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        .audio-toggle-only:hover {
+          background: rgba(90, 138, 90, 0.22);
+          transform: translateY(-1px);
         }
 
-        .control-section .mini-volume-slider::-webkit-slider-track {
-          background: rgba(90, 138, 90, 0.15);
-          border: none;
-          border-radius: 3px;
-          height: 3px;
-          position: relative;
-        }
-
-        .control-section .mini-volume-slider::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          height: 100%;
-          background: linear-gradient(to right, #4ADE80 0%, var(--volume-level));
-          border-radius: 3px;
-          pointer-events: none;
+        .audio-toggle-only.muted {
+          color: rgba(144, 238, 144, 0.6);
+          border-color: rgba(144, 238, 144, 0.25);
         }
 
         /* Responsive design for 2-row layout */
