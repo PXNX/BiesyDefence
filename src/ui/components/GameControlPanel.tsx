@@ -25,19 +25,14 @@ const GameControlPanel = ({
 }: GameControlPanelProps) => {
   return (
     <div className="game-control-panel" role="toolbar" aria-label="Game Controls">
-      {/* Row 1: Speed controls and Pause button */}
-      <div className="control-row control-row-1">
+      <div className="control-row control-row-single">
         <div className="control-section">
           <SpeedChips speed={speed} onChange={onSpeedChange} />
         </div>
         <div className="control-section">
           <PauseButton isPaused={isPaused} onClick={onPauseToggle} />
         </div>
-      </div>
-      
-      {/* Row 2: Audio controls */}
-      <div className="control-row control-row-2">
-        <div className="control-section">
+        <div className="control-section audio-inline">
           <AudioMini
             muted={audioConfig.muted}
             volume={audioConfig.masterVolume}
@@ -49,45 +44,28 @@ const GameControlPanel = ({
       
       <style>{`
         .game-control-panel {
-          position: fixed;
-          top: 1rem;
-          right: 1rem;
-          transform: none;
-          background: rgba(5, 15, 9, 0.12);
-          backdrop-filter: blur(6px);
-          border: 1px solid rgba(255, 255, 255, 0.03);
-          border-radius: 6px;
-          padding: 0.25rem;
-          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          z-index: 90;
+          background: rgba(5, 15, 9, 0.7);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 10px;
+          padding: 0.4rem 0.5rem;
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+          transition: all 0.25s ease;
           display: flex;
           flex-direction: column;
           gap: 0.25rem;
-          opacity: 0.3;
-          min-height: 48px;
-        }
-
-        .game-control-panel:hover {
-          transform: translateY(-1px);
-          background: rgba(5, 15, 9, 0.45);
-          opacity: 1;
-          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          width: 220px;
         }
 
         .control-row {
           display: flex;
-          gap: 0.25rem;
+          gap: 0.4rem;
           align-items: center;
+          justify-content: flex-end;
         }
 
-        .control-row-1 {
+        .control-row-single {
           justify-content: space-between;
-        }
-
-        .control-row-2 {
-          justify-content: center;
         }
 
         .control-section {
@@ -154,8 +132,8 @@ const GameControlPanel = ({
           display: flex;
           align-items: center;
           gap: 0.375rem;
-          background: rgba(90, 138, 90, 0.15);
-          border: 1px solid rgba(90, 138, 90, 0.2);
+          background: rgba(90, 138, 90, 0.12);
+          border: 1px solid rgba(90, 138, 90, 0.18);
           border-radius: 6px;
           padding: 0.375rem;
         }
@@ -224,15 +202,15 @@ const GameControlPanel = ({
         /* Responsive design for 2-row layout */
         @media (max-width: 768px) {
           .game-control-panel {
-            top: 0.5rem;
-            right: 0.5rem;
             padding: 0.1875rem;
             gap: 0.1875rem;
             min-height: 40px;
+            width: 200px;
           }
 
           .control-row {
             gap: 0.1875rem;
+            flex-wrap: wrap;
           }
 
           .control-section .mini-volume-slider {
@@ -242,15 +220,15 @@ const GameControlPanel = ({
 
         @media (max-width: 480px) {
           .game-control-panel {
-            top: 0.375rem;
-            right: 0.375rem;
             padding: 0.125rem;
             gap: 0.125rem;
             min-height: 36px;
+            width: 180px;
           }
 
           .control-row {
             gap: 0.125rem;
+            justify-content: space-between;
           }
 
           .control-section .speed-chips {

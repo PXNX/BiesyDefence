@@ -450,38 +450,36 @@ function App() {
               </section>
               <div className="hud-overlay">
                 <StatsCornerLayout snapshot={snapshot} />
-                {snapshot && (
-                  <>
-                    <GameControlPanel
-                      speed={snapshot.gameSpeed ?? 1}
-                      onSpeedChange={handleSpeedChange}
-                      isPaused={snapshot.status === 'paused'}
-                      onPauseToggle={handlePause}
-                      audioConfig={audioConfig}
-                      onToggleMute={handleToggleMute}
-                      onMasterVolumeChange={handleMasterVolumeChange}
-                    />
-                    {(snapshot.nextSpawnCountdown !== null &&
-                      snapshot.nextSpawnDelay !== null) && (
-                      <SpawnTicker
-                        countdown={snapshot.nextSpawnCountdown}
-                        delay={snapshot.nextSpawnDelay}
-                      />
-                    )}
-                  </>
+                {snapshot && snapshot.nextSpawnCountdown !== null && snapshot.nextSpawnDelay !== null && (
+                  <SpawnTicker
+                    countdown={snapshot.nextSpawnCountdown}
+                    delay={snapshot.nextSpawnDelay}
+                  />
                 )}
               </div>
-              <div className="tower-dock-shell">
-              <div className="tower-dock" role="complementary" aria-label="Tower Arsenal">
-                <TowerIconBar
-                  className="tower-dock-bar"
-                  orientation="horizontal"
-                  selectedTower={selectedTower}
-                  onSelectTower={(towerType: string) => handleSelectTower(towerType as TowerType)}
-                  feedback={feedback}
-                  money={snapshot?.money ?? 0}
-                />
-                <div className="tower-dock-meta" aria-hidden={!snapshot}>
+              {snapshot && (
+                <aside className="side-dock-panel" aria-label="Controls and towers">
+                  <GameControlPanel
+                    speed={snapshot.gameSpeed ?? 1}
+                    onSpeedChange={handleSpeedChange}
+                    isPaused={snapshot.status === 'paused'}
+                    onPauseToggle={handlePause}
+                    audioConfig={audioConfig}
+                    onToggleMute={handleToggleMute}
+                    onMasterVolumeChange={handleMasterVolumeChange}
+                  />
+                  <TowerIconBar
+                    className="tower-dock-bar"
+                    orientation="vertical"
+                    selectedTower={selectedTower}
+                    onSelectTower={(towerType: string) => handleSelectTower(towerType as TowerType)}
+                    feedback={feedback}
+                    money={snapshot?.money ?? 0}
+                  />
+                </aside>
+              )}
+              <div className="info-bar-shell">
+                <div className="info-bar" role="status" aria-label="Resource summary">
                   <div className="meta-pill">
                     <span>Money</span>
                     <strong>${snapshot?.money ?? 0}</strong>
@@ -496,7 +494,6 @@ function App() {
                   </div>
                 </div>
               </div>
-            </div>
             </section>
           </section>
         </main>
