@@ -5,6 +5,14 @@ All notable changes to BiesyDefence will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 2025-11-20
+
+### 🗺️ Expanded Default Map & HUD polish
+
+- **Expanded field grid**: the default `Verdant Reach` map now covers a 68×45 tile grid (50 % wider/taller), keeping the same `48px` cell resolution so all calculated world bounds, enemy paths, textures, and camera fit logic scale automatically.
+- **Path data update**: the handcrafted `pathNodes` array tracks the new extents so waves still follow a smooth, looping route that now reaches the full width before exiting.
+- **HUD cleanup**: `StatsCornerLayout` now only shows wave and score corners while the floating tower dock presents money/lives/wave below the compact tower icons, eliminating redundant overlays over the map.
+
 ## [1.12.0] - 2025-11-19 - UI Refactoring Complete
 
 ### 🎨 Major UI Redesign Implementation

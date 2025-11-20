@@ -308,6 +308,7 @@ function App() {
   const showGameOverOverlay =
     snapshot?.status === 'won' || snapshot?.status === 'lost'
   const isAppBusy = appPhase === 'loading' || appPhase === 'resetting'
+  const waveLabel = snapshot ? `${snapshot.wave.current}/${snapshot.wave.total}` : '--/--'
   const canvasStatusMessage = !isAudioReady
     ? 'Loading audio...'
     : appPhase === 'resetting'
@@ -435,79 +436,70 @@ function App() {
         <div className="sr-live" role="status" aria-live="polite" aria-atomic="true">
           {liveAnnouncement ?? ''}
         </div>
-      <main className="game-stage">
-        <section className="canvas-column">
-          <section className="canvas-scene">
-            <section className="canvas-wrapper" aria-busy={isCanvasBusy}>
-              {canvasStatusMessage && (
-                <div className="canvas-loading" role="status" aria-live="polite">
-                  <span className="spinner" aria-hidden="true" />
-                  <span>{canvasStatusMessage}</span>
-                </div>
-              )}
-              <canvas ref={canvasRef} onClick={handleCanvasClick} />
-            </section>
-            <div className="hud-overlay">
-              <StatsCornerLayout
-                snapshot={snapshot}
-              />
-              {snapshot && (
-                <>
-                  <GameControlPanel
-                    speed={snapshot.gameSpeed ?? 1}
-                    onSpeedChange={handleSpeedChange}
-                    isPaused={snapshot.status === 'paused'}
-                    onPauseToggle={handlePause}
-                    audioConfig={audioConfig}
-                    onToggleMute={handleToggleMute}
-                    onMasterVolumeChange={handleMasterVolumeChange}
-                  />
-                  {(snapshot.nextSpawnCountdown !== null && snapshot.nextSpawnDelay !== null) && (
-                    <SpawnTicker
-                      countdown={snapshot.nextSpawnCountdown}
-                      delay={snapshot.nextSpawnDelay}
+        <main className="game-stage">
+          <section className="canvas-column">
+            <section className="canvas-scene">
+              <section className="canvas-wrapper" aria-busy={isCanvasBusy}>
+                {canvasStatusMessage && (
+                  <div className="canvas-loading" role="status" aria-live="polite">
+                    <span className="spinner" aria-hidden="true" />
+                    <span>{canvasStatusMessage}</span>
+                  </div>
+                )}
+                <canvas ref={canvasRef} onClick={handleCanvasClick} />
+              </section>
+              <div className="hud-overlay">
+                <StatsCornerLayout snapshot={snapshot} />
+                {snapshot && (
+                  <>
+                    <GameControlPanel
+                      speed={snapshot.gameSpeed ?? 1}
+                      onSpeedChange={handleSpeedChange}
+                      isPaused={snapshot.status === 'paused'}
+                      onPauseToggle={handlePause}
+                      audioConfig={audioConfig}
+                      onToggleMute={handleToggleMute}
+                      onMasterVolumeChange={handleMasterVolumeChange}
                     />
-                  )}
-                </>
-              )}
-            </div>
-          </section>
-        </section>
-        <aside className="tower-sidebar" aria-label="Tower Shop">
-          <div className="tower-sidebar-panel">
-            <div className="tower-sidebar-header">
-              <p className="sidebar-title">Tower Arsenal</p>
-              <div className="tower-sidebar-stats">
-                <div>
-                  <span>Money</span>
-                  <strong>${snapshot?.money ?? 0}</strong>
-                </div>
-                <div>
-                  <span>Lives</span>
-                  <strong>{snapshot?.lives ?? 0}</strong>
-                </div>
-                <div>
-                  <span>Wave</span>
-                  <strong>
-                    {snapshot ? `${snapshot.wave.current}/${snapshot.wave.total}` : '–'}
-                  </strong>
+                    {(snapshot.nextSpawnCountdown !== null &&
+                      snapshot.nextSpawnDelay !== null) && (
+                      <SpawnTicker
+                        countdown={snapshot.nextSpawnCountdown}
+                        delay={snapshot.nextSpawnDelay}
+                      />
+                    )}
+                  </>
+                )}
+              </div>
+              <div className="tower-dock-shell">
+              <div className="tower-dock" role="complementary" aria-label="Tower Arsenal">
+                <TowerIconBar
+                  className="tower-dock-bar"
+                  orientation="horizontal"
+                  selectedTower={selectedTower}
+                  onSelectTower={(towerType: string) => handleSelectTower(towerType as TowerType)}
+                  feedback={feedback}
+                  money={snapshot?.money ?? 0}
+                />
+                <div className="tower-dock-meta" aria-hidden={!snapshot}>
+                  <div className="meta-pill">
+                    <span>Money</span>
+                    <strong>${snapshot?.money ?? 0}</strong>
+                  </div>
+                  <div className="meta-pill">
+                    <span>Lives</span>
+                    <strong>{snapshot?.lives ?? 0}</strong>
+                  </div>
+                  <div className="meta-pill">
+                    <span>Wave</span>
+                    <strong>{waveLabel}</strong>
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="tower-sidebar-body">
-              <TowerIconBar
-                className="tower-sidebar-list"
-                orientation="vertical"
-                selectedTower={selectedTower}
-                onSelectTower={(towerType: string) => handleSelectTower(towerType as TowerType)}
-                feedback={feedback}
-                money={snapshot?.money ?? 0}
-              />
-            </div>
-          </div>
-        </aside>
-      </main>
-
+            </section>
+          </section>
+        </main>
       <div
         className={`overlay-panel start-overlay ${showStartOverlay ? 'visible' : ''}`}
         aria-hidden={!showStartOverlay}
