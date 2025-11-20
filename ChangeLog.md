@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Path data update**: the handcrafted `pathNodes` array tracks the new extents so waves still follow a smooth, looping route that now reaches the full width before exiting.
 - **HUD cleanup**: `StatsCornerLayout` now only shows wave and score corners while the floating tower dock presents money/lives/wave below the compact tower icons, eliminating redundant overlays over the map.
 
+### ⚔️ Gameplay Balancing & Scaling
+
+- Added typed damage/resistance system (`impact`, `volley`, `control`, `dot`) so tower shots, slows, and DoTs respect enemy resistances and vulnerability debuffs.
+- Expanded enemy roster with `swarm`, `armored_pest`, `swift_runner`, `bulwark`, and `carrier_boss`, plus per-wave HP/Speed/Reward scaling tied to map difficulty.
+- Reworked waves to 20 rounds with phase-based compositions, boss death-spawns, and a streak-based reward bonus.
+- Rebalanced towers: Indica higher impact damage, Sativa light splash volleys, Support slows + DoT + vulnerability; upgrade costs tuned for mid/late progression.
+
 ## [1.12.0] - 2025-11-19 - UI Refactoring Complete
 
 ### 🎨 Major UI Redesign Implementation

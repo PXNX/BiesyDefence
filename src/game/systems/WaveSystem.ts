@@ -7,6 +7,7 @@ const hasActiveEnemies = (state: GameState): boolean => {
 export interface WaveSpawnRequest {
   type: EnemyType
   spawnPosition: { x: number; y: number }
+  waveIndex: number
 }
 
 export interface WaveSystemCallbacks {
@@ -56,7 +57,8 @@ export const updateWaves = (
     
     callbacks?.onEnemySpawn({
       type: spawn.type,
-      spawnPosition
+      spawnPosition,
+      waveIndex: state.currentWaveIndex
     })
     
     wave.nextIndex += 1

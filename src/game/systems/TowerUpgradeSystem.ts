@@ -10,15 +10,15 @@ const TOWER_UPGRADE_PATHS: Record<TowerType, TowerUpgrade[]> = {
     },
     {
       level: 2,
-      cost: 45,
+      cost: 50,
       statMultiplier: 1.15,
-      description: 'Precision Rounds: +15% damage and improved accuracy for multi-target bursts.',
+      description: 'Precision Rounds: +15% damage and +10% range for better pick-offs.',
     },
     {
       level: 3,
-      cost: 80,
+      cost: 95,
       statMultiplier: 1.35,
-      description: 'Auto-Targeting Rounds: +35% damage with faster tracking for late waves.',
+      description: 'Overpenetration: +35% damage, minor pierce/bonus vs armored.',
     },
   ],
   sativa: [
@@ -30,13 +30,13 @@ const TOWER_UPGRADE_PATHS: Record<TowerType, TowerUpgrade[]> = {
     },
     {
       level: 2,
-      cost: 40,
+      cost: 45,
       statMultiplier: 1.1,
-      description: 'Ion Loops: +10% projectile speed and slightly wider spread.',
+      description: 'Ion Loops: +10% projectile speed and light splash.',
     },
     {
       level: 3,
-      cost: 70,
+      cost: 85,
       statMultiplier: 1.3,
       description: 'Hyperfire Mode: +30% damage with expert timing on aoe bursts.',
     },
@@ -50,15 +50,15 @@ const TOWER_UPGRADE_PATHS: Record<TowerType, TowerUpgrade[]> = {
     },
     {
       level: 2,
-      cost: 35,
+      cost: 40,
       statMultiplier: 1.05,
       description: 'Temporal Nets: extends slow duration by 0.5 seconds.',
     },
     {
       level: 3,
-      cost: 65,
+      cost: 75,
       statMultiplier: 1.2,
-      description: 'Phase Anchors: significant slow plus minor damage amplification.',
+      description: 'Phase Anchors: vulnerability debuff and DoT amplification.',
     },
   ],
 }

@@ -77,7 +77,7 @@ describe('Logger', () => {
       
       const fps = logger.getCurrentFps()
       expect(fps).toBeGreaterThan(0)
-      expect(fps).toBeFinite()
+      expect(Number.isFinite(fps)).toBe(true)
     })
   })
 

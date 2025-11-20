@@ -1,5 +1,14 @@
-import type { Enemy, EnemyStats, EnemyType, FutureEnemyType, Vector2 } from '@/game/core/types'
+import type {
+  DamageResistances,
+  DamageType,
+  Enemy,
+  EnemyStats,
+  EnemyType,
+  EnemyTag,
+  Vector2,
+} from '@/game/core/types'
 import { createEntityId } from '@/game/utils/id'
+import { MapManager } from '@/game/maps/MapManager'
 
 export const ENEMY_PROFILES: Record<EnemyType, EnemyStats> = {
   pest: {
@@ -9,6 +18,8 @@ export const ENEMY_PROFILES: Record<EnemyType, EnemyStats> = {
     damageToLives: 1,
     color: '#ffc45c',
     radius: 9,
+    resistances: {},
+    tags: [],
   },
   runner: {
     speed: 150,
@@ -17,35 +28,95 @@ export const ENEMY_PROFILES: Record<EnemyType, EnemyStats> = {
     damageToLives: 1,
     color: '#ff7bd4',
     radius: 8,
+    resistances: { control: 0.3 },
+    slowCap: 0.7,
+    tags: ['fast'] as EnemyTag[],
   },
-}
-
-// TODO: Chapter 2 Balance - Future enemy types for extended gameplay
-// armored_pest: High health (80), low speed (70), resistant to Sativa towers
-// swift_runner: Very high speed (200), medium health (25), resistant to Support slow
-export const FUTURE_ENEMY_PROFILES: Record<Exclude<FutureEnemyType, EnemyType>, EnemyStats> = {
-  // TODO: Implement armored_pest profile
   armored_pest: {
     speed: 70,
     health: 80,
     reward: 20,
     damageToLives: 1,
-    color: '#8b5a2b', // Brown
+    color: '#8b5a2b',
     radius: 10,
+    resistances: { volley: 0.25 },
+    tags: ['armored'] as EnemyTag[],
   },
-  // TODO: Implement swift_runner profile
   swift_runner: {
     speed: 200,
     health: 25,
     reward: 22,
     damageToLives: 1,
-    color: '#00bfff', // Deep sky blue
+    color: '#00bfff',
     radius: 7,
+    resistances: { control: 0.4 },
+    slowCap: 0.8,
+    tags: ['fast'] as EnemyTag[],
+  },
+  swarm: {
+    speed: 115,
+    health: 18,
+    reward: 6,
+    damageToLives: 1,
+    color: '#d0ff6a',
+    radius: 7,
+    resistances: { impact: 0.1, volley: -0.2 },
+    tags: ['swarm'] as EnemyTag[],
+  },
+  bulwark: {
+    speed: 65,
+    health: 160,
+    reward: 48,
+    damageToLives: 2,
+    color: '#c7b2ff',
+    radius: 12,
+    resistances: { volley: 0.35, dot: 0.5 },
+    tags: ['armored', 'shielded'] as EnemyTag[],
+  },
+  carrier_boss: {
+    speed: 85,
+    health: 220,
+    reward: 80,
+    damageToLives: 3,
+    color: '#ff9e7f',
+    radius: 14,
+    resistances: { volley: 0.35, control: 0.25 },
+    slowCap: 0.7,
+    tags: ['boss'] as EnemyTag[],
+    onDeathSpawn: {
+      type: 'swarm',
+      count: 3,
+    },
   },
 }
 
-export const createEnemy = (type: EnemyType, spawnPosition: Vector2): Enemy => {
-  const stats = ENEMY_PROFILES[type]
+const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
+
+const getWaveScaling = (waveIndex: number) => {
+  const hpScale = clamp(1 + 0.07 * waveIndex, 1, 2.2)
+  const speedScale = clamp(1 + 0.02 * waveIndex, 1, 1.4)
+  const rewardScale = 1 + 0.03 * waveIndex
+  const isEliteBoost =
+    waveIndex === 9 || waveIndex === 14 ? 1.2 : waveIndex === 19 ? 1.25 : 1
+  return {
+    hpScale: hpScale * isEliteBoost,
+    speedScale: speedScale * isEliteBoost,
+    rewardScale: rewardScale * isEliteBoost,
+  }
+}
+
+export const createEnemy = (type: EnemyType, spawnPosition: Vector2, waveIndex = 0): Enemy => {
+  const base = ENEMY_PROFILES[type] ?? ENEMY_PROFILES.pest
+  const difficultyConfig = MapManager.getInstance().getCurrentDifficultyConfig()
+  const { hpScale, speedScale, rewardScale } = getWaveScaling(waveIndex)
+
+  const stats: EnemyStats = {
+    ...base,
+    speed: Math.round(base.speed * speedScale * difficultyConfig.enemySpeedMultiplier),
+    health: Math.round(base.health * hpScale * difficultyConfig.enemyHealthMultiplier),
+    reward: Math.round(base.reward * rewardScale * difficultyConfig.enemyRewardMultiplier),
+  }
+
   return {
     id: createEntityId('enemy'),
     type,
@@ -58,8 +129,12 @@ export const createEnemy = (type: EnemyType, spawnPosition: Vector2): Enemy => {
     reachedGoal: false,
     rewardClaimed: false,
     speedMultiplier: 1,
-    // Chapter 2 Balance: Initialize support tower slow effects array
     slowEffects: [],
+    dotEffects: [],
+    resistances: stats.resistances,
+    vulnerability: stats.vulnerability ?? 0,
+    tags: stats.tags as EnemyTag[] | undefined,
+    vulnerabilityEffects: [],
   }
 }
 
@@ -86,6 +161,17 @@ export class EnemyEntity {
     multiplier: number
     appliedBy: string // tower id
   }[]
+  public dotEffects: {
+    duration: number
+    remainingTime: number
+    dps: number
+    damageType: DamageType
+    appliedBy: string // tower id
+  }[]
+  public resistances?: DamageResistances
+  public vulnerability?: number
+  public tags?: EnemyTag[]
+  public vulnerabilityEffects?: { amount: number; remainingTime: number }[]
 
   constructor(type: EnemyType, spawnPosition: Vector2) {
     const stats = ENEMY_PROFILES[type]
@@ -101,6 +187,11 @@ export class EnemyEntity {
     this.rewardClaimed = false
     this.speedMultiplier = 1
     this.slowEffects = []
+    this.dotEffects = []
+    this.resistances = stats.resistances
+    this.vulnerability = stats.vulnerability ?? 0
+    this.tags = stats.tags as EnemyTag[] | undefined
+    this.vulnerabilityEffects = []
   }
 
   /**
@@ -250,6 +341,11 @@ export class EnemyEntity {
       rewardClaimed: this.rewardClaimed,
       speedMultiplier: this.speedMultiplier,
       slowEffects: [...this.slowEffects],
+      dotEffects: [...this.dotEffects],
+      resistances: this.resistances,
+      vulnerability: this.vulnerability,
+      tags: this.tags,
+      vulnerabilityEffects: this.vulnerabilityEffects ? [...this.vulnerabilityEffects] : [],
     }
   }
 }

@@ -1,6 +1,7 @@
 import type { GameState } from '@/game/core/types'
 import { distanceBetween, normalize } from '@/game/utils/math'
 import { createImpactParticles } from '@/game/entities/particles'
+import { applyDamageToEnemy, findSplashTargets } from '@/game/utils/combat'
 
 export const updateProjectiles = (state: GameState, deltaSeconds: number): void => {
   state.projectiles.forEach((projectile) => {
@@ -22,7 +23,17 @@ export const updateProjectiles = (state: GameState, deltaSeconds: number): void 
     const travelDistance = projectile.speed * deltaSeconds
 
     if (distToTarget <= travelDistance) {
-      target.health = Math.max(target.health - projectile.damage, 0)
+      const dmgType = projectile.damageType ?? 'impact'
+      applyDamageToEnemy(target, projectile.damage, dmgType)
+      const splashTargets =
+        projectile.splashRadius && projectile.splashRadius > 0
+          ? findSplashTargets(target.position, state.enemies, projectile.splashRadius, target.id)
+          : []
+      if (splashTargets.length > 0) {
+        splashTargets.forEach((enemy) => {
+          applyDamageToEnemy(enemy, Math.floor(projectile.damage * 0.5), dmgType)
+        })
+      }
       projectile.isExpired = true
       if (target.health === 0) {
         target.isDead = true

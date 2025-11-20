@@ -17,10 +17,10 @@ export interface CanvasHighlight {
 }
 
 // Caching system for expensive operations
-class RenderCache {
-  private gradients = new Map<string, CanvasGradient>()
-  private offscreenCanvas?: HTMLCanvasElement
-  private offscreenContext?: CanvasRenderingContext2D
+  class RenderCache {
+    private gradients = new Map<string, CanvasGradient>()
+    private offscreenCanvas?: OffscreenCanvas | HTMLCanvasElement
+    private offscreenContext?: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D
 
   // Viewport culling bounds
   private cullingMargin = 50 // Extra margin to prevent edge popping
@@ -29,12 +29,18 @@ class RenderCache {
     this.initializeOffscreenCanvas()
   }
 
-  private initializeOffscreenCanvas() {
-    if (typeof OffscreenCanvas !== 'undefined') {
-      this.offscreenCanvas = new OffscreenCanvas(256, 256)
-      this.offscreenContext = this.offscreenCanvas.getContext('2d')
+    private initializeOffscreenCanvas() {
+      if (typeof OffscreenCanvas !== 'undefined') {
+        this.offscreenCanvas = new OffscreenCanvas(256, 256) as OffscreenCanvas
+        this.offscreenContext = this.offscreenCanvas.getContext('2d') ?? undefined
+      } else if (typeof document !== 'undefined') {
+        const fallback = document.createElement('canvas')
+        fallback.width = 256
+        fallback.height = 256
+        this.offscreenCanvas = fallback
+        this.offscreenContext = fallback.getContext('2d') ?? undefined
+      }
     }
-  }
 
   getGradient(width: number, height: number): CanvasGradient {
     const cacheKey = `${width}x${height}`
@@ -42,7 +48,11 @@ class RenderCache {
     
     if (!gradient || (gradient as any).__width !== width || (gradient as any).__height !== height) {
       if (!this.offscreenContext) {
-        this.offscreenContext = this.offscreenCanvas?.getContext('2d') || document.createElement('canvas').getContext('2d') || undefined
+        this.offscreenContext =
+          this.offscreenCanvas?.getContext('2d') ||
+          (typeof document !== 'undefined'
+            ? document.createElement('canvas').getContext('2d') ?? undefined
+            : undefined)
       }
       
       if (this.offscreenContext) {

@@ -4,6 +4,7 @@ import { createMuzzleParticles } from '@/game/entities/particles'
 import { acquireProjectile } from '@/game/utils/enhancedPool'
 import { findOptimalTargets } from '@/game/utils/spatialGrid'
 import { logger } from '@/game/utils/logger'
+import { applyDamageToEnemy, applyDotToEnemy, applySlowToEnemy, applyVulnerability } from '@/game/utils/combat'
 
 // Chapter 5 Performance: Optimized tower targeting with spatial partitioning
 // Prioritizes enemies closer to the goal (higher pathIndex) using efficient spatial queries
@@ -12,7 +13,20 @@ const selectTarget = (tower: Tower, enemies: Enemy[]): Enemy | null => {
   
   // Use spatial grid for O(n log n) targeting instead of O(n×m)
   const targets = findOptimalTargets(tower, enemies)
-  const target = targets.length > 0 ? targets[0] : null
+  let target = targets.length > 0 ? targets[0] : null
+  
+  // Fallback: direct scan if grid misses candidates (safety net)
+  if (!target) {
+    const inRange = enemies
+      .filter((enemy) => !enemy.isDead && !enemy.reachedGoal && distanceBetween(tower.position, enemy.position) <= tower.range)
+      .sort((a, b) => {
+        if (a.pathIndex !== b.pathIndex) return b.pathIndex - a.pathIndex
+        const distA = distanceBetween(a.position, tower.position)
+        const distB = distanceBetween(b.position, tower.position)
+        return distA - distB
+      })
+    target = inRange[0] ?? null
+  }
   
   const targetingTime = performance.now() - startTime
   if (targetingTime > 0.5) { // Log slow targeting operations
@@ -32,6 +46,7 @@ const selectTarget = (tower: Tower, enemies: Enemy[]): Enemy | null => {
 // - Indica: Single powerful shots for focused elimination
 export const updateTowers = (state: GameState, deltaSeconds: number): void => {
   state.towers.forEach((tower) => {
+    const towerDamageType = tower.damageType ?? 'impact'
     tower.cooldown = Math.max(tower.cooldown - deltaSeconds, 0)
     
     // CHAPTER 2: Support towers apply slow effects instead of shooting projectiles
@@ -43,22 +58,24 @@ export const updateTowers = (state: GameState, deltaSeconds: number): void => {
           return dist <= tower.range
         })
         
-        // Apply 30% slow for 2 seconds to all enemies in range
+        // Apply slow + DoT + vulnerability
         enemiesInRange.forEach(enemy => {
-          enemy.slowEffects.push({
-            duration: 2.0,
-            remainingTime: 2.0,
-            multiplier: 0.7, // 30% speed reduction
-            appliedBy: tower.id
-          })
+          const slowCfg = tower.slow ?? { multiplier: 0.7, duration: 2.0 }
+          applySlowToEnemy(enemy, slowCfg.multiplier, slowCfg.duration, tower.id)
+
+          if (tower.dot) {
+            const dotType = tower.dot.damageType ?? 'dot'
+            applyDotToEnemy(enemy, tower.dot.dps, tower.dot.duration, dotType, tower.id)
+          }
+
+          if (tower.vulnerabilityDebuff) {
+            applyVulnerability(enemy, tower.vulnerabilityDebuff.amount, tower.vulnerabilityDebuff.duration)
+          }
         })
         
         // Support towers deal light damage to enemies in range
         enemiesInRange.forEach(enemy => {
-          enemy.health = Math.max(0, enemy.health - tower.damage)
-          if (enemy.health <= 0) {
-            enemy.isDead = true
-          }
+          applyDamageToEnemy(enemy, tower.damage, towerDamageType)
         })
         
         tower.cooldown = tower.fireRate
@@ -89,6 +106,8 @@ export const updateTowers = (state: GameState, deltaSeconds: number): void => {
         damage: damagePerProjectile,
         color: tower.color,
         isExpired: false,
+        damageType: towerDamageType,
+        splashRadius: tower.splashRadius,
       })
       state.projectiles.push(projectile)
     }

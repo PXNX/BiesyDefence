@@ -609,8 +609,8 @@ export class GameController {
   /**
    * Handle enemy spawn requests from WaveSystem
    */
-  private handleEnemySpawn(request: { type: any, spawnPosition: { x: number, y: number } }): void {
-    const enemy = createEnemy(request.type, request.spawnPosition)
+  private handleEnemySpawn(request: { type: any; spawnPosition: { x: number; y: number }; waveIndex: number }): void {
+    const enemy = createEnemy(request.type, request.spawnPosition, request.waveIndex)
     this.state.enemies.push(enemy)
   }
 
@@ -652,6 +652,10 @@ export class GameController {
     
     const previousLives = this.state.resources.lives
     this.state.resources.lives = Math.max(0, this.state.resources.lives - damage)
+    // Reset streak-based bonuses on leak
+    if (typeof this.state.resources.killStreak === 'number') {
+      this.state.resources.killStreak = 0
+    }
     
     console.log(`Life lost: ${damage} damage. Lives: ${previousLives} → ${this.state.resources.lives}`)
     
@@ -762,19 +766,39 @@ export class GameController {
     let currencyGainedThisFrame = 0
     let scoreGainedThisFrame = 0
     
-    // Process enemy deaths and count kills for WaveSystem integration
-    this.state.enemies.forEach((enemy) => {
-      if (enemy.isDead && !enemy.rewardClaimed) {
-        if (!enemy.reachedGoal) {
-          // Enemy was killed - add rewards
-          enemiesKilledThisFrame++
-          currencyGainedThisFrame += enemy.stats.reward
-          scoreGainedThisFrame += 10 + Math.floor(enemy.stats.reward * 0.5)
-        } else {
-          // Enemy reached goal - apply life loss using new method
-          this.loseLife(enemy.stats.damageToLives)
-          livesLostThisFrame += enemy.stats.damageToLives
-        }
+      // Process enemy deaths and count kills for WaveSystem integration
+      this.state.enemies.forEach((enemy) => {
+        if (enemy.isDead && !enemy.rewardClaimed) {
+          if (!enemy.reachedGoal) {
+            // Enemy was killed - add rewards
+            enemiesKilledThisFrame++
+            currencyGainedThisFrame += enemy.stats.reward
+            scoreGainedThisFrame += 10 + Math.floor(enemy.stats.reward * 0.5)
+
+            // Handle on-death spawns (e.g., carrier boss releasing swarm)
+            if (enemy.stats.onDeathSpawn) {
+              const { type, count } = enemy.stats.onDeathSpawn
+              for (let i = 0; i < count; i += 1) {
+                const jitter = {
+                  x: (Math.random() - 0.5) * 12,
+                  y: (Math.random() - 0.5) * 12,
+                }
+                const spawned = createEnemy(
+                  type,
+                  {
+                    x: enemy.position.x + jitter.x,
+                    y: enemy.position.y + jitter.y,
+                  },
+                  this.state.currentWaveIndex
+                )
+                this.state.enemies.push(spawned)
+              }
+            }
+          } else {
+            // Enemy reached goal - apply life loss using new method
+            this.loseLife(enemy.stats.damageToLives)
+            livesLostThisFrame += enemy.stats.damageToLives
+          }
       }
     })
     
@@ -882,6 +906,9 @@ export class GameController {
       console.warn(`Invalid score value detected: ${this.state.resources.score}, resetting to 0`)
       this.state.resources.score = 0
     }
+    if (typeof this.state.resources.killStreak !== 'number' || !Number.isFinite(this.state.resources.killStreak)) {
+      this.state.resources.killStreak = 0
+    }
     
     // Clamp values to reasonable ranges
     const maxMoney = 999999999 // Prevent overflow
@@ -889,6 +916,7 @@ export class GameController {
     this.state.resources.money = Math.max(0, Math.min(maxMoney, this.state.resources.money))
     this.state.resources.lives = Math.max(0, Math.min(999, this.state.resources.lives)) // Max 999 lives
     this.state.resources.score = Math.max(0, Math.min(maxScore, this.state.resources.score))
+    this.state.resources.killStreak = Math.max(0, Math.min(25, this.state.resources.killStreak))
     
     // Validate game status
     const validStatuses = ['idle', 'running', 'paused', 'won', 'lost']
@@ -1260,6 +1288,12 @@ export class GameController {
       cooldown: 0,
       color: profile.color,
       cost: profile.cost,
+      damageType: profile.damageType,
+      splashRadius: profile.splashRadius,
+      slow: profile.slow,
+      dot: profile.dot ? { ...profile.dot, damageType: profile.dot.damageType ?? 'dot' } : undefined,
+      vulnerabilityDebuff: profile.vulnerabilityDebuff,
+      level: 1,
     })
 
     this.state.resources.money -= profile.cost

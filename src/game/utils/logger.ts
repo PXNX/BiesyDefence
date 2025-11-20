@@ -218,6 +218,15 @@ class Logger {
 // Global logger instance
 export const logger = new Logger()
 
+// Namespaced logger factory for consistency with older imports
+export const createLogger = (category?: string): Logger => {
+  const scoped = new Logger()
+  if (category) {
+    scoped.addCategory(category)
+  }
+  return scoped
+}
+
 // Development environment setup
 if (import.meta.env.DEV) {
   logger.setLevel('debug')

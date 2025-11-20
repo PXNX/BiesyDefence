@@ -10,7 +10,13 @@ import type {
 } from '@/game/core/types'
 import { palette } from '@/assets/theme'
 
-type TextureKey = 'grassBase' | 'woodBase' | 'tower-indica' | 'tower-sativa' | 'tower-support'
+type TextureKey =
+  | 'grassBase'
+  | 'woodBase'
+  | 'pathStraight'
+  | 'tower-indica'
+  | 'tower-sativa'
+  | 'tower-support'
 
 const TOWER_TEXTURE_BY_TYPE: Record<TowerType, TextureKey> = {
   indica: 'tower-indica',
@@ -21,6 +27,7 @@ const TOWER_TEXTURE_BY_TYPE: Record<TowerType, TextureKey> = {
 const TEXTURE_PATHS: Record<TextureKey, string> = {
   grassBase: new URL('../../../assets/textures/grass_base.png', import.meta.url).href,
   woodBase: new URL('../../../assets/textures/wood_base.png', import.meta.url).href,
+  pathStraight: new URL('../../../assets/textures/wood_base.png', import.meta.url).href,
   'tower-indica': new URL('../../../assets/towers/tower_indica_level1.png', import.meta.url).href,
   'tower-sativa': new URL('../../../assets/towers/tower_sativa_level1.png', import.meta.url).href,
   'tower-support': new URL('../../../assets/towers/tower_support_level1.png', import.meta.url).href,

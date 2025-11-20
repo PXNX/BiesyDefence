@@ -19,8 +19,9 @@ import {
   MapManager,
   TOWER_PROFILES,
 } from '@/game/config/constants'
-import { WAVE_SCHEDULES } from '@/game/config/waves'
+import { buildWaveSchedules } from '@/game/config/waves'
 import { createEntityId } from '@/game/utils/id'
+import type { PlayerProgress } from '@/game/progression/PlayerProgress'
 
 const gridKey = (x: number, y: number) => `${x}:${y}`
 
@@ -84,7 +85,8 @@ const buildMap = (pathNodes: Vector2[]): MapData => {
 }
 
 const buildWaves = (): Wave[] => {
-  return WAVE_SCHEDULES.map((spawnQueue, index) => ({
+  const waveSchedules = buildWaveSchedules()
+  return waveSchedules.map((spawnQueue, index) => ({
     id: index,
     spawnQueue,
     timer: 0,
@@ -140,6 +142,12 @@ const createInitialTowers = (map: MapData): Tower[] => {
       cooldown: 0,
       color: profile.color,
       cost: profile.cost,
+      damageType: profile.damageType,
+      splashRadius: profile.splashRadius,
+      slow: profile.slow,
+      dot: profile.dot ? { ...profile.dot, damageType: profile.dot.damageType ?? 'dot' } : undefined,
+      vulnerabilityDebuff: profile.vulnerabilityDebuff,
+      level: 1,
     })
   })
 
@@ -184,6 +192,7 @@ export const createInitialState = (options?: {
       money: initialResources.initialMoney,
       lives: initialResources.initialLives,
       score: INITIAL_SCORE,
+      killStreak: 0,
     },
     waves: buildWaves(),
     currentWaveIndex: 0,
@@ -197,10 +206,16 @@ export const createInitialState = (options?: {
 export const createProgressAwareState = (playerProgress?: {
   preferredDifficulty?: 'easy' | 'normal' | 'hard'
   unlockedMaps?: string[]
-}): GameState => {
+} | PlayerProgress): GameState => {
   // Determine map and difficulty from progress
-  const preferredDifficulty = playerProgress?.preferredDifficulty || 'normal'
-  const unlockedMaps = playerProgress?.unlockedMaps || ['default']
+  const preferredDifficulty =
+    (playerProgress as any)?.preferredDifficulty ||
+    (playerProgress as any)?.settings?.preferredDifficulty ||
+    'normal'
+  const unlockedMaps =
+    (playerProgress as any)?.unlockedMaps ||
+    (playerProgress as any)?.mapsUnlocked ||
+    ['default']
   const selectedMap = unlockedMaps[0] || 'default'
   
   return createInitialState({
@@ -217,5 +232,12 @@ export const adjustResourcesForDifficulty = (
 ): { money: number; lives: number } => {
   const mapManager = MapManager.getInstance()
   mapManager.setDifficulty(difficulty)
-  return mapManager.applyDifficultyModifiers(baseResources)
+  const adjusted = mapManager.applyDifficultyModifiers({
+    initialMoney: baseResources.money,
+    initialLives: baseResources.lives,
+  })
+  return {
+    money: adjusted.initialMoney,
+    lives: adjusted.initialLives,
+  }
 }

@@ -3,6 +3,8 @@ export type Vector2 = {
   y: number
 }
 
+export type DamageType = 'impact' | 'volley' | 'control' | 'dot'
+
 export type GameStatus = 'idle' | 'running' | 'paused' | 'won' | 'lost'
 
 export type TileType = 'path' | 'grass'
@@ -27,12 +29,15 @@ export interface MapData {
 }
 
 export type TowerType = 'indica' | 'sativa' | 'support'
-export type EnemyType = 'pest' | 'runner'
-// Chapter 2 Balance: Future enemy types for extended gameplay
-// armored_pest: resistant to Sativa, requires Indica for optimal efficiency
-// swift_runner: resistant to Support slow, high reward, tests economic management
-export type FutureEnemyType = EnemyType | 'armored_pest' | 'swift_runner'
-export type EnemyTypeWithFuture = EnemyType | FutureEnemyType
+export type EnemyType =
+  | 'pest'
+  | 'runner'
+  | 'armored_pest'
+  | 'swift_runner'
+  | 'swarm'
+  | 'bulwark'
+  | 'carrier_boss'
+export type EnemyTag = 'armored' | 'fast' | 'swarm' | 'boss' | 'shielded'
 
 // Chapter 2 Balance: Tower upgrade system preparation (levels 1-3)
 export interface TowerUpgrade {
@@ -57,6 +62,21 @@ export interface EnemyStats {
   damageToLives: number
   color: string
   radius: number
+  resistances?: DamageResistances
+  slowCap?: number
+  tags?: EnemyTag[]
+  vulnerability?: number
+  onDeathSpawn?: {
+    type: EnemyType
+    count: number
+  }
+}
+
+export type DamageResistances = {
+  impact?: number
+  volley?: number
+  control?: number
+  dot?: number
 }
 
 export interface Enemy {
@@ -71,13 +91,26 @@ export interface Enemy {
   reachedGoal: boolean
   rewardClaimed: boolean
   speedMultiplier: number
-  // TODO: Chapter 2 Balance - Support tower slow effect system
   slowEffects: {
     duration: number
     remainingTime: number
     multiplier: number
     appliedBy: string // tower id
   }[]
+  vulnerabilityEffects?: {
+    amount: number
+    remainingTime: number
+  }[]
+  dotEffects: {
+    duration: number
+    remainingTime: number
+    dps: number
+    damageType: DamageType
+    appliedBy: string
+  }[]
+  resistances?: DamageResistances
+  vulnerability?: number
+  tags?: EnemyTag[]
 }
 
 export interface Tower {
@@ -92,6 +125,22 @@ export interface Tower {
   cooldown: number
   color: string
   cost: number
+  damageType: DamageType
+  splashRadius?: number
+  slow?: {
+    multiplier: number
+    duration: number
+  }
+  dot?: {
+    dps: number
+    duration: number
+    damageType: DamageType
+  }
+  vulnerabilityDebuff?: {
+    amount: number
+    duration: number
+  }
+  level?: TowerUpgrade['level']
 }
 
 export interface Projectile {
@@ -103,6 +152,8 @@ export interface Projectile {
   damage: number
   color: string
   isExpired: boolean
+  damageType: DamageType
+  splashRadius?: number
 }
 
 export interface Particle {
@@ -119,6 +170,7 @@ export interface Resources {
   money: number
   lives: number
   score: number
+  killStreak?: number
 }
 
 export interface WaveSpawn {
@@ -184,4 +236,6 @@ export interface ViewportTransform {
   offsetY: number
   width: number
   height: number
+  renderedWidth?: number
+  renderedHeight?: number
 }

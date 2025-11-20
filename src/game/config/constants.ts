@@ -37,6 +37,21 @@ export interface TowerProfile {
   projectileSpeed: number
   cost: number
   color: string
+  damageType: 'impact' | 'volley' | 'control'
+  splashRadius?: number
+  slow?: {
+    multiplier: number
+    duration: number
+  }
+  dot?: {
+    dps: number
+    duration: number
+    damageType?: 'dot' | 'control'
+  }
+  vulnerabilityDebuff?: {
+    amount: number
+    duration: number
+  }
 }
 
 // Chapter 2 Balance: TOWER-ROLE & ROLE DIFFERENTIATION
@@ -49,32 +64,53 @@ export const TOWER_PROFILES: Record<TowerType, TowerProfile> = {
   indica: {
     name: 'Indica Tower',
     description: 'Single-Target-Hard-Hit: Heavy rounds for focused elimination.',
-    range: 140,
-    fireRate: 1.2,
-    damage: 28,
-    projectileSpeed: 310,
+    range: 142,
+    fireRate: 1.25,
+    damage: 32,
+    projectileSpeed: 315,
     cost: 75,
     color: '#9fd8b8',
+    damageType: 'impact',
+    vulnerabilityDebuff: {
+      amount: 0.05,
+      duration: 2,
+    },
   },
   sativa: {
     name: 'Sativa Tower',
     description: 'Fast-Shot: Rapid fire with double-shot capability.',
-    range: 135,
+    range: 138,
     fireRate: 0.8,
-    damage: 16,
+    damage: 12,
     projectileSpeed: 380,
     cost: 70,
     color: '#f2e881',
+    damageType: 'volley',
+    splashRadius: 22, // light splash for crowd control
   },
   support: {
     name: 'Support Tower',
     description: 'Slow-Support: Slows enemies 30% for 2 seconds, light damage.',
-    range: 145,
-    fireRate: 1.1,
-    damage: 13,
+    range: 150,
+    fireRate: 1.05,
+    damage: 10,
     projectileSpeed: 240,
     cost: 65,
     color: '#6fe2ff',
+    damageType: 'control',
+    slow: {
+      multiplier: 0.7,
+      duration: 2.0,
+    },
+    dot: {
+      dps: 3,
+      duration: 2.0,
+      damageType: 'dot',
+    },
+    vulnerabilityDebuff: {
+      amount: 0.15,
+      duration: 2.5,
+    },
   },
 }
 

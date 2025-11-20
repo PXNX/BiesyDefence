@@ -346,7 +346,7 @@ export class LanguageDetector {
     fallback: string[]
     script?: string
   } {
-    const fontRecommendations: Record<Language, any> = {
+    const fontRecommendations: Record<string, any> = {
       en: {
         primary: 'Inter, system-ui, sans-serif',
         fallback: ['Arial', 'Helvetica', 'sans-serif'],

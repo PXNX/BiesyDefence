@@ -1,4 +1,4 @@
-import type { MapConfiguration } from '../MapConfiguration'
+import type { MapConfiguration } from '@/game/maps/MapConfiguration'
 
 /**
  * Example map configurations for future expansion

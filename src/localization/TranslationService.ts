@@ -3,7 +3,21 @@
  * Provides foundation for multilingual support with RTL language preparation
  */
 
-export type Language = 'en' | 'es' | 'fr' | 'de' | 'zh' | 'ja' | 'ar' | 'ru' | 'pt' | 'it'
+export type Language =
+  | 'en'
+  | 'es'
+  | 'fr'
+  | 'de'
+  | 'zh'
+  | 'ja'
+  | 'ar'
+  | 'ru'
+  | 'pt'
+  | 'it'
+  | 'he'
+  | 'fa'
+  | 'ur'
+  | 'ko'
 
 export interface LanguageConfig {
   code: Language
@@ -121,6 +135,42 @@ export const SUPPORTED_LANGUAGES: Record<Language, LanguageConfig> = {
     dateFormat: 'DD/MM/YYYY',
     numberFormat: 'it-IT',
   },
+  he: {
+    code: 'he',
+    name: 'Hebrew',
+    nativeName: 'עברית',
+    rtl: true,
+    region: 'IL',
+    dateFormat: 'DD/MM/YYYY',
+    numberFormat: 'he-IL',
+  },
+  fa: {
+    code: 'fa',
+    name: 'Farsi',
+    nativeName: 'فارسی',
+    rtl: true,
+    region: 'IR',
+    dateFormat: 'DD/MM/YYYY',
+    numberFormat: 'fa-IR',
+  },
+  ur: {
+    code: 'ur',
+    name: 'Urdu',
+    nativeName: 'اردو',
+    rtl: true,
+    region: 'PK',
+    dateFormat: 'DD/MM/YYYY',
+    numberFormat: 'ur-PK',
+  },
+  ko: {
+    code: 'ko',
+    name: 'Korean',
+    nativeName: '한국어',
+    rtl: false,
+    region: 'KR',
+    dateFormat: 'YYYY.MM.DD',
+    numberFormat: 'ko-KR',
+  },
 }
 
 /**
@@ -181,6 +231,10 @@ export class TranslationService {
     ru: {},
     pt: {},
     it: {},
+    he: {},
+    fa: {},
+    ur: {},
+    ko: {},
   }
   private missingKeys: Set<string> = new Set()
   private subscribers: Set<LanguageChangeCallback> = new Set()

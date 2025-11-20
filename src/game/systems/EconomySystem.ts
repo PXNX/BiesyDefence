@@ -6,12 +6,17 @@ export const updateEconomy = (state: GameState): void => {
   state.enemies.forEach((enemy) => {
     if (enemy.isDead && !enemy.rewardClaimed) {
       if (!enemy.reachedGoal) {
-        // Add money reward for killing enemy
-        state.resources.money += enemy.stats.reward
+        // Add money reward for killing enemy with streak bonus
+        const streak = state.resources.killStreak ?? 0
+        const streakBonus = Math.min(streak * 0.01, 0.25)
+        const reward = Math.round(enemy.stats.reward * (1 + streakBonus))
+        state.resources.money += reward
         
         // Add score for killing enemy (base score + enemy-specific bonus)
         const enemyScore = 10 + Math.floor(enemy.stats.reward * 0.5)
         scoreGainedThisFrame += enemyScore
+
+        state.resources.killStreak = Math.min(streak + 1, 25)
       }
       enemy.rewardClaimed = true
     }

@@ -16,6 +16,7 @@ interface PoolStats {
   totalCreated: number
   peakUsage: number
   efficiency: number
+  maxSize: number
 }
 
 class ObjectPool<T extends { id: string }> {
@@ -95,7 +96,8 @@ class ObjectPool<T extends { id: string }> {
       pooled: this.pool.length,
       totalCreated: this.totalCreated,
       peakUsage: this.peakUsage,
-      efficiency: Math.round(efficiency * 100) / 100
+      efficiency: Math.round(efficiency * 100) / 100,
+      maxSize: this.config.maxSize,
     }
   }
 
@@ -142,6 +144,8 @@ class ProjectilePool extends ObjectPool<Projectile> {
         damage: 0,
         color: '',
         isExpired: false,
+        damageType: 'impact',
+        splashRadius: 0,
       } as Projectile),
       (projectile) => {
         projectile.isExpired = false
@@ -149,6 +153,8 @@ class ProjectilePool extends ObjectPool<Projectile> {
         projectile.speed = 0
         projectile.damage = 0
         projectile.color = ''
+        projectile.damageType = 'impact'
+        projectile.splashRadius = 0
         projectile.position.x = 0
         projectile.position.y = 0
         projectile.origin.x = 0
@@ -211,6 +217,8 @@ export const acquireProjectile = (template: Omit<Projectile, 'id'>): Projectile 
   projectile.damage = template.damage
   projectile.color = template.color
   projectile.isExpired = template.isExpired
+  projectile.damageType = template.damageType
+  projectile.splashRadius = template.splashRadius
   
   return projectile
 }
@@ -311,7 +319,7 @@ export const performPeriodicCleanup = (): void => {
 }
 
 // Auto-cleanup scheduling
-let cleanupInterval: number | null = null
+let cleanupInterval: ReturnType<typeof setInterval> | null = null
 
 export const startAutoCleanup = (intervalMs: number = 30000): void => { // Every 30 seconds
   if (cleanupInterval) {
