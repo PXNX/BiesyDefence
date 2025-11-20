@@ -20,7 +20,7 @@ function App() {
   const startOverlayRef = useRef<HTMLDivElement | null>(null)
   const gameOverOverlayRef = useRef<HTMLDivElement | null>(null)
   const [snapshot, setSnapshot] = useState<GameSnapshot | null>(null)
-  const [selectedTower, setSelectedTower] = useState<TowerType>(initialTower)
+  const [selectedTower, setSelectedTower] = useState<TowerType | null>(initialTower)
   const [feedback, setFeedback] = useState<string | null>(null)
   const [showHowToPlay, setShowHowToPlay] = useState(false)
   const [quickWaveIndex, setQuickWaveIndex] = useState(0)
@@ -195,8 +195,26 @@ function App() {
       return
     }
 
+    if (controller.consumePlacementSuppression()) {
+      return
+    }
+
+    if (!selectedTower) {
+      setFeedback('Select a tower to build.')
+      return
+    }
+
     const result = controller.placeTowerFromScreen(event.clientX, event.clientY, selectedTower)
     setFeedback(result.message)
+  }
+
+  const handleCanvasContextMenu = (event: MouseEvent<HTMLCanvasElement>) => {
+    event.preventDefault()
+    const controller = controllerRef.current
+    controller?.setPreviewTowerType(null)
+    controller?.clearHover()
+    setSelectedTower(null)
+    setFeedback('Tower selection cancelled')
   }
 
   const handleSelectTower = (type: TowerType) => {
@@ -363,7 +381,9 @@ function App() {
             handleRetry()
           } else {
             // Cancel tower selection (reset to first available tower)
-            handleSelectTower('indica')
+            controllerRef.current?.setPreviewTowerType(null)
+            controllerRef.current?.clearHover()
+            setSelectedTower(null)
             setFeedback('Tower selection cancelled')
           }
           break
@@ -446,7 +466,11 @@ function App() {
                     <span>{canvasStatusMessage}</span>
                   </div>
                 )}
-                <canvas ref={canvasRef} onClick={handleCanvasClick} />
+                <canvas
+                  ref={canvasRef}
+                  onClick={handleCanvasClick}
+                  onContextMenu={handleCanvasContextMenu}
+                />
               </section>
               <div className="hud-overlay">
                 <StatsCornerLayout snapshot={snapshot} />

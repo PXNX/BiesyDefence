@@ -42,7 +42,7 @@ export class GameController {
   private subscribers = new Set<(snapshot: GameSnapshot) => void>()
   private hoverState: CanvasHighlight | null = null
   private lastHoverWorld: Vector2 | null = null
-  private previewTowerType: TowerType = 'indica'
+  private previewTowerType: TowerType | null = 'indica'
   private gameSpeed: number = 1
   private debugSettings = {
     showRanges: false,
@@ -75,11 +75,18 @@ export class GameController {
   private boundContextMenu: (event: MouseEvent) => void
   private isPanning = false
   private lastPanPoint: { x: number; y: number } | null = null
+  private panStartPoint: { x: number; y: number } | null = null
+  private panButton: number | null = null
+  private hasPannedSinceMouseDown = false
+  private cancelPlacementClick = false
+  private readonly panStartThreshold = 4
+  private readonly cameraOverscrollPx = 220
+  private readonly cameraOverscrollFactor = 0.12
   private camera = {
     center: { x: 0, y: 0 },
     zoom: 1,
     minZoom: 0.7,
-    maxZoom: 1.6,
+    maxZoom: 2.5,
   }
 
   constructor() {
@@ -154,14 +161,23 @@ export class GameController {
     const visibleWidth = width / scale
     const visibleHeight = height / scale
 
+    const overscrollWidth = Math.max(
+      this.cameraOverscrollPx / scale,
+      visibleWidth * this.cameraOverscrollFactor
+    )
+    const overscrollHeight = Math.max(
+      this.cameraOverscrollPx / scale,
+      visibleHeight * this.cameraOverscrollFactor
+    )
+
     if (visibleWidth >= map.worldWidth) {
       this.camera.center.x = map.worldWidth / 2
     } else {
       const halfWidth = visibleWidth / 2
       this.camera.center.x = clampValue(
         this.camera.center.x,
-        halfWidth,
-        map.worldWidth - halfWidth
+        halfWidth - overscrollWidth,
+        map.worldWidth - halfWidth + overscrollWidth
       )
     }
 
@@ -171,20 +187,24 @@ export class GameController {
       const halfHeight = visibleHeight / 2
       this.camera.center.y = clampValue(
         this.camera.center.y,
-        halfHeight,
-        map.worldHeight - halfHeight
+        halfHeight - overscrollHeight,
+        map.worldHeight - halfHeight + overscrollHeight
       )
     }
   }
 
   private handlePanStart(event: MouseEvent): void {
-    if (!this.canvas || event.button !== 1) {
+    if (!this.canvas || (event.button !== 0 && event.button !== 1)) {
       return
     }
 
     event.preventDefault()
     this.isPanning = true
+    this.panButton = event.button
     this.lastPanPoint = { x: event.clientX, y: event.clientY }
+    this.panStartPoint = { x: event.clientX, y: event.clientY }
+    this.cancelPlacementClick = false
+    this.hasPannedSinceMouseDown = false
     this.canvas.style.cursor = 'grabbing'
   }
 
@@ -198,6 +218,19 @@ export class GameController {
       Math.max(this.calculateBaseScale() * this.camera.zoom, 0.0001)
     const deltaX = event.clientX - this.lastPanPoint.x
     const deltaY = event.clientY - this.lastPanPoint.y
+    if (!this.hasPannedSinceMouseDown && this.panStartPoint) {
+      const startDeltaX = event.clientX - this.panStartPoint.x
+      const startDeltaY = event.clientY - this.panStartPoint.y
+      if (
+        Math.abs(startDeltaX) < this.panStartThreshold &&
+        Math.abs(startDeltaY) < this.panStartThreshold
+      ) {
+        this.lastPanPoint = { x: event.clientX, y: event.clientY }
+        return
+      }
+      this.hasPannedSinceMouseDown = true
+      this.cancelPlacementClick = true
+    }
     this.camera.center.x -= deltaX / scale
     this.camera.center.y -= deltaY / scale
     this.lastPanPoint = { x: event.clientX, y: event.clientY }
@@ -205,12 +238,18 @@ export class GameController {
   }
 
   private handlePanEnd(): void {
-    if (!this.canvas || !this.isPanning) {
+    if (!this.canvas || (!this.isPanning && !this.panStartPoint)) {
       return
     }
 
     this.isPanning = false
     this.lastPanPoint = null
+    this.panStartPoint = null
+    if (this.hasPannedSinceMouseDown) {
+      this.cancelPlacementClick = true
+    }
+    this.hasPannedSinceMouseDown = false
+    this.panButton = null
     this.canvas.style.cursor = 'grab'
   }
 
@@ -346,13 +385,25 @@ export class GameController {
     this.canvas = undefined
   }
 
-  public setPreviewTowerType(type: TowerType) {
+  public setPreviewTowerType(type: TowerType | null) {
     this.previewTowerType = type
+    if (!type) {
+      this.hoverState = null
+      this.render()
+      return
+    }
+
     if (this.lastHoverWorld) {
       this.recalculateHover(this.lastHoverWorld)
     } else {
       this.render()
     }
+  }
+
+  public consumePlacementSuppression(): boolean {
+    const shouldBlock = this.cancelPlacementClick
+    this.cancelPlacementClick = false
+    return shouldBlock
   }
 
   public setGameSpeed(speed: number) {
@@ -381,8 +432,11 @@ export class GameController {
   public placeTowerFromScreen(
     screenX: number,
     screenY: number,
-    towerType: TowerType
+    towerType: TowerType | null
   ): PlacementResult {
+    if (!towerType) {
+      return { success: false, message: 'Select a tower to build first.' }
+    }
     const world = this.screenToWorld(screenX, screenY)
     if (!world) {
       return { success: false, message: 'Please click inside the playfield.' }
@@ -1251,6 +1305,13 @@ export class GameController {
   }
 
   private recalculateHover(world: Vector2, triggerRender = true) {
+    if (!this.previewTowerType) {
+      this.hoverState = null
+      if (triggerRender) {
+        this.render()
+      }
+      return
+    }
     const map = this.state.map
     const gridX = Math.floor(world.x / map.cellSize)
     const gridY = Math.floor(world.y / map.cellSize)
