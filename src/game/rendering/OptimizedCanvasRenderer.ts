@@ -5,6 +5,8 @@ import type {
   MapTile,
   Vector2,
   TowerType,
+  EnemyType,
+  EnemyTag,
 } from '@/game/core/types'
 import { palette } from '@/assets/theme'
 import { logger } from '@/game/utils/logger'
@@ -16,11 +18,69 @@ export interface CanvasHighlight {
   valid: boolean
 }
 
+type TextureKey =
+  | 'enemy-runner'
+  | 'enemy-swift'
+  | 'enemy-pest'
+  | 'enemy-swarm'
+  | 'enemy-swarm-variant2'
+  | 'enemy-swarm-variant3'
+  | 'enemy-armored'
+  | 'enemy-bulwark'
+  | 'enemy-boss'
+  | 'badge-fast'
+  | 'badge-armored'
+  | 'badge-boss'
+  | 'badge-shielded'
+  | 'badge-swarm'
+  | 'effect-motion-trail'
+  | 'effect-shield'
+  | 'effect-boss-glow'
+
+const ENEMY_TEXTURE_BY_TYPE: Partial<Record<EnemyType, TextureKey>> = {
+  pest: 'enemy-pest',
+  runner: 'enemy-runner',
+  swift_runner: 'enemy-swift',
+  swarm: 'enemy-swarm',
+  armored_pest: 'enemy-armored',
+  bulwark: 'enemy-bulwark',
+  carrier_boss: 'enemy-boss',
+}
+
+const BADGE_BY_TAG: Partial<Record<EnemyTag, TextureKey>> = {
+  fast: 'badge-fast',
+  armored: 'badge-armored',
+  boss: 'badge-boss',
+  shielded: 'badge-shielded',
+  swarm: 'badge-swarm',
+}
+
+const TEXTURE_PATHS: Record<TextureKey, string> = {
+  'enemy-runner': new URL('../../../assets/enemies/enemy_runner.png', import.meta.url).href,
+  'enemy-swift': new URL('../../../assets/enemies/enemy_swift_runner.png', import.meta.url).href,
+  'enemy-pest': new URL('../../../assets/enemies/enemy_swarm.png', import.meta.url).href,
+  'enemy-swarm': new URL('../../../assets/enemies/enemy_swarm_variant2.png', import.meta.url).href,
+  'enemy-swarm-variant2': new URL('../../../assets/enemies/enemy_swarm_variant2.png', import.meta.url).href,
+  'enemy-swarm-variant3': new URL('../../../assets/enemies/enemy_swarm_variant3.png', import.meta.url).href,
+  'enemy-armored': new URL('../../../assets/enemies/enemy_armored_pest.png', import.meta.url).href,
+  'enemy-bulwark': new URL('../../../assets/enemies/enemy_bulwark.png', import.meta.url).href,
+  'enemy-boss': new URL('../../../assets/enemies/enemy_carrier_boss.png', import.meta.url).href,
+  'badge-fast': new URL('../../../assets/enemies/badges/badge_fast.svg.png', import.meta.url).href,
+  'badge-armored': new URL('../../../assets/enemies/badges/badge_armored.svg.png', import.meta.url).href,
+  'badge-boss': new URL('../../../assets/enemies/badges/badge_boss.svg.png', import.meta.url).href,
+  'badge-shielded': new URL('../../../assets/enemies/badges/badge_shielded.svg.png', import.meta.url).href,
+  'badge-swarm': new URL('../../../assets/enemies/badges/badge_swarm.svg.png', import.meta.url).href,
+  'effect-motion-trail': new URL('../../../assets/enemies/effect_motion_trail_fast.png', import.meta.url).href,
+  'effect-shield': new URL('../../../assets/enemies/effect_shield_overlay.png', import.meta.url).href,
+  'effect-boss-glow': new URL('../../../assets/enemies/effect_boss_glow.png', import.meta.url).href,
+}
+
 // Caching system for expensive operations
   class RenderCache {
     private gradients = new Map<string, CanvasGradient>()
     private offscreenCanvas?: OffscreenCanvas | HTMLCanvasElement
     private offscreenContext?: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D
+    private imageCache = new Map<TextureKey, HTMLImageElement | null>()
 
   // Viewport culling bounds
   private cullingMargin = 50 // Extra margin to prevent edge popping
@@ -40,6 +100,23 @@ export interface CanvasHighlight {
         this.offscreenCanvas = fallback
         this.offscreenContext = fallback.getContext('2d') ?? undefined
       }
+    }
+
+    getImage(key: TextureKey): HTMLImageElement | null {
+      if (this.imageCache.has(key)) {
+        return this.imageCache.get(key) ?? null
+      }
+
+      const url = TEXTURE_PATHS[key]
+      if (!url) {
+        this.imageCache.set(key, null)
+        return null
+      }
+
+      const img = new Image()
+      img.src = url
+      this.imageCache.set(key, img)
+      return img
     }
 
   getGradient(width: number, height: number): CanvasGradient {
@@ -250,31 +327,71 @@ export class OptimizedCanvasRenderer {
   private drawEnhancedEnemy(ctx: CanvasRenderingContext2D, x: number, y: number, enemy: any, tileSize: number): void {
     const radius = enemy.stats.radius
     const healthPercent = enemy.health / enemy.maxHealth
+
+    // Try sprite rendering first (reuse CanvasRenderer sprite cache paths)
+    const texKey = (ENEMY_TEXTURE_BY_TYPE as any)?.[enemy.type]
+    const image = texKey ? this.cache.getImage(texKey) : null
+    if (image && image.complete && image.naturalWidth > 0) {
+      const scaleFactor = 2.4
+      const size = Math.max(radius * scaleFactor, radius * 1.6)
+      ctx.save()
+      ctx.globalAlpha = enemy.isDead ? 0.35 : 1
+      ctx.drawImage(image, x - size / 2, y - size / 2, size, size)
+      ctx.restore()
+
+      // Motion trail
+      if (enemy.tags?.includes('fast')) {
+        const trail = this.cache.getImage('effect-motion-trail')
+        if (trail && trail.complete && trail.naturalWidth > 0) {
+          ctx.save()
+          ctx.globalAlpha = 0.55
+          ctx.drawImage(trail, x - size * 0.6, y - size * 0.5, size * 0.8, size)
+          ctx.restore()
+        }
+      }
+
+      if (enemy.tags?.includes('shielded')) {
+        const shield = this.cache.getImage('effect-shield')
+        if (shield && shield.complete && shield.naturalWidth > 0) {
+          ctx.save()
+          ctx.globalAlpha = 0.5
+          ctx.drawImage(shield, x - size / 2, y - size / 2, size, size)
+          ctx.restore()
+        }
+      }
+
+      if (enemy.tags?.includes('boss')) {
+        const glow = this.cache.getImage('effect-boss-glow')
+        if (glow && glow.complete && glow.naturalWidth > 0) {
+          ctx.save()
+          ctx.globalAlpha = 0.35
+          ctx.drawImage(glow, x - size / 2, y - size / 2, size, size)
+          ctx.restore()
+        }
+      }
+
+      if (enemy.tags && enemy.tags.length > 0) {
+        const badgeKey = (BADGE_BY_TAG as any)?.[enemy.tags[0]]
+        const badge = badgeKey ? this.cache.getImage(badgeKey) : null
+        if (badge && badge.complete && badge.naturalWidth > 0) {
+          const badgeSize = Math.max(12, radius * 0.9)
+          ctx.save()
+          ctx.globalAlpha = 0.9
+          ctx.drawImage(badge, x - badgeSize / 2, y - radius - badgeSize * 0.6, badgeSize, badgeSize)
+          ctx.restore()
+        }
+      }
+
+      this.drawEnhancedHealthBar(ctx, x, y, radius, tileSize, healthPercent)
+      return
+    }
     
-    // Base enemy rendering
+    // Base fallback rendering
     ctx.fillStyle = enemy.stats.color
     ctx.beginPath()
     ctx.arc(x, y, radius, 0, Math.PI * 2)
     ctx.fill()
     
-    // Enhanced characteristics
-    if (enemy.stats.type === 'pest') {
-      ctx.fillStyle = 'rgba(0,0,0,0.3)'
-      ctx.beginPath()
-      ctx.arc(x + radius * 0.2, y + radius * 0.2, radius * 0.6, 0, Math.PI * 2)
-      ctx.fill()
-    } else if (enemy.stats.type === 'runner') {
-      ctx.strokeStyle = 'rgba(255,255,255,0.4)'
-      ctx.lineWidth = 2
-      for (let i = 0; i < 3; i++) {
-        ctx.beginPath()
-        ctx.moveTo(x - radius * 1.5 - i * 4, y + (i - 1) * 2)
-        ctx.lineTo(x - radius * 0.8 - i * 4, y + (i - 1) * 2)
-        ctx.stroke()
-      }
-    }
-    
-    // Enhanced slow effect indicator with time-based animation
     if (enemy.speedMultiplier < 1) {
       const time = performance.now() * 0.01
       ctx.strokeStyle = 'rgba(124, 197, 255, 0.8)'
@@ -289,25 +406,6 @@ export class OptimizedCanvasRenderer {
       ctx.beginPath()
       ctx.arc(x, y, pulseRadius, 0, Math.PI * 2)
       ctx.stroke()
-    }
-
-    // Tag badge for readability
-    if (enemy.tags && enemy.tags.length > 0) {
-      const badgeColorMap: Record<string, string> = {
-        fast: '#5eead4',
-        armored: '#cbd5e1',
-        boss: '#f97316',
-        shielded: '#94a3b8',
-        swarm: '#a3e635',
-      }
-      const primaryTag = enemy.tags[0]
-      const badgeColor = badgeColorMap[primaryTag] ?? '#ffffff'
-      ctx.save()
-      ctx.fillStyle = badgeColor
-      ctx.beginPath()
-      ctx.arc(x, y - radius - 6, Math.max(3, radius * 0.35), 0, Math.PI * 2)
-      ctx.fill()
-      ctx.restore()
     }
     
     this.drawEnhancedHealthBar(ctx, x, y, radius, tileSize, healthPercent)

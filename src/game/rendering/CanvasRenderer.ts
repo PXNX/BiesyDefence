@@ -4,6 +4,8 @@ import type {
   GameState,
   MapData,
   Enemy,
+  EnemyType,
+  EnemyTag,
   MapTile,
   Vector2,
   TowerType,
@@ -17,11 +19,54 @@ type TextureKey =
   | 'tower-indica'
   | 'tower-sativa'
   | 'tower-support'
+  | 'tower-sniper'
+  | 'tower-flamethrower'
+  | 'tower-chain'
+  // Enemies
+  | 'enemy-runner'
+  | 'enemy-swift'
+  | 'enemy-pest'
+  | 'enemy-swarm'
+  | 'enemy-swarm-variant2'
+  | 'enemy-swarm-variant3'
+  | 'enemy-armored'
+  | 'enemy-bulwark'
+  | 'enemy-boss'
+  // Badges & overlays
+  | 'badge-fast'
+  | 'badge-armored'
+  | 'badge-boss'
+  | 'badge-shielded'
+  | 'badge-swarm'
+  | 'effect-motion-trail'
+  | 'effect-shield'
+  | 'effect-boss-glow'
 
 const TOWER_TEXTURE_BY_TYPE: Record<TowerType, TextureKey> = {
   indica: 'tower-indica',
   sativa: 'tower-sativa',
   support: 'tower-support',
+  sniper: 'tower-sniper',
+  flamethrower: 'tower-flamethrower',
+  chain: 'tower-chain',
+}
+
+const ENEMY_TEXTURE_BY_TYPE: Partial<Record<EnemyType, TextureKey>> = {
+  pest: 'enemy-pest',
+  runner: 'enemy-runner',
+  swift_runner: 'enemy-swift',
+  swarm: 'enemy-swarm',
+  armored_pest: 'enemy-armored',
+  bulwark: 'enemy-bulwark',
+  carrier_boss: 'enemy-boss',
+}
+
+const BADGE_BY_TAG: Partial<Record<EnemyTag, TextureKey>> = {
+  fast: 'badge-fast',
+  armored: 'badge-armored',
+  boss: 'badge-boss',
+  shielded: 'badge-shielded',
+  swarm: 'badge-swarm',
 }
 
 const TEXTURE_PATHS: Record<TextureKey, string> = {
@@ -31,6 +76,26 @@ const TEXTURE_PATHS: Record<TextureKey, string> = {
   'tower-indica': new URL('../../../assets/towers/tower_indica_level1.png', import.meta.url).href,
   'tower-sativa': new URL('../../../assets/towers/tower_sativa_level1.png', import.meta.url).href,
   'tower-support': new URL('../../../assets/towers/tower_support_level1.png', import.meta.url).href,
+  'tower-sniper': new URL('../../../assets/towers/tower_indica_level1.png', import.meta.url).href,
+  'tower-flamethrower': new URL('../../../assets/towers/tower_sativa_level1.png', import.meta.url).href,
+  'tower-chain': new URL('../../../assets/towers/tower_support_level1.png', import.meta.url).href,
+  'enemy-runner': new URL('../../../assets/enemies/enemy_runner.png', import.meta.url).href,
+  'enemy-swift': new URL('../../../assets/enemies/enemy_swift_runner.png', import.meta.url).href,
+  'enemy-pest': new URL('../../../assets/enemies/enemy_swarm.png', import.meta.url).href,
+  'enemy-swarm': new URL('../../../assets/enemies/enemy_swarm_variant2.png', import.meta.url).href,
+  'enemy-swarm-variant2': new URL('../../../assets/enemies/enemy_swarm_variant2.png', import.meta.url).href,
+  'enemy-swarm-variant3': new URL('../../../assets/enemies/enemy_swarm_variant3.png', import.meta.url).href,
+  'enemy-armored': new URL('../../../assets/enemies/enemy_armored_pest.png', import.meta.url).href,
+  'enemy-bulwark': new URL('../../../assets/enemies/enemy_bulwark.png', import.meta.url).href,
+  'enemy-boss': new URL('../../../assets/enemies/enemy_carrier_boss.png', import.meta.url).href,
+  'badge-fast': new URL('../../../assets/enemies/badges/badge_fast.svg.png', import.meta.url).href,
+  'badge-armored': new URL('../../../assets/enemies/badges/badge_armored.svg.png', import.meta.url).href,
+  'badge-boss': new URL('../../../assets/enemies/badges/badge_boss.svg.png', import.meta.url).href,
+  'badge-shielded': new URL('../../../assets/enemies/badges/badge_shielded.svg.png', import.meta.url).href,
+  'badge-swarm': new URL('../../../assets/enemies/badges/badge_swarm.svg.png', import.meta.url).href,
+  'effect-motion-trail': new URL('../../../assets/enemies/effect_motion_trail_fast.png', import.meta.url).href,
+  'effect-shield': new URL('../../../assets/enemies/effect_shield_overlay.png', import.meta.url).href,
+  'effect-boss-glow': new URL('../../../assets/enemies/effect_boss_glow.png', import.meta.url).href,
 }
 
 class TextureCache {
@@ -254,7 +319,7 @@ export class CanvasRenderer {
     }
   }
 
-  private drawTowerSprite(ctx: CanvasRenderingContext2D, x: number, y: number, towerType: TowerType, tileSize: number): void {
+  private drawTowerSprite(ctx: CanvasRenderingContext2D, x: number, y: number, towerType: TowerType, tileSize: number, level: number | undefined): void {
     const textureKey = TOWER_TEXTURE_BY_TYPE[towerType]
     const sprite = this.textureCache.getImage(textureKey)
     if (!sprite || !sprite.complete || sprite.naturalWidth === 0) {
@@ -267,7 +332,81 @@ export class CanvasRenderer {
     ctx.shadowColor = palette.accentStrong
     ctx.shadowBlur = 20
     ctx.drawImage(sprite, x - spriteSize / 2, y - spriteSize / 2, spriteSize, spriteSize)
+    // Upgrade halo based on level
+    if ((level ?? 1) > 1) {
+      const intensity = Math.min(1, ((level ?? 1) - 1) * 0.6)
+      ctx.shadowBlur = 8 + 6 * intensity
+      ctx.strokeStyle = `rgba(255,255,255,${0.45 * intensity})`
+      ctx.lineWidth = 3
+      ctx.beginPath()
+      ctx.arc(x, y, spriteSize / 2 + 2, 0, Math.PI * 2)
+      ctx.stroke()
+    }
     ctx.restore()
+  }
+
+  private drawEnemySprite(ctx: CanvasRenderingContext2D, x: number, y: number, enemy: Enemy, radius: number): boolean {
+    const texKey = ENEMY_TEXTURE_BY_TYPE[enemy.type]
+    if (!texKey) return false
+    const image = this.textureCache.getImage(texKey)
+    if (!image || !image.complete || image.naturalWidth === 0) return false
+
+    const scaleFactor = 2.4 // downscale oversized sprites to roughly tile footprint
+    const size = Math.max(radius * scaleFactor, radius * 1.6)
+    ctx.save()
+    ctx.globalAlpha = enemy.isDead ? 0.35 : 1
+    ctx.drawImage(image, x - size / 2, y - size / 2, size, size)
+    ctx.restore()
+
+    // Motion trail for fast tags
+    if (enemy.tags?.includes('fast')) {
+      const trail = this.textureCache.getImage('effect-motion-trail')
+      if (trail && trail.complete && trail.naturalWidth > 0) {
+        ctx.save()
+        ctx.globalAlpha = 0.55
+        ctx.drawImage(trail, x - size * 0.6, y - size * 0.5, size * 0.8, size)
+        ctx.restore()
+      }
+    }
+
+    // Shield overlay
+    if (enemy.tags?.includes('shielded')) {
+      const shield = this.textureCache.getImage('effect-shield')
+      if (shield && shield.complete && shield.naturalWidth > 0) {
+        ctx.save()
+        ctx.globalAlpha = 0.5
+        ctx.drawImage(shield, x - size / 2, y - size / 2, size, size)
+        ctx.restore()
+      }
+    }
+
+    // Boss glow
+    if (enemy.tags?.includes('boss')) {
+      const glow = this.textureCache.getImage('effect-boss-glow')
+      if (glow && glow.complete && glow.naturalWidth > 0) {
+        ctx.save()
+        ctx.globalAlpha = 0.35
+        ctx.drawImage(glow, x - size / 2, y - size / 2, size, size)
+        ctx.restore()
+      }
+    }
+
+    // Tag badge
+    if (enemy.tags && enemy.tags.length > 0) {
+      const badgeKey = BADGE_BY_TAG[enemy.tags[0]]
+      if (badgeKey) {
+        const badge = this.textureCache.getImage(badgeKey)
+        if (badge && badge.complete && badge.naturalWidth > 0) {
+          const badgeSize = Math.max(12, radius * 0.9)
+          ctx.save()
+          ctx.globalAlpha = 0.9
+          ctx.drawImage(badge, x - badgeSize / 2, y - radius - badgeSize * 0.6, badgeSize, badgeSize)
+          ctx.restore()
+        }
+      }
+    }
+
+    return true
   }
 
   private drawEnhancedEnemy(
@@ -282,6 +421,20 @@ export class CanvasRenderer {
     const syncedScale = Math.max(scale, 0.55)
     const baseRadius = Math.max(6, enemy.stats.radius * syncedScale)
     const pathPattern = this.textureCache.getPattern(ctx, 'woodBase')
+
+    // Try sprite rendering first
+    const usedSprite = this.drawEnemySprite(ctx, x, y, enemy, baseRadius)
+    if (usedSprite) {
+      this.drawEnhancedHealthBar(ctx, x, y, baseRadius, tileSize, healthPercent)
+      if (enemy.speedMultiplier < 1) {
+        ctx.strokeStyle = 'rgba(124, 197, 255, 0.85)'
+        ctx.lineWidth = 3
+        ctx.beginPath()
+        ctx.arc(x, y, baseRadius + 6, 0, Math.PI * 2)
+        ctx.stroke()
+      }
+      return
+    }
 
     ctx.save()
     ctx.shadowColor = enemy.stats.color
@@ -344,6 +497,106 @@ export class CanvasRenderer {
         ctx.stroke()
       }
       ctx.restore()
+    } else if (enemy.type === 'armored_pest') {
+      ctx.save()
+      ctx.fillStyle = 'rgba(255,255,255,0.15)'
+      ctx.beginPath()
+      for (let i = 0; i < 6; i += 1) {
+        const angle = (Math.PI / 3) * i
+        const px = x + Math.cos(angle) * baseRadius
+        const py = y + Math.sin(angle) * baseRadius
+        if (i === 0) ctx.moveTo(px, py)
+        else ctx.lineTo(px, py)
+      }
+      ctx.closePath()
+      ctx.fill()
+      ctx.strokeStyle = 'rgba(255,255,255,0.4)'
+      ctx.lineWidth = 2
+      ctx.stroke()
+      ctx.restore()
+    } else if (enemy.type === 'swift_runner') {
+      ctx.save()
+      ctx.strokeStyle = 'rgba(255,255,255,0.5)'
+      ctx.lineWidth = Math.max(1, baseRadius * 0.12)
+      for (let i = -1; i <= 1; i += 1) {
+        ctx.beginPath()
+        ctx.moveTo(x - baseRadius * 1.2, y + i * 4)
+        ctx.lineTo(x + baseRadius * 1.1, y + i * 2)
+        ctx.stroke()
+      }
+      ctx.restore()
+    } else if (enemy.type === 'swarm') {
+      ctx.save()
+      ctx.fillStyle = 'rgba(255,255,255,0.15)'
+      for (let i = 0; i < 4; i += 1) {
+        const dx = (Math.random() - 0.5) * baseRadius
+        const dy = (Math.random() - 0.5) * baseRadius
+        ctx.beginPath()
+        ctx.arc(x + dx, y + dy, baseRadius * 0.35, 0, Math.PI * 2)
+        ctx.fill()
+      }
+      ctx.restore()
+    } else if (enemy.type === 'bulwark') {
+      ctx.save()
+      ctx.fillStyle = 'rgba(148, 163, 184, 0.35)'
+      ctx.beginPath()
+      ctx.moveTo(x, y - baseRadius * 1.1)
+      ctx.lineTo(x + baseRadius * 0.9, y)
+      ctx.lineTo(x, y + baseRadius * 1.1)
+      ctx.lineTo(x - baseRadius * 0.9, y)
+      ctx.closePath()
+      ctx.fill()
+      ctx.strokeStyle = 'rgba(255,255,255,0.45)'
+      ctx.lineWidth = 3
+      ctx.stroke()
+      ctx.restore()
+    } else if (enemy.type === 'carrier_boss') {
+      ctx.save()
+      ctx.strokeStyle = 'rgba(255,255,255,0.5)'
+      ctx.lineWidth = 2.5
+      ctx.beginPath()
+      ctx.arc(x, y, baseRadius * 1.1, 0, Math.PI * 2)
+      ctx.stroke()
+      ctx.fillStyle = 'rgba(255,255,255,0.18)'
+      ctx.beginPath()
+      ctx.moveTo(x, y - baseRadius * 1.2)
+      ctx.lineTo(x + baseRadius * 0.8, y)
+      ctx.lineTo(x, y + baseRadius * 0.9)
+      ctx.lineTo(x - baseRadius * 0.8, y)
+      ctx.closePath()
+      ctx.fill()
+      ctx.restore()
+    } else if (enemy.type === 'stealth') {
+      ctx.save()
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.25)'
+      ctx.beginPath()
+      ctx.ellipse(x, y, baseRadius * 1.15, baseRadius * 0.6, 0.35, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.setLineDash([4, 4])
+      ctx.strokeStyle = 'rgba(255,255,255,0.35)'
+      ctx.stroke()
+      ctx.setLineDash([])
+      ctx.restore()
+    } else if (enemy.type === 'regenerator') {
+      ctx.save()
+      const pulse = baseRadius * (1 + Math.sin(Date.now() * 0.003) * 0.1)
+      ctx.strokeStyle = 'rgba(74, 222, 128, 0.55)'
+      ctx.lineWidth = 3
+      ctx.beginPath()
+      ctx.arc(x, y, pulse, 0, Math.PI * 2)
+      ctx.stroke()
+      ctx.restore()
+    } else if (enemy.type === 'splitter') {
+      ctx.save()
+      ctx.strokeStyle = 'rgba(252, 211, 77, 0.85)'
+      ctx.lineWidth = 3
+      ctx.beginPath()
+      ctx.moveTo(x - baseRadius * 0.8, y - baseRadius * 0.8)
+      ctx.lineTo(x + baseRadius * 0.8, y + baseRadius * 0.8)
+      ctx.moveTo(x + baseRadius * 0.8, y - baseRadius * 0.8)
+      ctx.lineTo(x - baseRadius * 0.8, y + baseRadius * 0.8)
+      ctx.stroke()
+      ctx.restore()
     }
 
     if (enemy.speedMultiplier < 1) {
@@ -369,6 +622,9 @@ export class CanvasRenderer {
         boss: '#f97316',
         shielded: '#94a3b8',
         swarm: '#a3e635',
+        stealth: '#38bdf8',
+        regenerator: '#4ade80',
+        splitter: '#fbc02d',
       }
       const primaryTag = enemy.tags[0]
       const badgeColor = badgeColorMap[primaryTag] ?? '#ffffff'
@@ -435,7 +691,7 @@ export class CanvasRenderer {
     state: GameState,
     viewport: ViewportSize,
     highlight?: CanvasHighlight | null,
-    debugSettings?: { showRanges: boolean; showHitboxes: boolean },
+    debugSettings?: { showRanges: boolean; showHitboxes: boolean; showDamageNumbers?: boolean },
     camera?: { center: Vector2; zoom: number }
   ): ViewportTransform {
     const { width, height } = viewport
@@ -480,7 +736,7 @@ export class CanvasRenderer {
       
       // Enhanced shadow system for depth perception
       this.drawTowerShadow(ctx, x, y, tileSize)
-      this.drawTowerSprite(ctx, x, y, tower.type, tileSize)
+      this.drawTowerSprite(ctx, x, y, tower.type, tileSize, tower.level)
       
       // Draw distinctive tower silhouettes based on type
       this.drawTowerSilhouette(ctx, x, y - 6, tileSize, tower.type, tower.color)
@@ -527,7 +783,7 @@ export class CanvasRenderer {
     })
 
     // Enhanced particle system
-    this.drawParticles(ctx, particles, worldToScreen)
+    this.drawParticles(ctx, particles, worldToScreen, debugSettings?.showDamageNumbers !== false)
 
     // Enhanced enemy rendering
     enemies.forEach((enemy) => {
@@ -685,11 +941,24 @@ export class CanvasRenderer {
     })
   }
 
-  private drawParticles(ctx: CanvasRenderingContext2D, particles: any[], worldToScreen: Function): void {
+  private drawParticles(ctx: CanvasRenderingContext2D, particles: any[], worldToScreen: Function, showDamageNumbers: boolean): void {
     // Enhanced particle rendering with better visibility
     particles.forEach((particle) => {
       const { x, y } = worldToScreen(particle.position.x, particle.position.y)
       const lifeRatio = Math.max(0, Math.min(1, particle.life))
+      
+      if (particle.kind === 'damage') {
+        if (!showDamageNumbers) {
+          return
+        }
+        ctx.globalAlpha = lifeRatio
+        ctx.fillStyle = '#fef3c7'
+        ctx.font = '12px Arial'
+        ctx.textAlign = 'center'
+        ctx.fillText(`${particle.value ?? ''}`, x, y - (1 - lifeRatio) * 12)
+        ctx.globalAlpha = 1
+        return
+      }
       
       // Enhanced particle appearance
       ctx.globalAlpha = lifeRatio
@@ -702,6 +971,17 @@ export class CanvasRenderer {
       ctx.beginPath()
       ctx.arc(x, y, particle.radius, 0, Math.PI * 2)
       ctx.fill()
+      
+      if (particle.kind === 'hit') {
+        ctx.strokeStyle = '#fef08a'
+        ctx.lineWidth = 2
+        ctx.beginPath()
+        ctx.moveTo(x - 6, y)
+        ctx.lineTo(x + 6, y)
+        ctx.moveTo(x, y - 6)
+        ctx.lineTo(x, y + 6)
+        ctx.stroke()
+      }
       
       // Reset shadow
       ctx.shadowBlur = 0

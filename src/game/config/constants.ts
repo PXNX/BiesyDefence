@@ -37,7 +37,7 @@ export interface TowerProfile {
   projectileSpeed: number
   cost: number
   color: string
-  damageType: 'impact' | 'volley' | 'control'
+  damageType: 'impact' | 'volley' | 'control' | 'pierce' | 'chain' | 'burn'
   splashRadius?: number
   splashFactor?: number
   slow?: {
@@ -47,12 +47,14 @@ export interface TowerProfile {
   dot?: {
     dps: number
     duration: number
-    damageType?: 'dot' | 'control'
+    damageType?: 'dot' | 'control' | 'burn'
   }
   vulnerabilityDebuff?: {
     amount: number
     duration: number
   }
+  chainJumps?: number
+  chainFalloff?: number
 }
 
 // Chapter 2 Balance: TOWER-ROLE & ROLE DIFFERENTIATION
@@ -113,6 +115,46 @@ export const TOWER_PROFILES: Record<TowerType, TowerProfile> = {
       amount: 0.15,
       duration: 2.5,
     },
+  },
+  sniper: {
+    name: 'Sniper Tower',
+    description: 'Pierce shot, extreme range, high single-target damage.',
+    range: 240,
+    fireRate: 1.8,
+    damage: 95,
+    projectileSpeed: 520,
+    cost: 110,
+    color: '#fef08a',
+    damageType: 'pierce',
+  },
+  flamethrower: {
+    name: 'Flamethrower',
+    description: 'Cone DoT firestream; excels vs. swarm and regen.',
+    range: 118,
+    fireRate: 0.35,
+    damage: 8,
+    projectileSpeed: 0,
+    cost: 105,
+    color: '#fb923c',
+    damageType: 'burn',
+    dot: {
+      dps: 6,
+      duration: 1.4,
+      damageType: 'burn',
+    },
+  },
+  chain: {
+    name: 'Chain Tower',
+    description: 'Arc lightning that jumps between clustered foes.',
+    range: 165,
+    fireRate: 1.05,
+    damage: 30,
+    projectileSpeed: 0,
+    cost: 95,
+    color: '#a5b4fc',
+    damageType: 'chain',
+    chainJumps: 2,
+    chainFalloff: 0.75,
   },
 }
 

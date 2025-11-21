@@ -3,7 +3,7 @@ export type Vector2 = {
   y: number
 }
 
-export type DamageType = 'impact' | 'volley' | 'control' | 'dot'
+export type DamageType = 'impact' | 'volley' | 'control' | 'dot' | 'pierce' | 'chain' | 'burn' | 'freeze'
 
 export type GameStatus = 'idle' | 'running' | 'paused' | 'won' | 'lost'
 
@@ -28,7 +28,7 @@ export interface MapData {
   pathGridKeys: Set<string>
 }
 
-export type TowerType = 'indica' | 'sativa' | 'support'
+export type TowerType = 'indica' | 'sativa' | 'support' | 'sniper' | 'flamethrower' | 'chain'
 export type EnemyType =
   | 'pest'
   | 'runner'
@@ -37,7 +37,18 @@ export type EnemyType =
   | 'swarm'
   | 'bulwark'
   | 'carrier_boss'
-export type EnemyTag = 'armored' | 'fast' | 'swarm' | 'boss' | 'shielded'
+  | 'stealth'
+  | 'regenerator'
+  | 'splitter'
+export type EnemyTag =
+  | 'armored'
+  | 'fast'
+  | 'swarm'
+  | 'boss'
+  | 'shielded'
+  | 'stealth'
+  | 'regenerator'
+  | 'splitter'
 
 // Chapter 2 Balance: Tower upgrade system preparation (levels 1-3)
 export interface TowerUpgrade {
@@ -70,6 +81,7 @@ export interface EnemyStats {
     type: EnemyType
     count: number
   }
+  regenPerSecond?: number
 }
 
 export type DamageResistances = {
@@ -77,6 +89,10 @@ export type DamageResistances = {
   volley?: number
   control?: number
   dot?: number
+  pierce?: number
+  chain?: number
+  burn?: number
+  freeze?: number
 }
 
 export interface Enemy {
@@ -144,6 +160,8 @@ export interface Tower {
     duration: number
   }
   level?: TowerUpgrade['level']
+  chainJumps?: number
+  chainFalloff?: number
 }
 
 export interface Projectile {
@@ -168,6 +186,8 @@ export interface Particle {
   life: number
   maxLife: number
   color: string
+  kind?: 'hit' | 'damage'
+  value?: number
 }
 
 export interface Resources {
@@ -222,6 +242,10 @@ export interface GameSnapshot {
   nextWaveAvailable: boolean
   nextSpawnCountdown: number | null
   nextSpawnDelay: number | null
+  wavePreview?: WavePreviewEntry[]
+  lastWaveSummary?: LastWaveSummary | null
+  autoWaveEnabled?: boolean
+  showDamageNumbers?: boolean
   fps: number
   showRanges: boolean
   showHitboxes: boolean
@@ -233,6 +257,25 @@ export interface GameSnapshot {
     nextCost: number | null
     name: string
   }
+}
+
+export interface WavePreviewEntry {
+  waveNumber: number
+  composition: {
+    type: EnemyType
+    count: number
+    tags?: EnemyTag[]
+    resistances?: DamageResistances
+  }[]
+  warnings: string[]
+}
+
+export interface LastWaveSummary {
+  waveNumber: number
+  kills: number
+  leaks: number
+  reward: number
+  score: number
 }
 
 export interface ViewportSize {

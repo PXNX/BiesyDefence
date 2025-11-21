@@ -61,6 +61,21 @@ const TOWER_UPGRADE_PATHS: Record<TowerType, TowerUpgrade[]> = {
       description: 'Phase Anchors: vulnerability debuff and DoT amplification.',
     },
   ],
+  sniper: [
+    { level: 1, cost: 0, statMultiplier: 1, description: 'Base Sniper: precise long-range pierce.' },
+    { level: 2, cost: 70, statMultiplier: 1.15, description: 'Sharpened Optics: +15% dmg/range.' },
+    { level: 3, cost: 120, statMultiplier: 1.35, description: 'Hyper-Pierce: +35% dmg, faster cycle.' },
+  ],
+  flamethrower: [
+    { level: 1, cost: 0, statMultiplier: 1, description: 'Base flamestream for close control.' },
+    { level: 2, cost: 65, statMultiplier: 1.12, description: 'Nitro Mix: +12% dmg, longer burn.' },
+    { level: 3, cost: 110, statMultiplier: 1.3, description: 'White Flame: +30% dmg, wider arc.' },
+  ],
+  chain: [
+    { level: 1, cost: 0, statMultiplier: 1, description: 'Base chain arc with 2 jumps.' },
+    { level: 2, cost: 60, statMultiplier: 1.15, description: 'Superconductive: +15% dmg, +1 jump.' },
+    { level: 3, cost: 105, statMultiplier: 1.35, description: 'Overcharge: +35% dmg, slower falloff.' },
+  ],
 }
 
 export interface TowerUpgradeSummary extends TowerUpgradeSystem {

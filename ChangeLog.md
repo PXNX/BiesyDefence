@@ -23,6 +23,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgrade flow: Added hover-upgrade action (button + hotkey U) with cost checks; towers track levels and gain scaled stats.
 - Economy & waves: Wave-based bounty (no-leak bonus) replaces kill-streak, spawn counts scale with difficulty wave strength, and boss on-death spawns produce reward-free, no-life-damage adds.
 
+### ?? UI & Gameplay Enhancements (P0/P1 roadmap execution)
+
+- **Wave intel**: Snapshots now carry a 3-wave preview (types, counts, tags, warnings) plus last-wave summary (kills/leaks/reward/score) and auto-wave toggle state. UI panels surface upcoming compositions, warnings, and enemy intel (HP/Speed/Resists/Tags) to let players plan counters.
+- **Upgrade visibility**: Tower details show next-step stat deltas, costs, and hotkey reminder; GameControlPanel exposes upgrade, auto-wave toggle, hit-FX toggle, and quick next-wave start.
+- **New enemies**: Added `stealth`, `regenerator`, and `splitter` profiles with appropriate tags, resistances, regen, and on-death spawns; wave templates updated to introduce them mid-game.
+- **Feedback/telemetry**: Hit markers and floating damage numbers (toggleable) render on impacts; last-wave stats persist in snapshot; interest + no-leak bonuses + early-start bonus roll into wave rewards; enemy visuals polished per type.
+
+### ?? P2 Strategic Variety
+
+- **New towers**: Added Sniper (pierce long-range), Flamethrower (cone burn DoT), and Chain (jumping arc) with damage types and upgrade paths; renderer shows level halo.
+- **Maps**: Registered two extra layouts (`canyon_split`, `tri_route`) with distinct paths for replay variety via MapManager.
+- **Combat types**: Damage types extended (pierce/chain/burn/freeze) and resist handling; Tower/Projectile systems updated for chain jumps and burn DoT.
+
+### Documentation
+
+- Updated `Possible_ToDos.md` to a single consolidated roadmap: P0/P1 items now have checkboxes, status markers (planned), and short implementation notes for UI/logic execution.
+
 ## [1.12.0] - 2025-11-19 - UI Refactoring Complete
 
 ### 🎨 Major UI Redesign Implementation

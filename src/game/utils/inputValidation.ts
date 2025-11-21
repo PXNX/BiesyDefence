@@ -413,7 +413,7 @@ export const GameValidation = {
   },
 
   validateTowerType(towerType: string): ValidationResult {
-    const validTypes = ['indica', 'sativa', 'support']
+    const validTypes = ['indica', 'sativa', 'support', 'sniper', 'flamethrower', 'chain']
     const isValid = validTypes.includes(towerType)
     
     return {

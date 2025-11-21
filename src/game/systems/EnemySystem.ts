@@ -43,6 +43,12 @@ export const updateEnemies = (state: GameState, deltaSeconds: number): void => {
       enemy.effects.dot = survivors
     }
 
+    // Regeneration for specific enemy types (e.g., regenerator)
+    if (!enemy.isDead && enemy.stats.regenPerSecond && enemy.health < enemy.maxHealth) {
+      const regenAmount = enemy.stats.regenPerSecond * deltaSeconds
+      enemy.health = Math.min(enemy.maxHealth, enemy.health + regenAmount)
+    }
+
     const nextIndex = Math.min(enemy.pathIndex + 1, path.length - 1)
     const targetNode = path[nextIndex]
     if (!targetNode) {

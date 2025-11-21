@@ -79,6 +79,54 @@ export const updateTowers = (state: GameState, deltaSeconds: number): void => {
       return
     }
 
+    // CHAIN tower: direct chaining damage, no projectile
+    if (tower.type === 'chain') {
+      if (tower.cooldown <= 0) {
+        const candidates = findTargetsInRange(tower, state.enemies).filter(
+          (e) => !e.isDead && !e.reachedGoal
+        )
+        if (candidates.length > 0) {
+          const chainJumps = tower.chainJumps ?? 2
+          const falloff = tower.chainFalloff ?? 0.75
+          let damage = tower.damage
+          let target = candidates[0]
+          const hitIds = new Set<string>()
+          for (let i = 0; i <= chainJumps && target; i += 1) {
+            if (hitIds.has(target.id)) break
+            hitIds.add(target.id)
+            applyDamageToEnemy(target, damage, towerDamageType)
+            // find next closest not hit
+            const next = candidates
+              .filter((c) => !hitIds.has(c.id))
+              .sort(
+                (a, b) =>
+                  distanceBetween(target.position, a.position) -
+                  distanceBetween(target.position, b.position)
+              )[0]
+            damage = Math.max(1, damage * falloff)
+            target = next
+          }
+        }
+        tower.cooldown = tower.fireRate
+      }
+      return
+    }
+
+    // FLAMETHROWER: cone DoT approximation (apply to all in range)
+    if (tower.type === 'flamethrower') {
+      if (tower.cooldown <= 0) {
+        const targets = findTargetsInRange(tower, state.enemies)
+        targets.forEach((enemy) => {
+          applyDamageToEnemy(enemy, tower.damage, 'burn')
+          if (tower.dot) {
+            applyDotToEnemy(enemy, tower.dot.dps, tower.dot.duration, 'burn', tower.id)
+          }
+        })
+        tower.cooldown = tower.fireRate
+      }
+      return
+    }
+
     // Non-support towers shoot projectiles
     if (tower.cooldown > 0) {
       return

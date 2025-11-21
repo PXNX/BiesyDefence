@@ -15,7 +15,7 @@ import { updateParticles } from '@/game/systems/ParticleSystem'
 import { updateProjectiles } from '@/game/systems/ProjectileSystem'
 import { updateTowers } from '@/game/systems/TowerSystem'
 import { updateWaves, type WaveSystemCallbacks, getWaveStatus } from '@/game/systems/WaveSystem'
-import { createEnemy } from '@/game/entities/enemies'
+import { createEnemy, ENEMY_PROFILES } from '@/game/entities/enemies'
 import { createTowerUpgradeSystem } from '@/game/systems/TowerUpgradeSystem'
 import { MapManager } from '@/game/maps/MapManager'
 import { createEntityId } from '@/game/utils/id'
@@ -49,6 +49,7 @@ export class GameController {
   private debugSettings = {
     showRanges: false,
     showHitboxes: false,
+    showDamageNumbers: true,
   }
   private fps = 0
   private fpsAccumulator = 0
@@ -91,6 +92,12 @@ export class GameController {
     maxZoom: 2.5,
   }
   private currentWaveNoLeak = true
+  private autoWaveEnabled = true
+  private waveKillCount = 0
+  private waveRewardGained = 0
+  private waveLeakCount = 0
+  private lastWaveSummary: GameSnapshot['lastWaveSummary'] = null
+  private lastWaveCompletedAt = 0
 
   constructor() {
     this.state = createInitialState()
@@ -467,6 +474,22 @@ export class GameController {
     this.notify()
   }
 
+  public toggleDamageNumbers() {
+    this.debugSettings.showDamageNumbers = !this.debugSettings.showDamageNumbers
+    this.render()
+    this.notify()
+  }
+
+  public toggleAutoWave() {
+    this.autoWaveEnabled = !this.autoWaveEnabled
+    this.notify()
+  }
+
+  public setAutoWave(enabled: boolean) {
+    this.autoWaveEnabled = enabled
+    this.notify()
+  }
+
   /**
    * Upgrade the tower currently under hover (if any)
    */
@@ -538,6 +561,19 @@ export class GameController {
     }
 
     this.resetWaveState(this.state.currentWaveIndex)
+    this.waveKillCount = 0
+    this.waveRewardGained = 0
+    this.waveLeakCount = 0
+    this.currentWaveNoLeak = true
+    // Early starter bonus if the player triggers quickly after completion
+    let earlyStarterBonus = 0
+    const now = performance.now()
+    if (this.lastWaveCompletedAt > 0 && now - this.lastWaveCompletedAt < 7000) {
+      earlyStarterBonus = Math.max(5, Math.round(5 + (this.state.currentWaveIndex + 1) * 2))
+      this.state.resources.money += earlyStarterBonus
+      this.waveRewardGained += earlyStarterBonus
+    }
+
     this.state.wavePhase = 'active'
     this.notify()
     this.render()
@@ -640,8 +676,8 @@ export class GameController {
     // Check for victory condition after cleanup
     this.checkVictoryCondition()
 
-    // Auto-advance to next wave when current wave is completed
-    if (this.state.wavePhase === 'completed' && this.state.status === 'running') {
+    // Auto-advance to next wave when current wave is completed (optional)
+    if (this.state.wavePhase === 'completed' && this.state.status === 'running' && this.autoWaveEnabled) {
       this.beginNextWave()
     }
 
@@ -674,8 +710,26 @@ export class GameController {
       const difficulty = this.state.map ? MapManager.getInstance().getCurrentDifficultyConfig() : { enemyRewardMultiplier: 1 }
       const bonus = Math.round((10 + (waveIndex + 1) * 5) * (difficulty.enemyRewardMultiplier ?? 1))
       this.state.resources.money += bonus
+      this.waveRewardGained += bonus
       this.notify()
     }
+
+    // Light interest / economy tempo bonus
+    const interest = Math.floor(this.state.resources.money * 0.05)
+    if (interest > 0) {
+      this.state.resources.money += interest
+      this.waveRewardGained += interest
+    }
+
+    this.lastWaveCompletedAt = performance.now()
+    this.lastWaveSummary = {
+      waveNumber: waveIndex + 1,
+      kills: this.waveKillCount,
+      leaks: this.waveLeakCount,
+      reward: this.waveRewardGained,
+      score: this.state.resources.score,
+    }
+    this.notify()
   }
 
   /**
@@ -709,6 +763,7 @@ export class GameController {
     const previousLives = this.state.resources.lives
     this.state.resources.lives = Math.max(0, this.state.resources.lives - damage)
     this.currentWaveNoLeak = false
+    this.waveLeakCount += 1
     
     console.log(`Life lost: ${damage} damage. Lives: ${previousLives} → ${this.state.resources.lives}`)
     
@@ -762,12 +817,19 @@ export class GameController {
     this.lastKnownScore = -1
     this.lastKnownWaveIndex = -1
     this.lastKnownStatus = 'idle'
+    this.waveKillCount = 0
+    this.waveRewardGained = 0
+    this.waveLeakCount = 0
+    this.lastWaveSummary = null
+    this.autoWaveEnabled = true
+    this.lastWaveCompletedAt = 0
     
     // Reset game speed and debug settings
     this.gameSpeed = 1
     this.debugSettings = {
       showRanges: false,
       showHitboxes: false,
+      showDamageNumbers: true,
     }
     
     // Clear hover state
@@ -826,7 +888,13 @@ export class GameController {
             // Enemy was killed - add rewards
             enemiesKilledThisFrame++
             currencyGainedThisFrame += enemy.stats.reward
-            scoreGainedThisFrame += 10 + Math.floor(enemy.stats.reward * 0.5)
+            const scoreGain = 10 + Math.floor(enemy.stats.reward * 0.5)
+            scoreGainedThisFrame += scoreGain
+            this.state.resources.money += enemy.stats.reward
+            this.state.resources.score += scoreGain
+            enemy.rewardClaimed = true
+            this.waveKillCount += 1
+            this.waveRewardGained += enemy.stats.reward
 
             // Handle on-death spawns (e.g., carrier boss releasing swarm)
             if (enemy.stats.onDeathSpawn) {
@@ -852,6 +920,7 @@ export class GameController {
             // Enemy reached goal - apply life loss using new method
             this.loseLife(enemy.stats.damageToLives)
             livesLostThisFrame += enemy.stats.damageToLives
+            enemy.rewardClaimed = true
           }
       }
     })
@@ -1042,6 +1111,10 @@ export class GameController {
       nextWaveAvailable: false,
       nextSpawnCountdown: null,
       nextSpawnDelay: null,
+      wavePreview: [],
+      lastWaveSummary: null,
+      autoWaveEnabled: false,
+      showDamageNumbers: true,
       fps: 0,
       showRanges: false,
       showHitboxes: false,
@@ -1238,6 +1311,9 @@ export class GameController {
       // Calculate FPS with proper rounding
       const fpsValue = Math.round(this.fps * 10) / 10
 
+      const wavePreview = this.buildWavePreview()
+      const lastWaveSummary = this.lastWaveSummary ?? null
+
       // Create snapshot with validated data from GameState
       const snapshot: GameSnapshot = {
         // Core resources from GameState only
@@ -1267,6 +1343,12 @@ export class GameController {
         // Spawn timing with validation
         nextSpawnCountdown,
         nextSpawnDelay,
+
+        // Preview and telemetry
+        wavePreview,
+        lastWaveSummary,
+        autoWaveEnabled: this.autoWaveEnabled,
+        showDamageNumbers: this.debugSettings.showDamageNumbers,
         
         // Performance data
         fps: fpsValue,
@@ -1311,7 +1393,66 @@ export class GameController {
       nextSpawnDelay: snapshot.nextSpawnDelay !== null && Number.isFinite(snapshot.nextSpawnDelay)
         ? Math.max(0, snapshot.nextSpawnDelay)
         : null,
+      wavePreview: snapshot.wavePreview ?? [],
+      lastWaveSummary: snapshot.lastWaveSummary ?? null,
+      autoWaveEnabled: Boolean(snapshot.autoWaveEnabled),
+      showDamageNumbers: snapshot.showDamageNumbers ?? true,
     }
+  }
+
+  private buildWavePreview(): GameSnapshot['wavePreview'] {
+    const entries: NonNullable<GameSnapshot['wavePreview']> = []
+    const upcomingStart =
+      this.state.wavePhase === 'completed'
+        ? this.state.currentWaveIndex + 1
+        : this.state.currentWaveIndex
+    const total = this.state.waves.length
+    for (let offset = 0; offset < 3; offset += 1) {
+      const waveIndex = upcomingStart + offset
+      if (waveIndex >= total) {
+        break
+      }
+      const wave = this.state.waves[waveIndex]
+      if (!wave) {
+        continue
+      }
+
+      const counts: Record<string, number> = {}
+      wave.spawnQueue.forEach((spawn) => {
+        counts[spawn.type] = (counts[spawn.type] ?? 0) + 1
+      })
+
+      const composition = Object.entries(counts).map(([type, count]) => {
+        const profile = ENEMY_PROFILES[type as keyof typeof ENEMY_PROFILES]
+        return {
+          type: type as any,
+          count,
+          tags: profile?.tags,
+          resistances: profile?.resistances,
+        }
+      })
+
+      const warnings = composition.flatMap((entry) => {
+        const tags = entry.tags ?? []
+        const derived: string[] = []
+        if (tags.includes('armored')) derived.push('Armor check')
+        if (tags.includes('fast')) derived.push('Speed spike')
+        if (tags.includes('swarm')) derived.push('Swarm density')
+        if (tags.includes('shielded')) derived.push('Shields')
+        if (tags.includes('boss')) derived.push('Boss threat')
+        if (tags.includes('stealth')) derived.push('Detection needed')
+        if (tags.includes('regenerator')) derived.push('Burst/DoT needed')
+        if (tags.includes('splitter')) derived.push('Splash/AoE needed')
+        return derived
+      })
+
+      entries.push({
+        waveNumber: waveIndex + 1,
+        composition,
+        warnings: Array.from(new Set(warnings)),
+      })
+    }
+    return entries
   }
 
   private placeTower(world: Vector2, towerType: TowerType): PlacementResult {
@@ -1360,6 +1501,8 @@ export class GameController {
       dot: profile.dot ? { ...profile.dot, damageType: profile.dot.damageType ?? 'dot' } : undefined,
       vulnerabilityDebuff: profile.vulnerabilityDebuff,
       level: 1,
+      chainJumps: profile.chainJumps,
+      chainFalloff: profile.chainFalloff,
     })
 
     this.state.resources.money -= profile.cost

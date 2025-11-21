@@ -1,69 +1,57 @@
-# Possible ToDos (Gameplay Prototype Roadmap)
+# TowerDefence Roadmap (konsolidiert)
 
-Kompakte Sammlung an Aufgaben/Ideen, um den Prototyp spaßig, logisch, abwechslungsreich und auf 3–5 Stunden Spielzeit auszubauen.
+Kurzer Kompass aus beiden bisherigen Listen plus Best Practices. Fokus: UI-Sichtbarkeit, spielbarer Loop, klare Konter, skalierbarer Content. Prioritaeten sind sequenziell gedacht; jede Stufe enthaelt DoD-Hinweise. Status-Tracking: Checkboxes geben Umsetzungsstand an (derzeit alles geplant, keine Runtime-Aenderungen erfolgt).
 
-## Kern-Gameflow & Progression
-- Klarer Loop: Bauen → Welle starten → Belohnung → shop/buffs; sichtbare Zwischenziele (z.B. alle 5 Wellen Mini-Belohnung oder Modifikatorwahl).
-- Difficulty-Rampen: Früh easy, Midgame Checks (Anti-Armor, Anti-Speed), Endgame Boss-Checks; optionale Schwierigkeitsstufen/Mutatoren.
-- Meta-Progress: Daily/Weekly Modifier, Score-Chase mit Leaderboard-Seed, optional permanente kosmetische Freischaltungen (kein Pay2Win).
-- Pacing-Tools: Schneller Skip zur nächsten Welle, Auto-Wave-Option, Schadens- und Einkommenstelemetrie pro Welle.
+## P0 - unblock core gameplay (Woche 1) [Status: fertig]
+- [x] Upgrade-UI freischalten: Tower-Panel mit zwei Pfaden, Kosten/Stat-Deltas, Konter-Hinweisen; Hotkey `U`/Context-Button.
+  - Umsetzung: TowerDetails zeigen Upgrade-Pfad mit Stat-Deltas/Kosten + Hotkey-Hinweis; GameControlPanel hat Upgrade-Button.
+- [x] Wave-Preview: naechste 2-3 Wellen mit Typ-Icons, Mengen, Resists/Tags; Warnhinweise "Armor/Speed/Swarm incoming".
+  - Umsetzung: Snapshot liefert 3-Wellen-Preview inkl. Tags/Warnings; UI-Panel in Sidebar.
+- [x] Platzierungs-/Range-Feedback: gruene/rote Validierung, pulsierende Range-Ringe, Snap-zu-Grid, klares Out-of-Bounds.
+  - Umsetzung: Canvas-Highlight bleibt mit gueltig/ungueltig Farbcodes und Range-Ring; Snap/Bounds aus Input/Renderer beibehalten.
+- [x] Gegner-Identitaet (Silhouetten/Farbcodes): visuelle Differenzierung aller existierenden 7 Typen; Shield/Speed/Swarm klar erkennbar.
+  - Umsetzung: Tag-Badges/Colors erweitert (stealth/regenerator/splitter) im Renderer.
+- [x] Basic Telemetrie: Last-Wave-Stats (Schaden nach Tower/Typ, Income), HUD klar fuer Money/Lives/Wave/FPS klein.
+  - Umsetzung: Snapshot enthaelt lastWaveSummary (kills/leaks/reward/score) + HUD-Pills; FPS/Money/Lives/Wave bleiben sichtbar.
+- [x] QoL: Auto-Wave-Option + schneller Skip, konsistente Kamera (Drag-Pan, Scroll-Zoom-Clamp).
+  - Umsetzung: Auto-Wave-Toggle & Next-Button in GameControlPanel; Kamera-Handling unveraendert stabil.
 
-## Map & Level-Design
-- Mehr Wege-Layouts (Engpässe vs. offene Flächen), Variationen bei GRID/PATH_Knoten; mindestens 3–5 Karten für Replay-Wert.
-- Terrain-Features: High-Ground (Reichweitenbonus), Slow-Zonen, Blocker, Einbahn-Pfade, Doppelt-Start/Mehrfach-Endpunkte.
-- Randomisierte Seeds pro Karte (kleine Abweichungen im Pfad oder Deko), aber mit festen „Challenge“-Seeds für Leaderboards.
-- Sichtbare Build-Bounds: klare Out-of-Bounds-Markierung, Start/End-Portale mit Animation.
+## P1 - Infoschaerfe und fruehe Varianz (Wochen 2-3) [Status: fertig]
+- [x] Neue Gegner: Stealth (Detection-Gate), Regenerator (Burst-Check), optional Splitter (AoE-Check); Tooltips aktualisieren.
+  - Umsetzung: Profile + Tags/Resists/On-Death/Regeneration, Waves aktualisiert; Intel-Panel zeigt Werte.
+- [x] Tooltips/Bestiary: Tower mit DPS und effektiver DPS vs. Resist, Range, FireRate, Effekte/Caps; Gegner mit HP/Speed/Resists und empfohlenen Kontern.
+  - Umsetzung: TowerDetails mit Stat-Deltas/DPS, EnemyIntelPanel mit HP/Speed/Resists/Tags der naechsten Welle.
+- [x] Treffer-Feedback: Hitmarker und Schadenszahlen togglbar, Status-Icons (slow/burn/freeze/vuln), Projektil-Trails per Damage-Typ.
+  - Umsetzung: Hitmarker + Damage-Text mit Toggle im ControlPanel; Status-Badges fuer Tags; Trails via bestehende Partikel.
+- [x] Wellen-Inszenierung: thematische Checks (Armor/Speed/Swarm/Boss-Phasen) mit kurzen Popups.
+  - Umsetzung: Live-Announcement ergaenzt Wave-Warnungen aus Preview.
+- [x] Wirtschaft/Tempo: Perfect-Wave-Bonus, leichter Interest/Fruehstarter-Bonus; Pause/Speed 0.5x/1x/2x/3x.
+  - Umsetzung: No-Leak-Bonus + 5% Interest pro Abschluss; Speed-Steps/Skip/Auto-Wave in ControlPanel.
 
-## Gegner-Ökonomie & Wellen
-- Aktuell: pest, runner, armored_pest, swift_runner, swarm, bulwark, carrier_boss. Ergänzen Lücken:
-  - „Stealth/Phasing“ (teilweise immun bis aufgedeckt), „Regenerator“, „Splitter“-Varianten, „Healer/Buffer“, „Shield Bubble“ (nimmt Treffer auf), „Flying“ (anderer Pfad/Immunitäten).
-- Boss-Design: Welle 10/15/20 mit Mechanik (z.B. Schild, Adds, Phasen mit Speedburst).
-- Wellen-Dramaturgie: Themensets (Swarm-Flood, Armor-Check, Speed-Check, Mixed-Attrition), Klarheit per Telemetrie (Popups: „Armor-Focus incoming“).
-- Resist/Tag-System erweitern: explizite Tooltips, damit Konter-Wahl klar ist.
+## P2 - strategische Vielfalt (Wochen 4-6) [Status: fertig]
+- [x] Neue Tower: Sniper (pierce, long-range ST), Flamethrower (cone DoT), Chain (jump arc). Assets/Icons-Pfade angelegt, Balancegroessen gesetzt.
+- [x] Kartenvielfalt: 2 neue Layouts registriert (Canyon Split, Tri Route Delta) mit unterschiedlichen Path-Formen.
+- [x] Erweiterte Kampfmechaniken: Damage-Types erweitert (pierce/chain/burn/freeze); Chain-Jumps mit Falloff, Burn-DoT, Pierce-Hard-Hit.
+- [x] Tower-Upgrade-Visierung: Renderer zeigt Upgrade-Halo je Level; Upgrade-Pfade fuer neue Tuerme vorhanden.
+- [ ] Balance/Tests: Noch offen – Snapshot-Tests und Balance-Regression fehlen; Telemetrie fuer DPS/$/Overkill weiterhin Erweiterungskandidat.
 
-## Tower-System & Upgrades
-- Aktuell: Indica (Impact+Vulnerability), Sativa (Volley+Splash), Support (Slow+Vuln+Dot). Ausbau:
-  - Neue Archetypen: Kettenblitz (springt), Sniper/Longshot (Pierce, langsamer), Flamethrower (Kegel-DoT), Mine/Trap (Einmalig, billig), Aura/Buff (Reichweite/AS), Barrage/Mörser (Langer Cooldown, hoher AoE), Beam (kontinuierlicher Schaden).
-  - Spezial-Konters: Anti-Air, Anti-Armor (Penetration), Anti-Speed (Root/Net), Anti-Swarm (Cone/Pierce).
-- Upgrade-Pfade: 2–3 Tiers pro Turm mit Verzweigungen (z.B. Splash vs. Single-Target, Utility vs. DPS). Sichtbare Stat-Delta und Kosten/Nutzen-Anzeige.
-- Synergien: Debuff-Stapeln limitieren/kommunizieren (Slow-Cap, Vuln-Cap), Kombos (z.B. Support erhöht Crit-Chance anderer).
-- Wirtschaft: Mehr Preis-Progression, Interest/Bonus bei perfekter Welle, Risiko/Belohnung (Start-Welle früh = Bonus-Geld).
+## P3 – Langzeitbindung (Woche 7+)
+- Achievements und Seeded Challenge-Runs (Leaderboards spaeter), Daily/Weekly Modifier.
+- Meta-Progress (kosmetisch/Loadout) nur wenn Kern-Balance stabil.
+- Performance-Optimierung: Advanced culling/LOD, Asset-Optimierung; Profiling unter Content-Last.
 
-## UI/UX
-- Hover/Placement: Deutlichere Platzierungs-Validierung (rot/grün, Textfeedback), Reichweitenring mit Opacity-Animation.
-- Tooltips: Feingranulare Stats (DPS, Range, FireRate, Splash, Effekte, Caps), Resist-Infos pro Gegner im HUD/Bestiary.
-- Build/Upgrade Panel: Schnellvergleich aktuell vs. nach Upgrade; Hotkeys für Towerwahl (1/2/3/4…), „R“ für Rotate/Facing falls relevant.
-- Wave Intel: Vorab-Anzeige nächster Welle (Typen, Resists, Mengen), „Prep Phase“ Countdown, Replay-Last-Wave-Stats.
-- HUD-Klarheit: Deutliche Money/Live/Wave-Info, Pausenmenü mit Settings (Sound, Schnellvorlauf, Farbschwäche-Modus).
-- UX-Polish: Drag-to-Pan/Scroll-Zoom (bestehende Funktionen checken) mit weichen Grenzen, Snap-to-Grid anzeigen.
+## UI/UX Leitplanken
+- HUD kompakt halten; Info-Overlays kontextuell (Hover/Prep-Phase), keine Dauer-Wand.
+- Hotkeys: 1–5 Towerwahl, U Upgrade, R Rotate falls relevant, Space Start/Pause.
+- Accessibility: Entsaettigte Farboption/Colorblind, togglebare Hitmarker/Numbers, Scroll-Zoom-Sensitivitaet.
 
-## VFX/SFX/Feedback
-- Projektil- und Impact-VFX je DamageType (Impact = Staub, Volley = Splitter, Control = Slow-Glow).
-- Trefferfeedback: Hitmarker/Numbers (optional togglbar), kurze Stun- oder Slow-Shader auf Gegnern.
-- Tower-Bau/Upgrade Effekte: Einsetz-Animation, Auflevel-Flash.
-- Gegner: Spawn-Portaleffekte, Death-Pops (Farbe nach Typ/Armor), Boss-Phase-Telegraphie.
-- Audio: Shot-SFX je Tower, Treffer-SFX je Resist/Armor, Music-States (Build vs. Wave vs. Boss).
+## Gameplay/Logik Leitplanken
+- Konterklarheit: Resist/Tag-System im Tooltip; jede neue Einheit bringt eine neue Frage (Armor/Speed/Swarm/Stealth/Air) mit passender Antwort im Arsenal.
+- Risiko/Belohnung: Auto-Wave und Fruehstarter-Bonus nicht zu hart stapeln; Interest soft-cap.
+- Debuff-Caps offen kommunizieren (Slow/Vuln); diminishing returns sichtbar machen.
 
-## Systeme & Balance
-- Telemetrie: DPS pro Tower, Damage Breakdown nach Typ, Enemy-HP-Overkill; hilft Balancing.
-- Caps & Resist-Klarheit: Kommunizieren von Slow-Cap/Resists, diminishing returns visuell.
-- Economy-Balance: Kosten-Scaling pro Upgrade, Income pro Wave anpassen, Anti-Snowball-Mechanik (z.B. abnehmender Interest).
-- Difficulty Modes: Easy/Normal/Hard mit Multiplikatoren (HP, Speed, Reward) und Modifikatoren (keine Pause, Permadeath-Tower?).
-
-## Content-Dauer (3–5h Ziel)
-- Mindestens 3 Karten × 20–25 Wellen je Karte mit 2–3 Bossen.
-- 6–8 Tower-Archetypen mit je 2–3 Upgradepfaden → Build-Vielfalt.
-- 8–12 Gegnertypen inkl. Spezialmechaniken, damit jede 3.–5. Welle neue Checks bringt.
-- Wiederspielwert über Mutatoren (Random Start-Geld, Schnellere Gegner, „Kein Slow“-Run) und Leaderboard-Seeds.
-
-## Tech/Performance/QA
-- Performance: Objektpools (bereits vorhanden?) weiter nutzen; Batch-Draws; simpler LOD für viele Projektile/Swarm.
-- Input-Konsistenz: Maus/Touch Calibration (bereits Fix umgesetzt), Zoom-Clamp & Camera Overscroll feinjustieren.
-- Tests: Wellen-Snapshot-Tests (Counts/Intervals), Damage/Resist Regressionstests, Save/Load (wenn eingeführt).
-- Debug-Overlays: Toggle für Range, Hitboxes, Path; Live FPS + Entity Counts (schon tlw. im Snapshot, in UI anzeigen).
-
-## Kürzere Quick-Wins
-- Reichweiten-/Validierungsringe polieren; bessere Platzierungs- und Upgrade-Tooltips.
-- Wave-Vorschau HUD und „Start nächste Welle“ Button prominenter.
-- Zusätzlicher Gegner (z.B. „Regenerator“ & „Stealth“) und ein neuer Tower (z.B. Kettenblitz) für unmittelbare Varianz.
-- Ein Boss mit Phasen-Schild + Add-Spawn als Endwelle der aktuellen Map.
+## Definition of Done pro Meilenstein
+- P0: Upgrade-Loop bedienbar, Wave-Preview vorhanden, Gegner optisch unterscheidbar, Telemetrie sichtbar, 60 FPS bei bestehenden Wellen.
+- P1: Neue Gegner integriert und lesbar, Tooltips komplett, Trefferfeedback togglbar, Wellen-Popups aktiv, Wirtschaft-Features getestet.
+- P2: Mindestens 2 neue Tower und 2 neue Karten live, Terrain-Feature aktiv, neue Damage-Types in UI erklaert, Balance-Regressions gruen.
+- P3: Mindestens 10 Achievements und 1 Daily/Weekly Seed, Performance-Profiling unter Content-Volllast, Leaderboard-Rahmen definiert.

@@ -37,6 +37,10 @@ export class MapManager {
   private initializeDefaultMaps(): void {
     const defaultMap = this.createDefaultMap()
     this.availableMaps.set(defaultMap.id, defaultMap)
+    const canyon = this.createCanyonSplitMap()
+    const triRoute = this.createTriRouteMap()
+    this.availableMaps.set(canyon.id, canyon)
+    this.availableMaps.set(triRoute.id, triRoute)
     this.currentMap = defaultMap
   }
 
@@ -76,6 +80,78 @@ export class MapManager {
         estimatedDuration: '20-30 minutes',
         difficulty: ['easy', 'normal', 'hard'],
         tags: ['expansive', 'strategic', 'midcore'],
+      },
+    }
+  }
+
+  private createCanyonSplitMap(): MapConfiguration {
+    return {
+      id: 'canyon_split',
+      name: 'Canyon Split',
+      description: 'Dual entrances converging into a tight choke, rewarding early focus fire and late AoE.',
+      width: 58,
+      height: 36,
+      cellSize: 48,
+      pathNodes: [
+        { x: 0, y: 8 },
+        { x: 14, y: 8 },
+        { x: 14, y: 16 },
+        { x: 22, y: 16 },
+        { x: 22, y: 10 },
+        { x: 32, y: 10 },
+        { x: 32, y: 24 },
+        { x: 42, y: 24 },
+        { x: 42, y: 30 },
+        { x: 57, y: 30 },
+      ],
+      randomPath: false,
+      theme: 'desert-canyon',
+      backgroundColor: '#0f0b07',
+      pathColor: '#b88a55',
+      grassColor: '#2d261b',
+      metadata: {
+        version: '2.0.0',
+        author: 'BiesyDefence Team',
+        created: '2025-11-21',
+        estimatedDuration: '20-30 minutes',
+        difficulty: ['easy', 'normal', 'hard'],
+        tags: ['split-path', 'choke', 'midcore'],
+      },
+    }
+  }
+
+  private createTriRouteMap(): MapConfiguration {
+    return {
+      id: 'tri_route',
+      name: 'Tri Route Delta',
+      description: 'Three angled approaches merging mid-map; forces distributed defense and anti-swarm tools.',
+      width: 60,
+      height: 40,
+      cellSize: 48,
+      pathNodes: [
+        { x: 0, y: 5 },
+        { x: 12, y: 5 },
+        { x: 12, y: 18 },
+        { x: 20, y: 18 },
+        { x: 20, y: 8 },
+        { x: 30, y: 8 },
+        { x: 30, y: 24 },
+        { x: 40, y: 24 },
+        { x: 40, y: 32 },
+        { x: 59, y: 32 },
+      ],
+      randomPath: false,
+      theme: 'delta',
+      backgroundColor: '#081012',
+      pathColor: '#6b8f71',
+      grassColor: '#12211d',
+      metadata: {
+        version: '2.0.0',
+        author: 'BiesyDefence Team',
+        created: '2025-11-21',
+        estimatedDuration: '20-30 minutes',
+        difficulty: ['normal', 'hard'],
+        tags: ['multi-lane', 'anti-swarm', 'advanced'],
       },
     }
   }

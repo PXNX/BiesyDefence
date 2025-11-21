@@ -8,6 +8,9 @@ const TOWER_ART_PATHS: Record<TowerType, string> = {
   indica: '/towers/tower_indica_level1.png',
   sativa: '/towers/tower_sativa_level1.png',
   support: '/towers/tower_support_level1.png',
+  sniper: '/towers/tower_sniper_level1.png',
+  flamethrower: '/towers/tower_flamethrower_level1.png',
+  chain: '/towers/tower_chain_level1.png',
 }
 
 const TOWER_ENTRIES = Object.entries(TOWER_PROFILES) as [TowerType, TowerProfile][]
@@ -31,11 +34,7 @@ export function TowerIconBar({
 }: TowerIconBarProps) {
   const [hoveredTower, setHoveredTower] = useState<TowerType | null>(null)
   const [panelPosition, setPanelPosition] = useState<{ x: number; y: number } | null>(null)
-  const iconRefs = useRef<Record<TowerType, HTMLButtonElement | null>>({
-    indica: null,
-    sativa: null,
-    support: null,
-  })
+  const iconRefs = useRef<Record<TowerType, HTMLButtonElement | null>>({} as Record<TowerType, HTMLButtonElement | null>)
 
   const handleIconHover = (towerType: TowerType, event?: React.MouseEvent | React.FocusEvent) => {
     setHoveredTower(towerType)

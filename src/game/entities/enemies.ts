@@ -88,6 +88,42 @@ export const ENEMY_PROFILES: Record<EnemyType, EnemyStats> = {
       count: 3,
     },
   },
+  stealth: {
+    speed: 130,
+    health: 48,
+    reward: 28,
+    damageToLives: 1,
+    color: '#7cc5ff',
+    radius: 8,
+    resistances: { control: 0.5, volley: 0.15 },
+    slowCap: 0.75,
+    tags: ['fast', 'stealth'] as EnemyTag[],
+  },
+  regenerator: {
+    speed: 90,
+    health: 120,
+    reward: 36,
+    damageToLives: 2,
+    color: '#7bff9c',
+    radius: 11,
+    resistances: { dot: -0.1, impact: 0.1 },
+    regenPerSecond: 6,
+    tags: ['regenerator', 'armored'] as EnemyTag[],
+  },
+  splitter: {
+    speed: 105,
+    health: 70,
+    reward: 18,
+    damageToLives: 1,
+    color: '#ffd17c',
+    radius: 9,
+    resistances: { volley: 0.2 },
+    tags: ['splitter'] as EnemyTag[],
+    onDeathSpawn: {
+      type: 'swarm',
+      count: 2,
+    },
+  },
 }
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))

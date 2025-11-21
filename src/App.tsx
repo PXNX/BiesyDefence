@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 import { GameController } from '@/game/core/GameController'
-import type { GameSnapshot, GameStatus, TowerType } from '@/game/core/types'
+import type { GameSnapshot, GameStatus, TowerType, EnemyType } from '@/game/core/types'
 import { StatsCornerLayout } from '@/ui/components/StatsCornerLayout'
 import { GameControlPanel } from '@/ui/components/GameControlPanel'
 import { SpawnTicker } from '@/ui/components/SpawnTicker'
 import { TowerIconBar } from '@/ui/components/TowerIconBar'
+import { WavePreviewPanel } from '@/ui/components/WavePreviewPanel'
+import { WaveSummaryCard } from '@/ui/components/WaveSummaryCard'
+import { EnemyIntelPanel } from '@/ui/components/EnemyIntelPanel'
 import { audioManager } from '@/game/audio/AudioManager'
 import type { AudioConfig } from '@/game/audio/AudioManager'
 import { ErrorBoundary } from '@/ui/components/ErrorBoundary'
@@ -170,12 +173,17 @@ function App() {
     prevStatusRef.current = currentStatus
 
     let message: string | null = null
+    const currentPreview = snapshot.wavePreview?.[0]
     if (currentStatus === 'won') {
       message = 'Victory! The prototype loop is cleared.'
     } else if (currentStatus === 'lost') {
       message = 'Game over! Reset to defend again.'
     } else if (currentStatus === 'running' && previousStatus !== 'running') {
-      message = `Wave ${snapshot.wave.current} launched.`
+      const warningText =
+        currentPreview && currentPreview.warnings.length > 0
+          ? ` - ${currentPreview.warnings.join(' · ')}`
+          : ''
+      message = `Wave ${snapshot.wave.current} launched${warningText}.`
     }
 
     if (!message) {
@@ -283,6 +291,14 @@ function App() {
     controllerRef.current?.toggleShowHitboxes()
   }
 
+  const handleToggleHitFx = () => {
+    controllerRef.current?.toggleDamageNumbers()
+  }
+
+  const handleToggleAutoWave = () => {
+    controllerRef.current?.toggleAutoWave()
+  }
+
   const handleSetQuickWave = (index: number) => {
     setQuickWaveIndex(index)
   }
@@ -347,6 +363,8 @@ function App() {
     snapshot?.status === 'won' || snapshot?.status === 'lost'
   const isAppBusy = appPhase === 'loading' || appPhase === 'resetting'
   const waveLabel = snapshot ? `${snapshot.wave.current}/${snapshot.wave.total}` : '--/--'
+  const nextWaveTypes: EnemyType[] =
+    snapshot?.wavePreview?.[0]?.composition.map((c) => c.type as EnemyType) ?? []
   const canvasStatusMessage = !isAudioReady
     ? 'Loading audio...'
     : appPhase === 'resetting'
@@ -509,11 +527,16 @@ function App() {
                     isPaused={snapshot.status === 'paused'}
                     onPauseToggle={handlePause}
                     audioConfig={audioConfig}
-                    onToggleMute={handleToggleMute}
-                    onMasterVolumeChange={handleMasterVolumeChange}
-                    onUpgrade={attemptTowerUpgrade}
-                    hoverTower={snapshot.hoverTower}
-                  />
+                  onToggleMute={handleToggleMute}
+                  onMasterVolumeChange={handleMasterVolumeChange}
+                  onUpgrade={attemptTowerUpgrade}
+                  onToggleAutoWave={handleToggleAutoWave}
+                  onNextWave={handleNextWave}
+                  onToggleHitFx={handleToggleHitFx}
+                  autoWaveEnabled={snapshot.autoWaveEnabled}
+                  showHitFx={snapshot.showDamageNumbers !== false}
+                  hoverTower={snapshot.hoverTower}
+                />
                   <TowerIconBar
                     className="tower-dock-bar"
                     orientation="vertical"
@@ -540,6 +563,17 @@ function App() {
                   </div>
                 </div>
               </div>
+              {(snapshot?.wavePreview?.length ?? 0) > 0 ||
+              nextWaveTypes.length > 0 ||
+              snapshot?.lastWaveSummary ? (
+                <div className="intel-stack" aria-label="Wave intel and summaries">
+                  {snapshot?.wavePreview && snapshot.wavePreview.length > 0 && (
+                    <WavePreviewPanel preview={snapshot.wavePreview} />
+                  )}
+                  {nextWaveTypes.length > 0 && <EnemyIntelPanel types={nextWaveTypes} />}
+                  {snapshot?.lastWaveSummary && <WaveSummaryCard summary={snapshot.lastWaveSummary} />}
+                </div>
+              ) : null}
             </section>
           </section>
         </main>

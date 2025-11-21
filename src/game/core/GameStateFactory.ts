@@ -149,6 +149,8 @@ const createInitialTowers = (map: MapData): Tower[] => {
       vulnerabilityDebuff: profile.vulnerabilityDebuff,
       splashFactor: profile.splashFactor,
       level: 1,
+      chainJumps: profile.chainJumps,
+      chainFalloff: profile.chainFalloff,
     })
   })
 

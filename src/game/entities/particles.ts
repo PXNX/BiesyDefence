@@ -21,10 +21,23 @@ export const createImpactParticles = (position: Vector2, color: string): Particl
       life: randomBetween(0.4, 0.7),
       maxLife: 0.7,
       color,
+      kind: 'hit',
     })
   }
   return particles
 }
+
+export const createHitMarker = (position: Vector2, color: string, value?: number): Particle => ({
+  id: createEntityId('particle'),
+  position: { ...position },
+  velocity: { x: 0, y: -40 },
+  radius: 0,
+  life: 0.6,
+  maxLife: 0.6,
+  color,
+  kind: 'damage',
+  value,
+})
 
 export const createMuzzleParticles = (
   towerPosition: Vector2,

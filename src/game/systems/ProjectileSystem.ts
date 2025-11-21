@@ -1,6 +1,6 @@
 import type { GameState } from '@/game/core/types'
 import { distanceBetween, normalize } from '@/game/utils/math'
-import { createImpactParticles } from '@/game/entities/particles'
+import { createHitMarker, createImpactParticles } from '@/game/entities/particles'
 import { applyDamageToEnemy, findSplashTargets } from '@/game/utils/combat'
 
 export const updateProjectiles = (state: GameState, deltaSeconds: number): void => {
@@ -24,7 +24,7 @@ export const updateProjectiles = (state: GameState, deltaSeconds: number): void 
 
     if (distToTarget <= travelDistance) {
       const dmgType = projectile.damageType ?? 'impact'
-      applyDamageToEnemy(target, projectile.damage, dmgType)
+      const dealt = applyDamageToEnemy(target, projectile.damage, dmgType)
       const splashTargets =
         projectile.splashRadius && projectile.splashRadius > 0
           ? findSplashTargets(target.position, state.enemies, projectile.splashRadius, target.id)
@@ -36,6 +36,7 @@ export const updateProjectiles = (state: GameState, deltaSeconds: number): void 
         })
       }
       projectile.isExpired = true
+      state.particles.push(createHitMarker(target.position, projectile.color, Math.round(dealt)))
       if (target.health === 0) {
         target.isDead = true
         state.particles.push(...createImpactParticles(target.position, projectile.color))
