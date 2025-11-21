@@ -325,14 +325,15 @@ export class OptimizedCanvasRenderer {
   }
 
   private drawEnhancedEnemy(ctx: CanvasRenderingContext2D, x: number, y: number, enemy: any, tileSize: number): void {
-    const radius = enemy.stats.radius
+    const ENEMY_SCALE = 1.5
+    const radius = enemy.stats.radius * ENEMY_SCALE
     const healthPercent = enemy.health / enemy.maxHealth
 
     // Try sprite rendering first (reuse CanvasRenderer sprite cache paths)
     const texKey = (ENEMY_TEXTURE_BY_TYPE as any)?.[enemy.type]
     const image = texKey ? this.cache.getImage(texKey) : null
     if (image && image.complete && image.naturalWidth > 0) {
-      const scaleFactor = 2.4
+      const scaleFactor = 3.2
       const size = Math.max(radius * scaleFactor, radius * 1.6)
       ctx.save()
       ctx.globalAlpha = enemy.isDead ? 0.35 : 1

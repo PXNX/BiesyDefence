@@ -34,17 +34,16 @@ export function TowerDetailsPanel({ towerType, position, onClose }: TowerDetails
   }, [])
 
   useEffect(() => {
-    // Adjust position to prevent panel from going off-screen
+    // Adjust position to prevent panel from going off-screen. Anchored to the right of the hovered icon.
     const panelWidth = 240 // Approximate panel width
-    const panelHeight = 120 // Approximate panel height
-    
-    const adjustedX = Math.min(
-      Math.max(position.x - panelWidth / 2, 10), // Keep 10px from edges
-      window.innerWidth - panelWidth - 10 // Keep 10px from right edge
+    const panelHeight = 160 // Approximate panel height
+
+    const adjustedX = Math.min(position.x, window.innerWidth - panelWidth - 10)
+    const adjustedY = Math.min(
+      Math.max(position.y - panelHeight / 2, 10),
+      window.innerHeight - panelHeight - 10
     )
-    
-    const adjustedY = Math.max(position.y - panelHeight - 20, 10) // Keep 20px above hovered icon and 10px from top
-    
+
     setAdjustedPosition({ x: adjustedX, y: adjustedY })
   }, [position])
 

@@ -7,11 +7,15 @@
 - **Swarm**: Kleine sprites (2–3 Varianten) in giftgrün (#a3e635), leicht flache Form, hohe Kontrastkanten.
 - **Generic badges** (Canvas Overlay): Kreis-Icons für Tags (fast/armored/boss/shielded/swarm) als kleine SVGs (single-color + white stroke) für beide Renderer.
 
-## Tower-Stufen (Level 1–3)
-- **Indica**: Drei PNGs (64–96px) mit zunehmender Panzer-/Rohrgröße, Impact-Styling in Grün/Teal; Level 3 mit leichten Funken- oder Mündungsflash-Details.
-- **Sativa**: Drei PNGs (64–96px) mit schlanker, schneller Silhouette, gelbe Akzente; Level 3 mit Doppel-/Triple-Mündungen und kleinem Energieeffekt.
-- **Support**: Drei PNGs (64–96px) mit Kontroll-/Energieoptik, Blau/Cyan; Level 3 mit „Anchor/Net“-Akzent oder Pulsring.
-- **Range/Slow/Splash UI**: Kleine SVG-Icons, die Range/Splash/Slow im HUD/Tower-Panel visualisieren (Kreis, Wellenlinien, Schildbruch).
+## Tower-Stufen & UI (Level 1-3, jeweils **PNG 64-128px**)
+- **Indica**: 3 Stufen. Schwerer Kanonenstil in Grün/Teal, L1 schlicht, L2 mit stärkerem Rohr/Seitenpanzerung, L3 mit Mündungsflash/Sparks. Asset-Namen: `tower_indica_level1/2/3.png`.
+- **Sativa**: 3 Stufen. Schlanke Silhouette, gelbe Akzente, "schnell" lesbar. L3 mit Doppel-/Triple-Barrel + kleiner Energie-Glow. `tower_sativa_level1/2/3.png`.
+- **Support**: 3 Stufen. Energie-/Kontrolloptik, Blau/Cyan. L3 mit sichtbarem Pulsring/Anchor-Net-Akzent. `tower_support_level1/2/3.png`.
+- **Sniper**: 3 Stufen. Extrem langes Rohr/Visier, sand-beige/gelb Highlights, high-tech Bipod/Tripod. L3 mit Laser-Glare/Fernziel-Optik. `tower_sniper_level1/2/3.png`.
+- **Flamethrower**: 3 Stufen. Breiter Tank + Düse, orange Glut. L3 mit Doppeltank oder Hitze-Schimmer/Flammenstreifen. `tower_flamethrower_level1/2/3.png`.
+- **Chain (Lightning)**: 3 Stufen. Spulen/Coils, blau-violetter Blitz. L3 mit Arc-Halo/mini Tesla-Krone. `tower_chain_level1/2/3.png`.
+- **Upgrade-Badge**: Kleine SVGs `upgrade_l1.svg`, `upgrade_l2.svg`, `upgrade_l3.svg` (Farbverlauf hell -> kräftig) für HUD/Tooltip.
+- **Tower-Stat-Icons** (SVG): `icon_range.svg` (Zielkreis), `icon_splash.svg` (Radialwelle), `icon_slow.svg` (Eis-/Schneeflocke), `icon_pierce.svg` (Pfeil durch Block), `icon_dot.svg` (Flamme/Tropfen), `icon_control.svg` (Stopp/Netz).
 
 ## Projectiles & Effects
 - **Impact projectile**: Small bullet sprite + Muzzle flash (PNG 32px), Impact spark particles (tiny PNG or procedural).

@@ -44,8 +44,8 @@ export function TowerIconBar({
     if (iconElement) {
       const rect = iconElement.getBoundingClientRect()
       setPanelPosition({
-        x: rect.left + rect.width / 2,
-        y: rect.top - 10,
+        x: rect.right + 12,
+        y: rect.top + rect.height / 2,
       })
     }
   }
@@ -91,7 +91,6 @@ export function TowerIconBar({
         role="toolbar"
         aria-label="Tower Selection"
         onKeyDown={handleKeyNavigation}
-        onMouseLeave={handleIconLeave}
       >
         {TOWER_ENTRIES.map(([towerType, towerProfile]) => {
           const isSelected = towerType === selectedTower

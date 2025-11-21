@@ -351,7 +351,7 @@ export class CanvasRenderer {
     const image = this.textureCache.getImage(texKey)
     if (!image || !image.complete || image.naturalWidth === 0) return false
 
-    const scaleFactor = 2.4 // downscale oversized sprites to roughly tile footprint
+    const scaleFactor = 3.2 // enlarge sprites for better readability
     const size = Math.max(radius * scaleFactor, radius * 1.6)
     ctx.save()
     ctx.globalAlpha = enemy.isDead ? 0.35 : 1
@@ -419,7 +419,8 @@ export class CanvasRenderer {
   ): void {
     const healthPercent = enemy.health / enemy.maxHealth
     const syncedScale = Math.max(scale, 0.55)
-    const baseRadius = Math.max(6, enemy.stats.radius * syncedScale)
+    const ENEMY_SCALE = 1.5
+    const baseRadius = Math.max(6, enemy.stats.radius * syncedScale * ENEMY_SCALE)
     const pathPattern = this.textureCache.getPattern(ctx, 'woodBase')
 
     // Try sprite rendering first
