@@ -288,23 +288,23 @@ body {
 }
 
 .hud-icon-money {
-  background-image: url('../assets/ui/icons/money_icon.png');
+  background-image: url('/ui/icons/money_icon.png');
 }
 
 .hud-icon-lives {
-  background-image: url('../assets/ui/icons/lives_icon.png');
+  background-image: url('/ui/icons/lives_icon.png');
 }
 
 .hud-icon-score {
-  background-image: url('../assets/ui/icons/score_icon.png');
+  background-image: url('/ui/icons/score_icon.png');
 }
 
 .hud-icon-wave {
-  background-image: url('../assets/ui/icons/wave_icon.png');
+  background-image: url('/ui/icons/wave_icon.png');
 }
 
 .hud-icon-speed {
-  background-image: url('../assets/ui/icons/speed_icon.png');
+  background-image: url('/ui/icons/speed_icon.png');
 }
 
 .hud-skeleton {
@@ -1065,7 +1065,7 @@ input:focus-visible {
 .overlay-button {
   background-image:
     linear-gradient(120deg, rgba(125, 208, 138, 0.92), rgba(100, 177, 103, 0.92)),
-    url('../assets/ui/buttons/button_primary_normal.png');
+    url('/ui/buttons/button_primary_normal.png');
   background-size: cover, cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -1088,7 +1088,7 @@ input:focus-visible {
 .overlay-button:hover {
   background-image:
     linear-gradient(120deg, rgba(141, 247, 197, 0.96), rgba(125, 208, 138, 0.96)),
-    url('../assets/ui/buttons/button_primary_hover.png');
+    url('/ui/buttons/button_primary_hover.png');
   transform: translateY(-2px);
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
 }
@@ -1110,14 +1110,14 @@ input:focus-visible {
 .game-over-overlay .overlay-button {
   background-image:
     linear-gradient(120deg, rgba(255, 90, 90, 0.95), rgba(231, 76, 60, 0.95)),
-    url('../assets/ui/buttons/button_primary_normal.png');
+    url('/ui/buttons/button_primary_normal.png');
   color: #ffffff;
 }
 
 .game-over-overlay .overlay-button:hover {
   background-image:
     linear-gradient(120deg, rgba(255, 102, 102, 0.95), rgba(255, 90, 90, 0.95)),
-    url('../assets/ui/buttons/button_primary_hover.png');
+    url('/ui/buttons/button_primary_hover.png');
   box-shadow: 0 18px 40px rgba(255, 90, 90, 0.35);
 }
 
@@ -1133,14 +1133,14 @@ input:focus-visible {
 .victory-overlay .overlay-button {
   background-image:
     linear-gradient(120deg, rgba(141, 247, 197, 0.95), rgba(125, 208, 138, 0.95)),
-    url('../assets/ui/buttons/button_primary_normal.png');
+    url('/ui/buttons/button_primary_normal.png');
   box-shadow: 0 14px 32px rgba(125, 208, 138, 0.35);
 }
 
 .victory-overlay .overlay-button:hover {
   background-image:
     linear-gradient(120deg, rgba(161, 248, 197, 0.95), rgba(141, 247, 197, 0.95)),
-    url('../assets/ui/buttons/button_primary_hover.png');
+    url('/ui/buttons/button_primary_hover.png');
   box-shadow: 0 18px 40px rgba(141, 247, 197, 0.35);
 }
 

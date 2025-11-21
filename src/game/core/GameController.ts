@@ -89,7 +89,7 @@ export class GameController {
     center: { x: 0, y: 0 },
     zoom: 1,
     minZoom: 0.7,
-    maxZoom: 3.5,
+    maxZoom: 6,
   }
   private currentWaveNoLeak = true
   private autoWaveEnabled = true

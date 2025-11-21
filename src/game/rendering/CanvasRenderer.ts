@@ -41,14 +41,21 @@ type TextureKey =
   | 'effect-motion-trail'
   | 'effect-shield'
   | 'effect-boss-glow'
+  | 'tower-placeholder'
 
 const TOWER_TEXTURE_BY_TYPE: Record<TowerType, TextureKey> = {
   indica: 'tower-indica',
   sativa: 'tower-sativa',
   support: 'tower-support',
-  sniper: 'tower-sniper',
-  flamethrower: 'tower-flamethrower',
-  chain: 'tower-chain',
+  sniper: 'tower-placeholder',
+  flamethrower: 'tower-placeholder',
+  chain: 'tower-placeholder'
+}
+
+const assetPath = (relativePath: string) => {
+  const base = (import.meta as any)?.env?.BASE_URL ?? '/'
+  const normalizedBase = base.endsWith('/') ? base.slice(0, -1) : base
+  return `${normalizedBase}${relativePath.startsWith('/') ? '' : '/'}${relativePath}`
 }
 
 const ENEMY_TEXTURE_BY_TYPE: Partial<Record<EnemyType, TextureKey>> = {
@@ -70,32 +77,33 @@ const BADGE_BY_TAG: Partial<Record<EnemyTag, TextureKey>> = {
 }
 
 const TEXTURE_PATHS: Record<TextureKey, string> = {
-  grassBase: new URL('../../../assets/textures/grass_base.png', import.meta.url).href,
-  woodBase: new URL('../../../assets/textures/wood_base.png', import.meta.url).href,
-  pathStraight: new URL('../../../assets/textures/wood_base.png', import.meta.url).href,
-  'tower-indica': new URL('../../../assets/towers/tower_indica_level1.png', import.meta.url).href,
-  'tower-sativa': new URL('../../../assets/towers/tower_sativa_level1.png', import.meta.url).href,
-  'tower-support': new URL('../../../assets/towers/tower_support_level1.png', import.meta.url).href,
-  'tower-sniper': new URL('../../../assets/towers/tower_indica_level1.png', import.meta.url).href,
-  'tower-flamethrower': new URL('../../../assets/towers/tower_sativa_level1.png', import.meta.url).href,
-  'tower-chain': new URL('../../../assets/towers/tower_support_level1.png', import.meta.url).href,
-  'enemy-runner': new URL('../../../assets/enemies/enemy_runner.png', import.meta.url).href,
-  'enemy-swift': new URL('../../../assets/enemies/enemy_swift_runner.png', import.meta.url).href,
-  'enemy-pest': new URL('../../../assets/enemies/enemy_swarm.png', import.meta.url).href,
-  'enemy-swarm': new URL('../../../assets/enemies/enemy_swarm_variant2.png', import.meta.url).href,
-  'enemy-swarm-variant2': new URL('../../../assets/enemies/enemy_swarm_variant2.png', import.meta.url).href,
-  'enemy-swarm-variant3': new URL('../../../assets/enemies/enemy_swarm_variant3.png', import.meta.url).href,
-  'enemy-armored': new URL('../../../assets/enemies/enemy_armored_pest.png', import.meta.url).href,
-  'enemy-bulwark': new URL('../../../assets/enemies/enemy_bulwark.png', import.meta.url).href,
-  'enemy-boss': new URL('../../../assets/enemies/enemy_carrier_boss.png', import.meta.url).href,
-  'badge-fast': new URL('../../../assets/enemies/badges/badge_fast.svg.png', import.meta.url).href,
-  'badge-armored': new URL('../../../assets/enemies/badges/badge_armored.svg.png', import.meta.url).href,
-  'badge-boss': new URL('../../../assets/enemies/badges/badge_boss.svg.png', import.meta.url).href,
-  'badge-shielded': new URL('../../../assets/enemies/badges/badge_shielded.svg.png', import.meta.url).href,
-  'badge-swarm': new URL('../../../assets/enemies/badges/badge_swarm.svg.png', import.meta.url).href,
-  'effect-motion-trail': new URL('../../../assets/enemies/effect_motion_trail_fast.png', import.meta.url).href,
-  'effect-shield': new URL('../../../assets/enemies/effect_shield_overlay.png', import.meta.url).href,
-  'effect-boss-glow': new URL('../../../assets/enemies/effect_boss_glow.png', import.meta.url).href,
+  grassBase: assetPath('/textures/grass_base.png'),
+  woodBase: assetPath('/textures/wood_base.png'),
+  pathStraight: assetPath('/textures/wood_base.png'),
+  'tower-indica': assetPath('/towers/tower_indica_build_level1.png'),
+  'tower-sativa': assetPath('/towers/tower_sativa_build_level1.png'),
+  'tower-support': assetPath('/towers/tower_support_build_level1.png'),
+  'tower-sniper': 'data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"96\" height=\"96\" viewBox=\"0 0 96 96\"><rect width=\"96\" height=\"96\" rx=\"16\" fill=\"%23222\"/><text x=\"50%\" y=\"55%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-size=\"18\" fill=\"%23ccc\">WIP</text></svg>',
+  'tower-flamethrower': 'data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"96\" height=\"96\" viewBox=\"0 0 96 96\"><rect width=\"96\" height=\"96\" rx=\"16\" fill=\"%23222\"/><text x=\"50%\" y=\"55%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-size=\"18\" fill=\"%23ccc\">WIP</text></svg>',
+  'tower-chain': 'data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"96\" height=\"96\" viewBox=\"0 0 96 96\"><rect width=\"96\" height=\"96\" rx=\"16\" fill=\"%23222\"/><text x=\"50%\" y=\"55%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-size=\"18\" fill=\"%23ccc\">WIP</text></svg>',
+  'tower-placeholder': 'data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"96\" height=\"96\" viewBox=\"0 0 96 96\"><rect width=\"96\" height=\"96\" rx=\"16\" fill=\"%23222\"/><text x=\"50%\" y=\"55%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-size=\"18\" fill=\"%23ccc\">WIP</text></svg>',
+  'enemy-runner': assetPath('/enemies/enemy_runner.png'),
+  'enemy-swift': assetPath('/enemies/enemy_swift_runner.png'),
+  'enemy-pest': assetPath('/enemies/enemy_swarm.png'),
+  'enemy-swarm': assetPath('/enemies/enemy_swarm_variant2.png'),
+  'enemy-swarm-variant2': assetPath('/enemies/enemy_swarm_variant2.png'),
+  'enemy-swarm-variant3': assetPath('/enemies/enemy_swarm_variant3.png'),
+  'enemy-armored': assetPath('/enemies/enemy_armored_pest.png'),
+  'enemy-bulwark': assetPath('/enemies/enemy_bulwark.png'),
+  'enemy-boss': assetPath('/enemies/enemy_carrier_boss.png'),
+  'badge-fast': assetPath('/enemies/badges/badge_fast.svg.png'),
+  'badge-armored': assetPath('/enemies/badges/badge_armored.svg.png'),
+  'badge-boss': assetPath('/enemies/badges/badge_boss.svg.png'),
+  'badge-shielded': assetPath('/enemies/badges/badge_shielded.svg.png'),
+  'badge-swarm': assetPath('/enemies/badges/badge_swarm.svg.png'),
+  'effect-motion-trail': assetPath('/enemies/effect_motion_trail_fast.png'),
+  'effect-shield': assetPath('/enemies/effect_shield_overlay.png'),
+  'effect-boss-glow': assetPath('/enemies/effect_boss_glow.png'),
 }
 
 class TextureCache {
@@ -220,60 +228,6 @@ export class CanvasRenderer {
     ctx.fill()
   }
 
-  private drawTowerSilhouette(ctx: CanvasRenderingContext2D, x: number, y: number, tileSize: number, towerType: TowerType, color: string): void {
-    const size = tileSize / 3.2
-
-    switch (towerType) {
-      case 'indica': {
-        // Square/rectangular shape for sturdy indica towers
-        const indicaSize = size * 1.1
-        ctx.fillStyle = color
-        ctx.fillRect(x - indicaSize / 2, y - indicaSize / 2, indicaSize, indicaSize)
-        
-        // Add subtle border
-        ctx.strokeStyle = 'rgba(255,255,255,0.2)'
-        ctx.lineWidth = 2
-        ctx.strokeRect(x - indicaSize / 2, y - indicaSize / 2, indicaSize, indicaSize)
-        break
-      }
-      case 'sativa': {
-        // Circular shape for fast sativa towers
-        ctx.fillStyle = color
-        ctx.beginPath()
-        ctx.arc(x, y, size, 0, Math.PI * 2)
-        ctx.fill()
-        
-        // Add inner highlight
-        ctx.fillStyle = 'rgba(255,255,255,0.3)'
-        ctx.beginPath()
-        ctx.arc(x - size * 0.3, y - size * 0.3, size * 0.4, 0, Math.PI * 2)
-        ctx.fill()
-        break
-      }
-      case 'support': {
-        // Triangle shape for control support towers
-        const triangleSize = size * 1.3
-        ctx.fillStyle = color
-        ctx.beginPath()
-        ctx.moveTo(x, y - triangleSize / 2)
-        ctx.lineTo(x - triangleSize / 2, y + triangleSize / 2)
-        ctx.lineTo(x + triangleSize / 2, y + triangleSize / 2)
-        ctx.closePath()
-        ctx.fill()
-        
-        // Add inner triangle detail
-        ctx.fillStyle = 'rgba(255,255,255,0.2)'
-        ctx.beginPath()
-        ctx.moveTo(x, y - triangleSize / 3)
-        ctx.lineTo(x - triangleSize / 3, y + triangleSize / 3)
-        ctx.lineTo(x + triangleSize / 3, y + triangleSize / 3)
-        ctx.closePath()
-        ctx.fill()
-        break
-      }
-    }
-  }
-
   private drawTowerAccent(ctx: CanvasRenderingContext2D, x: number, y: number, tileSize: number, towerType: TowerType, color: string): void {
     const accentColor = palette.accentStrong
     
@@ -320,22 +274,22 @@ export class CanvasRenderer {
   }
 
   private drawTowerSprite(ctx: CanvasRenderingContext2D, x: number, y: number, towerType: TowerType, tileSize: number, level: number | undefined): void {
-    const textureKey = TOWER_TEXTURE_BY_TYPE[towerType]
-    const sprite = this.textureCache.getImage(textureKey)
+    const textureKey = TOWER_TEXTURE_BY_TYPE[towerType] ?? 'tower-placeholder'
+    const sprite = textureKey ? this.textureCache.getImage(textureKey) : null
     if (!sprite || !sprite.complete || sprite.naturalWidth === 0) {
       return
     }
 
-    const spriteSize = tileSize * 0.9
+    const spriteSize = tileSize * 1.35
     ctx.save()
     ctx.globalAlpha = 0.92
     ctx.shadowColor = palette.accentStrong
-    ctx.shadowBlur = 20
+    ctx.shadowBlur = 4
     ctx.drawImage(sprite, x - spriteSize / 2, y - spriteSize / 2, spriteSize, spriteSize)
     // Upgrade halo based on level
     if ((level ?? 1) > 1) {
       const intensity = Math.min(1, ((level ?? 1) - 1) * 0.6)
-      ctx.shadowBlur = 8 + 6 * intensity
+      ctx.shadowBlur = 5 + 4 * intensity
       ctx.strokeStyle = `rgba(255,255,255,${0.45 * intensity})`
       ctx.lineWidth = 3
       ctx.beginPath()
@@ -738,10 +692,6 @@ export class CanvasRenderer {
       // Enhanced shadow system for depth perception
       this.drawTowerShadow(ctx, x, y, tileSize)
       this.drawTowerSprite(ctx, x, y, tower.type, tileSize, tower.level)
-      
-      // Draw distinctive tower silhouettes based on type
-      this.drawTowerSilhouette(ctx, x, y - 6, tileSize, tower.type, tower.color)
-      
       // Enhanced accent details
       this.drawTowerAccent(ctx, x, y - 6, tileSize, tower.type, tower.color)
     })

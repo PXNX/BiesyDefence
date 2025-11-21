@@ -4,13 +4,16 @@ import type { TowerProfile } from '@/game/config/constants'
 import type { TowerType } from '@/game/core/types'
 import { TowerDetailsPanel } from './TowerDetailsPanel'
 
+const PLACEHOLDER_SHOP =
+  'data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"96\" height=\"96\" viewBox=\"0 0 96 96\"><rect width=\"96\" height=\"96\" rx=\"18\" fill=\"%23181818\"/><text x=\"50%\" y=\"55%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-size=\"18\" fill=\"%23cccccc\">WIP</text></svg>'
+
 const TOWER_ART_PATHS: Record<TowerType, string> = {
-  indica: '/towers/tower_indica_level1.png',
-  sativa: '/towers/tower_sativa_level1.png',
-  support: '/towers/tower_support_level1.png',
-  sniper: '/towers/tower_sniper_level1.png',
-  flamethrower: '/towers/tower_flamethrower_level1.png',
-  chain: '/towers/tower_chain_level1.png',
+  indica: '/towers/tower_indica_shop.png',
+  sativa: '/towers/tower_sativa_shop.png',
+  support: '/towers/tower_support_shop.png',
+  sniper: PLACEHOLDER_SHOP,
+  flamethrower: PLACEHOLDER_SHOP,
+  chain: PLACEHOLDER_SHOP
 }
 
 const TOWER_ENTRIES = Object.entries(TOWER_PROFILES) as [TowerType, TowerProfile][]
