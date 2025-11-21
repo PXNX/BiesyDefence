@@ -1,23 +1,16 @@
-import React from 'react';
-import { SpeedChips } from './SpeedChips';
-import { PauseButton } from './PauseButton';
-import { AudioMini } from './AudioMini';
-import type { AudioConfig } from '@/game/audio/AudioManager';
+import React from 'react'
+import { SpeedChips } from './SpeedChips'
+import { PauseButton } from './PauseButton'
+import type { AudioConfig } from '@/game/audio/AudioManager'
 
 interface GameControlPanelProps {
-  speed: number;
-  onSpeedChange: (speed: number) => void;
-  isPaused: boolean;
-  onPauseToggle: () => void;
-  audioConfig: AudioConfig;
-  onToggleMute: () => void;
-  onMasterVolumeChange: (volume: number) => void;
-  onUpgrade?: () => void;
-  onToggleAutoWave?: () => void;
-  onNextWave?: () => void;
-  autoWaveEnabled?: boolean;
-  onToggleHitFx?: () => void;
-  showHitFx?: boolean;
+  speed: number
+  onSpeedChange: (speed: number) => void
+  isPaused: boolean
+  onPauseToggle: () => void
+  audioConfig: AudioConfig
+  onToggleMute: () => void
+  onMasterVolumeChange: (volume: number) => void
   hoverTower?: {
     id: string
     type: string
@@ -34,13 +27,7 @@ const GameControlPanel = ({
   onPauseToggle,
   audioConfig,
   onToggleMute,
-  onToggleAutoWave,
-  onNextWave,
-  autoWaveEnabled,
-  onToggleHitFx,
-  showHitFx = true,
-  onUpgrade,
-  hoverTower,
+  hoverTower
 }: GameControlPanelProps) => {
   return (
     <div className="game-control-panel" role="toolbar" aria-label="Game Controls">
@@ -61,54 +48,6 @@ const GameControlPanel = ({
             {audioConfig.muted ? 'Mute' : 'Sound'}
           </button>
         </div>
-        {onToggleAutoWave && (
-          <div className="control-section">
-            <button
-              type="button"
-              className={`auto-wave-button ${autoWaveEnabled ? 'on' : 'off'}`}
-              onClick={onToggleAutoWave}
-              aria-label="Toggle auto wave start"
-            >
-              {autoWaveEnabled ? 'Auto Wave On' : 'Auto Wave Off'}
-            </button>
-          </div>
-        )}
-        {onNextWave && (
-          <div className="control-section">
-            <button
-              type="button"
-              className="skip-button"
-              onClick={onNextWave}
-              aria-label="Start next wave now (N)"
-            >
-              Skip/Next
-            </button>
-          </div>
-        )}
-        {onToggleHitFx && (
-          <div className="control-section">
-            <button
-              type="button"
-              className={`hitfx-button ${showHitFx ? 'on' : 'off'}`}
-              onClick={onToggleHitFx}
-              aria-label="Toggle hit markers and damage numbers"
-            >
-              {showHitFx ? 'Hit FX On' : 'Hit FX Off'}
-            </button>
-          </div>
-        )}
-        {onUpgrade && (
-          <div className="control-section">
-            <button
-              type="button"
-              className="upgrade-button"
-              onClick={onUpgrade}
-              aria-label="Upgrade hovered tower (U)"
-            >
-              ⬆ Upgrade (U)
-            </button>
-          </div>
-        )}
       </div>
 
       {hoverTower && (
@@ -236,79 +175,11 @@ const GameControlPanel = ({
           border-color: rgba(144, 238, 144, 0.25);
         }
 
-        .upgrade-button {
-          font-size: 0.9rem;
-          background: linear-gradient(135deg, #2dd4bf 0%, #0ea5e9 100%);
-          color: #04100a;
-          border: none;
-          border-radius: 8px;
-          padding: 0.35rem 0.6rem;
-          cursor: pointer;
-          box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-          transition: transform 0.1s ease, box-shadow 0.2s ease;
-          white-space: nowrap;
-        }
-
-        .upgrade-button:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 8px 18px rgba(0,0,0,0.35);
-        }
-
-        .upgrade-button:active {
-          transform: translateY(0);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-
         .auto-wave-button,
-        .skip-button {
-          font-size: 0.85rem;
-          background: rgba(90, 138, 90, 0.12);
-          color: #d9f99d;
-          border: 1px solid rgba(90, 138, 90, 0.25);
-          border-radius: 6px;
-          padding: 0.3rem 0.5rem;
-          cursor: pointer;
-          transition: all 0.15s ease;
-          white-space: nowrap;
-        }
-
-        .auto-wave-button.on {
-          background: rgba(125, 211, 52, 0.2);
-          border-color: rgba(125, 211, 52, 0.45);
-          color: #bef264;
-        }
-
-        .skip-button {
-          background: rgba(244, 114, 182, 0.18);
-          border-color: rgba(244, 114, 182, 0.35);
-          color: #f9a8d4;
-        }
-
-        .auto-wave-button:hover,
-        .skip-button:hover {
-          transform: translateY(-1px);
-        }
-
-        .hitfx-button {
-          font-size: 0.8rem;
-          background: rgba(125, 211, 52, 0.12);
-          color: #c7f9cc;
-          border: 1px solid rgba(125, 211, 52, 0.28);
-          border-radius: 6px;
-          padding: 0.25rem 0.45rem;
-          cursor: pointer;
-          transition: all 0.15s ease;
-          white-space: nowrap;
-        }
-
-        .hitfx-button.off {
-          background: rgba(239, 68, 68, 0.12);
-          border-color: rgba(239, 68, 68, 0.28);
-          color: #fecaca;
-        }
-
-        .hitfx-button:hover {
-          transform: translateY(-1px);
+        .skip-button,
+        .hitfx-button,
+        .upgrade-button {
+          display: none;
         }
 
         .hover-tower-bar {
@@ -433,7 +304,7 @@ const GameControlPanel = ({
         }
       `}</style>
     </div>
-  );
-};
+  )
+}
 
-export { GameControlPanel };
+export { GameControlPanel }

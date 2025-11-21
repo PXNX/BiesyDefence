@@ -4,7 +4,7 @@ Kurzer Kompass aus beiden bisherigen Listen plus Best Practices. Fokus: UI-Sicht
 
 ## P0 - unblock core gameplay (Woche 1) [Status: fertig]
 - [x] Upgrade-UI freischalten: Tower-Panel mit zwei Pfaden, Kosten/Stat-Deltas, Konter-Hinweisen; Hotkey `U`/Context-Button.
-  - Umsetzung: TowerDetails zeigen Upgrade-Pfad mit Stat-Deltas/Kosten + Hotkey-Hinweis; GameControlPanel hat Upgrade-Button.
+  - Umsetzung: TowerDetails zeigen Upgrade-Pfad mit Stat-Deltas/Kosten + Hotkey-Hinweis; U-Hotkey bleibt, ControlPanel-Button entfernt.
 - [x] Wave-Preview: naechste 2-3 Wellen mit Typ-Icons, Mengen, Resists/Tags; Warnhinweise "Armor/Speed/Swarm incoming".
   - Umsetzung: Snapshot liefert 3-Wellen-Preview inkl. Tags/Warnings; UI-Panel in Sidebar.
 - [x] Platzierungs-/Range-Feedback: gruene/rote Validierung, pulsierende Range-Ringe, Snap-zu-Grid, klares Out-of-Bounds.
@@ -22,11 +22,11 @@ Kurzer Kompass aus beiden bisherigen Listen plus Best Practices. Fokus: UI-Sicht
 - [x] Tooltips/Bestiary: Tower mit DPS und effektiver DPS vs. Resist, Range, FireRate, Effekte/Caps; Gegner mit HP/Speed/Resists und empfohlenen Kontern.
   - Umsetzung: TowerDetails mit Stat-Deltas/DPS, EnemyIntelPanel mit HP/Speed/Resists/Tags der naechsten Welle.
 - [x] Treffer-Feedback: Hitmarker und Schadenszahlen togglbar, Status-Icons (slow/burn/freeze/vuln), Projektil-Trails per Damage-Typ.
-  - Umsetzung: Hitmarker + Damage-Text mit Toggle im ControlPanel; Status-Badges fuer Tags; Trails via bestehende Partikel.
+  - Umsetzung: Hitmarker + Damage-Text Toggle bleibt im Backend (zukuenftiges Popup), Button aus HUD entfernt; Status-Badges fuer Tags; Trails via bestehende Partikel.
 - [x] Wellen-Inszenierung: thematische Checks (Armor/Speed/Swarm/Boss-Phasen) mit kurzen Popups.
   - Umsetzung: Live-Announcement ergaenzt Wave-Warnungen aus Preview.
 - [x] Wirtschaft/Tempo: Perfect-Wave-Bonus, leichter Interest/Fruehstarter-Bonus; Pause/Speed 0.5x/1x/2x/3x.
-  - Umsetzung: No-Leak-Bonus + 5% Interest pro Abschluss; Speed-Steps/Skip/Auto-Wave in ControlPanel.
+  - Umsetzung: No-Leak-Bonus + 5% Interest pro Abschluss; Speed-Steps per HUD + Hotkey N fuer Next-Wave; Auto-Wave-Backend bleibt, UI-Toggle entfernt.
 
 ## P2 - strategische Vielfalt (Wochen 4-6) [Status: fertig]
 - [x] Neue Tower: Sniper (pierce, long-range ST), Flamethrower (cone DoT), Chain (jump arc). Assets/Icons-Pfade angelegt, Balancegroessen gesetzt.
@@ -42,8 +42,9 @@ Kurzer Kompass aus beiden bisherigen Listen plus Best Practices. Fokus: UI-Sicht
 
 ## UI/UX Leitplanken
 - HUD kompakt halten; Info-Overlays kontextuell (Hover/Prep-Phase), keine Dauer-Wand.
-- Hotkeys: 1–5 Towerwahl, U Upgrade, R Rotate falls relevant, Space Start/Pause.
+- Hotkeys: 1-5 Towerwahl, U Upgrade, R Rotate falls relevant, Space Start/Pause.
 - Accessibility: Entsaettigte Farboption/Colorblind, togglebare Hitmarker/Numbers, Scroll-Zoom-Sensitivitaet.
+- Top-Right Cleanup: Auto-Wave/Skip/Hit-FX/Upgrade Buttons aus dem HUD entfernt, nur Speed/Pause/Mute bleiben; Hit-FX Toggle bleibt im Backend fuer spaeteres Audio-/FX-Popup erhalten.
 
 ## Gameplay/Logik Leitplanken
 - Konterklarheit: Resist/Tag-System im Tooltip; jede neue Einheit bringt eine neue Frage (Armor/Speed/Swarm/Stealth/Air) mit passender Antwort im Arsenal.

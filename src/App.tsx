@@ -283,22 +283,6 @@ function App() {
     }
   }, [setFeedback, unlockAudioContext])
 
-  const handleToggleRanges = () => {
-    controllerRef.current?.toggleShowRanges()
-  }
-
-  const handleToggleHitboxes = () => {
-    controllerRef.current?.toggleShowHitboxes()
-  }
-
-  const handleToggleHitFx = () => {
-    controllerRef.current?.toggleDamageNumbers()
-  }
-
-  const handleToggleAutoWave = () => {
-    controllerRef.current?.toggleAutoWave()
-  }
-
   const handleSetQuickWave = (index: number) => {
     setQuickWaveIndex(index)
   }
@@ -365,6 +349,10 @@ function App() {
   const waveLabel = snapshot ? `${snapshot.wave.current}/${snapshot.wave.total}` : '--/--'
   const nextWaveTypes: EnemyType[] =
     snapshot?.wavePreview?.[0]?.composition.map((c) => c.type as EnemyType) ?? []
+  const hasIntel =
+    (snapshot?.wavePreview?.length ?? 0) > 0 ||
+    nextWaveTypes.length > 0 ||
+    Boolean(snapshot?.lastWaveSummary)
   const canvasStatusMessage = !isAudioReady
     ? 'Loading audio...'
     : appPhase === 'resetting'
@@ -525,16 +513,10 @@ function App() {
                     speed={snapshot.gameSpeed ?? 1}
                     onSpeedChange={handleSpeedChange}
                     isPaused={snapshot.status === 'paused'}
-                    onPauseToggle={handlePause}
-                    audioConfig={audioConfig}
+                  onPauseToggle={handlePause}
+                  audioConfig={audioConfig}
                   onToggleMute={handleToggleMute}
                   onMasterVolumeChange={handleMasterVolumeChange}
-                  onUpgrade={attemptTowerUpgrade}
-                  onToggleAutoWave={handleToggleAutoWave}
-                  onNextWave={handleNextWave}
-                  onToggleHitFx={handleToggleHitFx}
-                  autoWaveEnabled={snapshot.autoWaveEnabled}
-                  showHitFx={snapshot.showDamageNumbers !== false}
                   hoverTower={snapshot.hoverTower}
                 />
                   <TowerIconBar
@@ -549,6 +531,20 @@ function App() {
               )}
               <div className="info-bar-shell">
                 <div className="info-bar" role="status" aria-label="Resource summary">
+                  {hasIntel && (
+                    <div className="meta-pill intel-trigger">
+                      <button type="button" aria-haspopup="true" aria-expanded="false">
+                        Wave Intel
+                      </button>
+                      <div className="intel-popover">
+                        {snapshot?.wavePreview && snapshot.wavePreview.length > 0 && (
+                          <WavePreviewPanel preview={snapshot.wavePreview} />
+                        )}
+                        {nextWaveTypes.length > 0 && <EnemyIntelPanel types={nextWaveTypes} />}
+                        {snapshot?.lastWaveSummary && <WaveSummaryCard summary={snapshot.lastWaveSummary} />}
+                      </div>
+                    </div>
+                  )}
                   <div className="meta-pill">
                     <span>Money</span>
                     <strong>${snapshot?.money ?? 0}</strong>
@@ -563,17 +559,6 @@ function App() {
                   </div>
                 </div>
               </div>
-              {(snapshot?.wavePreview?.length ?? 0) > 0 ||
-              nextWaveTypes.length > 0 ||
-              snapshot?.lastWaveSummary ? (
-                <div className="intel-stack" aria-label="Wave intel and summaries">
-                  {snapshot?.wavePreview && snapshot.wavePreview.length > 0 && (
-                    <WavePreviewPanel preview={snapshot.wavePreview} />
-                  )}
-                  {nextWaveTypes.length > 0 && <EnemyIntelPanel types={nextWaveTypes} />}
-                  {snapshot?.lastWaveSummary && <WaveSummaryCard summary={snapshot.lastWaveSummary} />}
-                </div>
-              ) : null}
             </section>
           </section>
         </main>
