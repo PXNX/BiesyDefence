@@ -36,7 +36,7 @@ export const applySlowToEnemy = (
   const effectiveSlow = slowAmount * (1 - resist)
   const multiplier = clamp(1 - effectiveSlow, enemy.stats.slowCap ?? 0, 1)
 
-  enemy.slowEffects.push({
+  enemy.effects.slow.push({
     duration,
     remainingTime: duration,
     multiplier,
@@ -55,7 +55,7 @@ export const applyDotToEnemy = (
   const effectiveDps = Math.max(0, dps * (1 - resist))
   if (effectiveDps <= 0) return
 
-  enemy.dotEffects.push({
+  enemy.effects.dot.push({
     duration,
     remainingTime: duration,
     dps: effectiveDps,
@@ -70,10 +70,7 @@ export const applyVulnerability = (
   duration: number
 ): void => {
   enemy.vulnerability = Math.max(0, (enemy.vulnerability ?? 0) + amount)
-  if (!enemy.vulnerabilityEffects) {
-    enemy.vulnerabilityEffects = []
-  }
-  enemy.vulnerabilityEffects.push({ amount, remainingTime: duration })
+  enemy.effects.vulnerability.push({ amount, remainingTime: duration })
 }
 
 export const findSplashTargets = (

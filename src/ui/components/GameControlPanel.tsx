@@ -12,6 +12,14 @@ interface GameControlPanelProps {
   audioConfig: AudioConfig;
   onToggleMute: () => void;
   onMasterVolumeChange: (volume: number) => void;
+  onUpgrade?: () => void;
+  hoverTower?: {
+    id: string
+    type: string
+    level: number
+    nextCost: number | null
+    name: string
+  }
 }
 
 const GameControlPanel = ({
@@ -21,6 +29,8 @@ const GameControlPanel = ({
   onPauseToggle,
   audioConfig,
   onToggleMute,
+  onUpgrade,
+  hoverTower,
 }: GameControlPanelProps) => {
   return (
     <div className="game-control-panel" role="toolbar" aria-label="Game Controls">
@@ -41,7 +51,33 @@ const GameControlPanel = ({
             {audioConfig.muted ? '🔇' : '🔊'}
           </button>
         </div>
+        {onUpgrade && (
+          <div className="control-section">
+            <button
+              type="button"
+              className="upgrade-button"
+              onClick={onUpgrade}
+              aria-label="Upgrade hovered tower (U)"
+            >
+              ⬆ Upgrade (U)
+            </button>
+          </div>
+        )}
       </div>
+
+      {hoverTower && (
+        <div className="hover-tower-bar" aria-live="polite">
+          <div className="hover-label">{hoverTower.name}</div>
+          <div className="hover-meta">
+            <span className="pill">Lvl {hoverTower.level}</span>
+            {hoverTower.nextCost !== null ? (
+              <span className="pill cost">Next: ${hoverTower.nextCost}</span>
+            ) : (
+              <span className="pill maxed">Maxed</span>
+            )}
+          </div>
+        </div>
+      )}
       
       <style>{`
         .game-control-panel {
@@ -152,6 +188,72 @@ const GameControlPanel = ({
         .audio-toggle-only.muted {
           color: rgba(144, 238, 144, 0.6);
           border-color: rgba(144, 238, 144, 0.25);
+        }
+
+        .upgrade-button {
+          font-size: 0.9rem;
+          background: linear-gradient(135deg, #2dd4bf 0%, #0ea5e9 100%);
+          color: #04100a;
+          border: none;
+          border-radius: 8px;
+          padding: 0.35rem 0.6rem;
+          cursor: pointer;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+          transition: transform 0.1s ease, box-shadow 0.2s ease;
+          white-space: nowrap;
+        }
+
+        .upgrade-button:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 8px 18px rgba(0,0,0,0.35);
+        }
+
+        .upgrade-button:active {
+          transform: translateY(0);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .hover-tower-bar {
+          margin-top: 0.35rem;
+          padding: 0.35rem 0.5rem;
+          border-radius: 8px;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.08);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .hover-label {
+          font-size: 0.85rem;
+          color: #e2e8f0;
+        }
+
+        .hover-meta {
+          display: flex;
+          gap: 0.35rem;
+        }
+
+        .pill {
+          font-size: 0.75rem;
+          padding: 0.2rem 0.45rem;
+          border-radius: 999px;
+          background: rgba(255,255,255,0.08);
+          color: #cbd5e1;
+          border: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .pill.cost {
+          background: rgba(94, 234, 212, 0.12);
+          color: #67e8f9;
+          border-color: rgba(94, 234, 212, 0.3);
+        }
+
+        .pill.maxed {
+          background: rgba(248, 113, 113, 0.12);
+          color: #fca5a5;
+          border-color: rgba(248, 113, 113, 0.3);
         }
 
         /* Responsive design for 2-row layout */

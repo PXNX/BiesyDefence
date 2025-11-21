@@ -2,7 +2,7 @@ import type { GameState, Enemy, Tower } from '@/game/core/types'
 import { distanceBetween } from '@/game/utils/math'
 import { createMuzzleParticles } from '@/game/entities/particles'
 import { acquireProjectile } from '@/game/utils/enhancedPool'
-import { findOptimalTargets } from '@/game/utils/spatialGrid'
+import { findOptimalTargets, findTargetsInRange } from '@/game/utils/spatialGrid'
 import { logger } from '@/game/utils/logger'
 import { applyDamageToEnemy, applyDotToEnemy, applySlowToEnemy, applyVulnerability } from '@/game/utils/combat'
 
@@ -52,11 +52,7 @@ export const updateTowers = (state: GameState, deltaSeconds: number): void => {
     // CHAPTER 2: Support towers apply slow effects instead of shooting projectiles
     if (tower.type === 'support') {
       if (tower.cooldown <= 0) {
-        const enemiesInRange = state.enemies.filter(enemy => {
-          if (enemy.isDead || enemy.reachedGoal) return false
-          const dist = distanceBetween(tower.position, enemy.position)
-          return dist <= tower.range
-        })
+        const enemiesInRange = findTargetsInRange(tower, state.enemies)
         
         // Apply slow + DoT + vulnerability
         enemiesInRange.forEach(enemy => {
@@ -98,17 +94,18 @@ export const updateTowers = (state: GameState, deltaSeconds: number): void => {
     const damagePerProjectile = tower.type === 'sativa' ? Math.floor(tower.damage * 0.6) : tower.damage
     
     for (let i = 0; i < projectileCount; i++) {
-      const projectile = acquireProjectile({
-        position: { ...tower.position },
-        origin: { ...tower.position },
-        targetId: target.id,
-        speed: tower.projectileSpeed,
-        damage: damagePerProjectile,
-        color: tower.color,
-        isExpired: false,
-        damageType: towerDamageType,
-        splashRadius: tower.splashRadius,
-      })
+    const projectile = acquireProjectile({
+      position: { ...tower.position },
+      origin: { ...tower.position },
+      targetId: target.id,
+      speed: tower.projectileSpeed,
+      damage: damagePerProjectile,
+      color: tower.color,
+      isExpired: false,
+      damageType: towerDamageType,
+      splashRadius: tower.splashRadius,
+      splashFactor: tower.splashFactor ?? 0.5,
+    })
       state.projectiles.push(projectile)
     }
 

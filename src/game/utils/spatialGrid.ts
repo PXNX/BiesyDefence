@@ -288,3 +288,17 @@ export function findOptimalTargets(tower: Tower, enemies: Enemy[]): Enemy[] {
   
   return targets.slice(0, maxTargets)
 }
+
+export function findTargetsInRange(tower: Tower, enemies: Enemy[]): Enemy[] {
+  return enemySpatialGrid.findTargetsInRange(tower, enemies, {
+    minPathIndex: tower.type === 'support' ? 0 : undefined,
+  })
+}
+
+export function clearEnemySpatialGrid() {
+  enemySpatialGrid.clear()
+}
+
+export function rebalanceEnemySpatialGrid() {
+  enemySpatialGrid.rebalance()
+}

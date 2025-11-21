@@ -9,6 +9,11 @@
 - On-Death-Spawn: GameController spawnt zusätzliche Gegner laut `enemy.stats.onDeathSpawn` (z.B. Boss → Swarm).
 - Build ist wieder grün (tsc + vite). Demo/Localization-Exports gefixt, Logger-Tests bereinigt, Rendering-Offscreen-Typen und Path-Texture-Key ergänzt.
 - Targeting-Fallback: Tower-Zielwahl fällt bei Spatial-Grid-Desync auf direkte Distanzsuche zurück, damit Türme zuverlässig feuern.
+- Status-Effekte zentralisiert (`enemy.effects`), gemeinsame Tick/Decay für Slow/DoT/Vulnerability. Support-AoE nutzt Spatial-Grid statt Filter.
+- Splash-Schaden parametrierbar (`splashFactor` pro Tower/Projectile), Standard 50%.
+- Wave-Bounty statt Kill-Streak: Wave-Start setzt No-Leak-Flag, Life-Loss deaktiviert Bonus; bei Wave-Abschluss ohne Leaks gibt es Bonusgeld.
+- Wave-Scaling: Spawn-Anzahlen werden mit `waveStrengthMultiplier` pro Difficulty skaliert.
+- On-Death-Spawns von Boss/Carrier spawnen Kind-Gegner ohne Reward/Life-Schaden.
 
 ## Noch offen / nächste Schritte
 - Upgrade-Bedienung: UI/Controller bietet noch keinen Kauf/Upgrade-Flow für Tower-Level 2/3 – Hook in HUD + Controller einbauen, Kosten aus `TowerUpgradeSystem` nutzen.

@@ -361,6 +361,25 @@ export class CanvasRenderer {
       ctx.stroke()
     }
 
+    // Tag badge for readability (fast/armored/boss/ etc.)
+    if (enemy.tags && enemy.tags.length > 0) {
+      const badgeColorMap: Record<string, string> = {
+        fast: '#5eead4',
+        armored: '#cbd5e1',
+        boss: '#f97316',
+        shielded: '#94a3b8',
+        swarm: '#a3e635',
+      }
+      const primaryTag = enemy.tags[0]
+      const badgeColor = badgeColorMap[primaryTag] ?? '#ffffff'
+      ctx.save()
+      ctx.fillStyle = badgeColor
+      ctx.beginPath()
+      ctx.arc(x, y - baseRadius - 6, Math.max(3, baseRadius * 0.35), 0, Math.PI * 2)
+      ctx.fill()
+      ctx.restore()
+    }
+
     this.drawEnhancedHealthBar(ctx, x, y, baseRadius, tileSize, healthPercent)
   }
 

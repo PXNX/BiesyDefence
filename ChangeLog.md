@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Expanded enemy roster with `swarm`, `armored_pest`, `swift_runner`, `bulwark`, and `carrier_boss`, plus per-wave HP/Speed/Reward scaling tied to map difficulty.
 - Reworked waves to 20 rounds with phase-based compositions, boss death-spawns, and a streak-based reward bonus.
 - Rebalanced towers: Indica higher impact damage, Sativa light splash volleys, Support slows + DoT + vulnerability; upgrade costs tuned for mid/late progression.
+- Targeting & effects: unified target selection (grid with direct fallback), support AoE uses spatial grid, status effects centralized (slow/DoT/vulnerability), splash damage now parameterized.
+- Upgrade flow: Added hover-upgrade action (button + hotkey U) with cost checks; towers track levels and gain scaled stats.
+- Economy & waves: Wave-based bounty (no-leak bonus) replaces kill-streak, spawn counts scale with difficulty wave strength, and boss on-death spawns produce reward-free, no-life-damage adds.
 
 ## [1.12.0] - 2025-11-19 - UI Refactoring Complete
 

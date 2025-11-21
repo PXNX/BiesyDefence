@@ -91,23 +91,25 @@ export interface Enemy {
   reachedGoal: boolean
   rewardClaimed: boolean
   speedMultiplier: number
-  slowEffects: {
-    duration: number
-    remainingTime: number
-    multiplier: number
-    appliedBy: string // tower id
-  }[]
-  vulnerabilityEffects?: {
-    amount: number
-    remainingTime: number
-  }[]
-  dotEffects: {
-    duration: number
-    remainingTime: number
-    dps: number
-    damageType: DamageType
-    appliedBy: string
-  }[]
+  effects: {
+    slow: {
+      duration: number
+      remainingTime: number
+      multiplier: number
+      appliedBy: string // tower id
+    }[]
+    vulnerability: {
+      amount: number
+      remainingTime: number
+    }[]
+    dot: {
+      duration: number
+      remainingTime: number
+      dps: number
+      damageType: DamageType
+      appliedBy: string
+    }[]
+  }
   resistances?: DamageResistances
   vulnerability?: number
   tags?: EnemyTag[]
@@ -127,6 +129,7 @@ export interface Tower {
   cost: number
   damageType: DamageType
   splashRadius?: number
+  splashFactor?: number
   slow?: {
     multiplier: number
     duration: number
@@ -154,6 +157,7 @@ export interface Projectile {
   isExpired: boolean
   damageType: DamageType
   splashRadius?: number
+  splashFactor?: number
 }
 
 export interface Particle {
@@ -170,7 +174,6 @@ export interface Resources {
   money: number
   lives: number
   score: number
-  killStreak?: number
 }
 
 export interface WaveSpawn {
@@ -223,6 +226,13 @@ export interface GameSnapshot {
   showRanges: boolean
   showHitboxes: boolean
   gameSpeed: number
+  hoverTower?: {
+    id: string
+    type: TowerType
+    level: number
+    nextCost: number | null
+    name: string
+  }
 }
 
 export interface ViewportSize {

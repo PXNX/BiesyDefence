@@ -16,9 +16,11 @@ import { updateProjectiles } from '@/game/systems/ProjectileSystem'
 import { updateTowers } from '@/game/systems/TowerSystem'
 import { updateWaves, type WaveSystemCallbacks, getWaveStatus } from '@/game/systems/WaveSystem'
 import { createEnemy } from '@/game/entities/enemies'
+import { createTowerUpgradeSystem } from '@/game/systems/TowerUpgradeSystem'
+import { MapManager } from '@/game/maps/MapManager'
 import { createEntityId } from '@/game/utils/id'
 import { releaseProjectile } from '@/game/utils/pool'
-import { updateEnemySpatialGrid } from '@/game/utils/spatialGrid'
+import { clearEnemySpatialGrid, updateEnemySpatialGrid } from '@/game/utils/spatialGrid'
 
 const clampValue = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max)
@@ -88,6 +90,7 @@ export class GameController {
     minZoom: 0.7,
     maxZoom: 2.5,
   }
+  private currentWaveNoLeak = true
 
   constructor() {
     this.state = createInitialState()
@@ -464,6 +467,46 @@ export class GameController {
     this.notify()
   }
 
+  /**
+   * Upgrade the tower currently under hover (if any)
+   */
+  public upgradeHoveredTower(): { success: boolean; message: string } {
+    if (!this.hoverState || !this.hoverState.tile) {
+      return { success: false, message: 'No tower selected to upgrade.' }
+    }
+
+    const gridKey = this.hoverState.tile.key
+    const tower = this.state.towers.find((t) => t.gridKey === gridKey)
+    if (!tower) {
+      return { success: false, message: 'No tower on this tile.' }
+    }
+
+    const towerLevel = tower.level ?? 1
+    const upgradePath = createTowerUpgradeSystem(tower.type, towerLevel)
+    if (!upgradePath.canUpgrade || !upgradePath.nextUpgrade) {
+      return { success: false, message: 'Tower is already at max level.' }
+    }
+
+    const cost = upgradePath.upgradeCost
+    if (this.state.resources.money < cost) {
+      return { success: false, message: `Need $${cost} to upgrade.` }
+    }
+
+    // Apply upgrade based on base profile and multiplier
+    const baseProfile = TOWER_PROFILES[tower.type]
+    const m = upgradePath.nextUpgrade.statMultiplier
+    tower.level = upgradePath.nextUpgrade.level
+    tower.damage = Math.round(baseProfile.damage * m)
+    tower.range = Math.round(baseProfile.range * m)
+    tower.fireRate = Math.max(0.1, baseProfile.fireRate / m) // faster fire rate with higher multiplier
+    tower.projectileSpeed = Math.round(baseProfile.projectileSpeed * m)
+    tower.cooldown = Math.min(tower.cooldown, tower.fireRate)
+
+    this.state.resources.money -= cost
+    this.notify()
+    return { success: true, message: `Upgraded to level ${tower.level}.` }
+  }
+
   public beginNextWave(): boolean {
     // Prevent starting new waves after game is over
     if (this.state.status === 'won' || this.state.status === 'lost') {
@@ -597,6 +640,11 @@ export class GameController {
     // Check for victory condition after cleanup
     this.checkVictoryCondition()
 
+    // Auto-advance to next wave when current wave is completed
+    if (this.state.wavePhase === 'completed' && this.state.status === 'running') {
+      this.beginNextWave()
+    }
+
     if (this.state.status === 'lost' || this.state.status === 'won') {
       this.running = false
       this.notifyCritical() // Critical update for game over
@@ -620,6 +668,14 @@ export class GameController {
   private handleWaveCompleted(waveIndex: number): void {
     // Wave completed logic - can be extended for UI notifications
     console.log(`Wave ${waveIndex + 1} completed`)
+
+    // Wave bounty: bonus money if no leaks this wave
+    if (this.currentWaveNoLeak && this.state.status === 'running') {
+      const difficulty = this.state.map ? MapManager.getInstance().getCurrentDifficultyConfig() : { enemyRewardMultiplier: 1 }
+      const bonus = Math.round((10 + (waveIndex + 1) * 5) * (difficulty.enemyRewardMultiplier ?? 1))
+      this.state.resources.money += bonus
+      this.notify()
+    }
   }
 
   /**
@@ -652,10 +708,7 @@ export class GameController {
     
     const previousLives = this.state.resources.lives
     this.state.resources.lives = Math.max(0, this.state.resources.lives - damage)
-    // Reset streak-based bonuses on leak
-    if (typeof this.state.resources.killStreak === 'number') {
-      this.state.resources.killStreak = 0
-    }
+    this.currentWaveNoLeak = false
     
     console.log(`Life lost: ${damage} damage. Lives: ${previousLives} → ${this.state.resources.lives}`)
     
@@ -789,7 +842,8 @@ export class GameController {
                     x: enemy.position.x + jitter.x,
                     y: enemy.position.y + jitter.y,
                   },
-                  this.state.currentWaveIndex
+                  this.state.currentWaveIndex,
+                  { noReward: true, noLifeDamage: true }
                 )
                 this.state.enemies.push(spawned)
               }
@@ -906,17 +960,12 @@ export class GameController {
       console.warn(`Invalid score value detected: ${this.state.resources.score}, resetting to 0`)
       this.state.resources.score = 0
     }
-    if (typeof this.state.resources.killStreak !== 'number' || !Number.isFinite(this.state.resources.killStreak)) {
-      this.state.resources.killStreak = 0
-    }
-    
     // Clamp values to reasonable ranges
     const maxMoney = 999999999 // Prevent overflow
     const maxScore = 999999999
     this.state.resources.money = Math.max(0, Math.min(maxMoney, this.state.resources.money))
     this.state.resources.lives = Math.max(0, Math.min(999, this.state.resources.lives)) // Max 999 lives
     this.state.resources.score = Math.max(0, Math.min(maxScore, this.state.resources.score))
-    this.state.resources.killStreak = Math.max(0, Math.min(25, this.state.resources.killStreak))
     
     // Validate game status
     const validStatuses = ['idle', 'running', 'paused', 'won', 'lost']
@@ -1158,6 +1207,21 @@ export class GameController {
       // Get comprehensive wave status from WaveSystem
       const waveStatus = getWaveStatus(this.state)
       const currentWave = this.state.waves[this.state.currentWaveIndex]
+      const hoverTile = this.hoverState?.tile
+      const hoveredTower = hoverTile
+        ? this.state.towers.find((t) => t.gridKey === hoverTile.key)
+        : undefined
+      let hoverTowerSummary: GameSnapshot['hoverTower'] = undefined
+      if (hoveredTower) {
+        const upgradeInfo = createTowerUpgradeSystem(hoveredTower.type, hoveredTower.level ?? 1)
+        hoverTowerSummary = {
+          id: hoveredTower.id,
+          type: hoveredTower.type,
+          level: hoveredTower.level ?? 1,
+          nextCost: upgradeInfo.nextUpgrade ? upgradeInfo.upgradeCost : null,
+          name: TOWER_PROFILES[hoveredTower.type]?.name ?? hoveredTower.type,
+        }
+      }
       
       // Calculate next spawn information with error handling
       let nextSpawnCountdown: number | null = null
@@ -1213,6 +1277,8 @@ export class GameController {
         
         // Game speed
         gameSpeed: this.gameSpeed,
+        // Hover tower info
+        hoverTower: hoverTowerSummary,
       }
       
       // Final validation of snapshot data
@@ -1305,6 +1371,8 @@ export class GameController {
   }
 
   private resetWaveState(index: number) {
+    clearEnemySpatialGrid()
+    this.currentWaveNoLeak = true
     const wave = this.state.waves[index]
     if (!wave) {
       return
@@ -1329,8 +1397,9 @@ export class GameController {
 
     const { offsetX, offsetY, scale } = this.viewportTransform
     const rect = this.canvas.getBoundingClientRect()
-    const x = screenX - rect.left
-    const y = screenY - rect.top
+    const pixelScale = this.canvas.width / rect.width || 1
+    const x = (screenX - rect.left) * pixelScale
+    const y = (screenY - rect.top) * pixelScale
 
     return {
       x: (x - offsetX) / scale,
@@ -1388,10 +1457,8 @@ export class GameController {
       return
     }
 
-    const rect = this.canvas.getBoundingClientRect()
-    const screenX = e.clientX - rect.left
-    const screenY = e.clientY - rect.top
-    this.updateHover(screenX, screenY)
+    // Use client coordinates directly; screenToWorld handles canvas offsets.
+    this.updateHover(e.clientX, e.clientY)
   }
 
   private handleMouseLeave(): void {

@@ -84,8 +84,8 @@ const buildMap = (pathNodes: Vector2[]): MapData => {
   }
 }
 
-const buildWaves = (): Wave[] => {
-  const waveSchedules = buildWaveSchedules()
+const buildWaves = (strengthMultiplier: number): Wave[] => {
+  const waveSchedules = buildWaveSchedules(strengthMultiplier)
   return waveSchedules.map((spawnQueue, index) => ({
     id: index,
     spawnQueue,
@@ -147,6 +147,7 @@ const createInitialTowers = (map: MapData): Tower[] => {
       slow: profile.slow,
       dot: profile.dot ? { ...profile.dot, damageType: profile.dot.damageType ?? 'dot' } : undefined,
       vulnerabilityDebuff: profile.vulnerabilityDebuff,
+      splashFactor: profile.splashFactor,
       level: 1,
     })
   })
@@ -192,9 +193,8 @@ export const createInitialState = (options?: {
       money: initialResources.initialMoney,
       lives: initialResources.initialLives,
       score: INITIAL_SCORE,
-      killStreak: 0,
     },
-    waves: buildWaves(),
+    waves: buildWaves(difficultyConfig.waveStrengthMultiplier ?? 1),
     currentWaveIndex: 0,
     status: 'idle',
     wavePhase: 'idle',

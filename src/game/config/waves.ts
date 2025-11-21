@@ -7,10 +7,11 @@ interface WaveScheduleEntry {
   interval: number
 }
 
-const createSpawnQueue = (schedule: WaveScheduleEntry[]): WaveSpawn[] => {
+const createSpawnQueue = (schedule: WaveScheduleEntry[], strengthMultiplier: number): WaveSpawn[] => {
   const queue: WaveSpawn[] = []
   schedule.forEach((entry) => {
-    for (let i = 0; i < entry.count; i += 1) {
+    const scaledCount = Math.max(1, Math.round(entry.count * strengthMultiplier))
+    for (let i = 0; i < scaledCount; i += 1) {
       queue.push({
         type: entry.type,
         delay: i === 0 ? entry.firstDelay : entry.interval,
@@ -135,8 +136,8 @@ const waveTemplates: WaveScheduleEntry[][] = [
   ],
 ]
 
-export const buildWaveSchedules = (): WaveSpawn[][] => {
-  return waveTemplates.map(createSpawnQueue)
+export const buildWaveSchedules = (strengthMultiplier: number = 1): WaveSpawn[][] => {
+  return waveTemplates.map((template) => createSpawnQueue(template, strengthMultiplier))
 }
 
 export const WAVE_SCHEDULES: WaveSpawn[][] = buildWaveSchedules()

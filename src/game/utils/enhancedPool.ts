@@ -146,6 +146,7 @@ class ProjectilePool extends ObjectPool<Projectile> {
         isExpired: false,
         damageType: 'impact',
         splashRadius: 0,
+        splashFactor: 0.5,
       } as Projectile),
       (projectile) => {
         projectile.isExpired = false
@@ -155,6 +156,7 @@ class ProjectilePool extends ObjectPool<Projectile> {
         projectile.color = ''
         projectile.damageType = 'impact'
         projectile.splashRadius = 0
+        projectile.splashFactor = 0.5
         projectile.position.x = 0
         projectile.position.y = 0
         projectile.origin.x = 0
@@ -219,6 +221,7 @@ export const acquireProjectile = (template: Omit<Projectile, 'id'>): Projectile 
   projectile.isExpired = template.isExpired
   projectile.damageType = template.damageType
   projectile.splashRadius = template.splashRadius
+  projectile.splashFactor = template.splashFactor
   
   return projectile
 }

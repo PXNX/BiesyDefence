@@ -105,7 +105,12 @@ const getWaveScaling = (waveIndex: number) => {
   }
 }
 
-export const createEnemy = (type: EnemyType, spawnPosition: Vector2, waveIndex = 0): Enemy => {
+export const createEnemy = (
+  type: EnemyType,
+  spawnPosition: Vector2,
+  waveIndex = 0,
+  options?: { noReward?: boolean; noLifeDamage?: boolean }
+): Enemy => {
   const base = ENEMY_PROFILES[type] ?? ENEMY_PROFILES.pest
   const difficultyConfig = MapManager.getInstance().getCurrentDifficultyConfig()
   const { hpScale, speedScale, rewardScale } = getWaveScaling(waveIndex)
@@ -115,6 +120,13 @@ export const createEnemy = (type: EnemyType, spawnPosition: Vector2, waveIndex =
     speed: Math.round(base.speed * speedScale * difficultyConfig.enemySpeedMultiplier),
     health: Math.round(base.health * hpScale * difficultyConfig.enemyHealthMultiplier),
     reward: Math.round(base.reward * rewardScale * difficultyConfig.enemyRewardMultiplier),
+    damageToLives: base.damageToLives,
+  }
+  if (options?.noReward) {
+    stats.reward = 0
+  }
+  if (options?.noLifeDamage) {
+    stats.damageToLives = 0
   }
 
   return {
@@ -129,12 +141,14 @@ export const createEnemy = (type: EnemyType, spawnPosition: Vector2, waveIndex =
     reachedGoal: false,
     rewardClaimed: false,
     speedMultiplier: 1,
-    slowEffects: [],
-    dotEffects: [],
+    effects: {
+      slow: [],
+      vulnerability: [],
+      dot: [],
+    },
     resistances: stats.resistances,
     vulnerability: stats.vulnerability ?? 0,
     tags: stats.tags as EnemyTag[] | undefined,
-    vulnerabilityEffects: [],
   }
 }
 
@@ -155,23 +169,28 @@ export class EnemyEntity {
   public reachedGoal: boolean
   public rewardClaimed: boolean
   public speedMultiplier: number
-  public slowEffects: {
-    duration: number
-    remainingTime: number
-    multiplier: number
-    appliedBy: string // tower id
-  }[]
-  public dotEffects: {
-    duration: number
-    remainingTime: number
-    dps: number
-    damageType: DamageType
-    appliedBy: string // tower id
-  }[]
+  public effects: {
+    slow: {
+      duration: number
+      remainingTime: number
+      multiplier: number
+      appliedBy: string // tower id
+    }[]
+    vulnerability: {
+      amount: number
+      remainingTime: number
+    }[]
+    dot: {
+      duration: number
+      remainingTime: number
+      dps: number
+      damageType: DamageType
+      appliedBy: string // tower id
+    }[]
+  }
   public resistances?: DamageResistances
   public vulnerability?: number
   public tags?: EnemyTag[]
-  public vulnerabilityEffects?: { amount: number; remainingTime: number }[]
 
   constructor(type: EnemyType, spawnPosition: Vector2) {
     const stats = ENEMY_PROFILES[type]
@@ -186,12 +205,10 @@ export class EnemyEntity {
     this.reachedGoal = false
     this.rewardClaimed = false
     this.speedMultiplier = 1
-    this.slowEffects = []
-    this.dotEffects = []
+    this.effects = { slow: [], vulnerability: [], dot: [] }
     this.resistances = stats.resistances
     this.vulnerability = stats.vulnerability ?? 0
     this.tags = stats.tags as EnemyTag[] | undefined
-    this.vulnerabilityEffects = []
   }
 
   /**
@@ -206,13 +223,13 @@ export class EnemyEntity {
     }
 
     // Update slow effects
-    this.slowEffects = this.slowEffects.filter(effect => {
+    this.effects.slow = this.effects.slow.filter(effect => {
       effect.remainingTime -= deltaTime
       return effect.remainingTime > 0
     })
     
     // Calculate effective speed multiplier from active slow effects
-    const activeSlowEffect = this.slowEffects.find(effect => effect.remainingTime > 0)
+    const activeSlowEffect = this.effects.slow.find(effect => effect.remainingTime > 0)
     this.speedMultiplier = activeSlowEffect ? activeSlowEffect.multiplier : 1
 
     // Check if we've reached the end of the path
@@ -291,7 +308,7 @@ export class EnemyEntity {
    * @param towerId - ID of the tower that applied the slow
    */
   public applySlow(multiplier: number, duration: number, towerId: string): void {
-    this.slowEffects.push({
+    this.effects.slow.push({
       duration,
       remainingTime: duration,
       multiplier,
@@ -340,12 +357,14 @@ export class EnemyEntity {
       reachedGoal: this.reachedGoal,
       rewardClaimed: this.rewardClaimed,
       speedMultiplier: this.speedMultiplier,
-      slowEffects: [...this.slowEffects],
-      dotEffects: [...this.dotEffects],
+      effects: {
+        slow: [...this.effects.slow],
+        vulnerability: [...this.effects.vulnerability],
+        dot: [...this.effects.dot],
+      },
       resistances: this.resistances,
       vulnerability: this.vulnerability,
       tags: this.tags,
-      vulnerabilityEffects: this.vulnerabilityEffects ? [...this.vulnerabilityEffects] : [],
     }
   }
 }

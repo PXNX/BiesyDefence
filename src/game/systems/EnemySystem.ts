@@ -9,32 +9,27 @@ export const updateEnemies = (state: GameState, deltaSeconds: number): void => {
       return
     }
 
-    // Chapter 2 Balance: Update and manage timed slow effects
-    enemy.slowEffects = enemy.slowEffects.filter(effect => {
+    // Chapter 2 Balance: Update and manage timed status effects
+    enemy.effects.slow = enemy.effects.slow.filter(effect => {
       effect.remainingTime -= deltaSeconds
       return effect.remainingTime > 0
     })
     
-    // Calculate effective speed multiplier from active slow effects
-    const activeSlowEffect = enemy.slowEffects.find(effect => effect.remainingTime > 0)
+    const activeSlowEffect = enemy.effects.slow.find(effect => effect.remainingTime > 0)
     enemy.speedMultiplier = activeSlowEffect ? activeSlowEffect.multiplier : 1
 
     // Update vulnerability decay
-    if (enemy.vulnerabilityEffects && enemy.vulnerabilityEffects.length > 0) {
-      enemy.vulnerabilityEffects = enemy.vulnerabilityEffects.filter((effect) => {
-        effect.remainingTime -= deltaSeconds
-        return effect.remainingTime > 0
-      })
-      const totalVuln = enemy.vulnerabilityEffects.reduce((sum, effect) => sum + effect.amount, 0)
-      enemy.vulnerability = Math.max(0, totalVuln)
-    } else {
-      enemy.vulnerability = Math.max(0, (enemy.vulnerability ?? 0) * 0.95)
-    }
+    enemy.effects.vulnerability = enemy.effects.vulnerability.filter((effect) => {
+      effect.remainingTime -= deltaSeconds
+      return effect.remainingTime > 0
+    })
+    const totalVuln = enemy.effects.vulnerability.reduce((sum, effect) => sum + effect.amount, 0)
+    enemy.vulnerability = Math.max(0, totalVuln)
 
     // Apply damage over time effects
-    if (enemy.dotEffects.length > 0) {
+    if (enemy.effects.dot.length > 0) {
       const survivors = []
-      for (const effect of enemy.dotEffects) {
+      for (const effect of enemy.effects.dot) {
         effect.remainingTime -= deltaSeconds
         if (effect.remainingTime > 0) {
           const damage = effect.dps * deltaSeconds
@@ -45,7 +40,7 @@ export const updateEnemies = (state: GameState, deltaSeconds: number): void => {
           }
         }
       }
-      enemy.dotEffects = survivors
+      enemy.effects.dot = survivors
     }
 
     const nextIndex = Math.min(enemy.pathIndex + 1, path.length - 1)

@@ -39,6 +39,7 @@ export interface TowerProfile {
   color: string
   damageType: 'impact' | 'volley' | 'control'
   splashRadius?: number
+  splashFactor?: number
   slow?: {
     multiplier: number
     duration: number
@@ -87,6 +88,7 @@ export const TOWER_PROFILES: Record<TowerType, TowerProfile> = {
     color: '#f2e881',
     damageType: 'volley',
     splashRadius: 22, // light splash for crowd control
+    splashFactor: 0.5,
   },
   support: {
     name: 'Support Tower',

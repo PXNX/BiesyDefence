@@ -30,8 +30,9 @@ export const updateProjectiles = (state: GameState, deltaSeconds: number): void 
           ? findSplashTargets(target.position, state.enemies, projectile.splashRadius, target.id)
           : []
       if (splashTargets.length > 0) {
+        const splashFactor = projectile.splashFactor ?? 0.5
         splashTargets.forEach((enemy) => {
-          applyDamageToEnemy(enemy, Math.floor(projectile.damage * 0.5), dmgType)
+          applyDamageToEnemy(enemy, projectile.damage * splashFactor, dmgType)
         })
       }
       projectile.isExpired = true

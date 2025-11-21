@@ -99,6 +99,26 @@ function App() {
     controllerRef.current?.setPreviewTowerType(selectedTower)
   }, [selectedTower])
 
+  const attemptTowerUpgrade = useCallback(() => {
+    const controller = controllerRef.current
+    if (!controller) return
+    const result = controller.upgradeHoveredTower()
+    setFeedback(result.message)
+    if (result.success) {
+      audioManager.playSoundEffect('tower-upgrade')
+    }
+  }, [])
+
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() === 'u') {
+        attemptTowerUpgrade()
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [attemptTowerUpgrade])
+
   useEffect(() => {
     if (!snapshotStatus || !isAudioReady) {
       setAppPhase('loading')
@@ -491,6 +511,8 @@ function App() {
                     audioConfig={audioConfig}
                     onToggleMute={handleToggleMute}
                     onMasterVolumeChange={handleMasterVolumeChange}
+                    onUpgrade={attemptTowerUpgrade}
+                    hoverTower={snapshot.hoverTower}
                   />
                   <TowerIconBar
                     className="tower-dock-bar"
