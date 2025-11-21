@@ -87,7 +87,7 @@ export class GameController {
   private readonly cameraOverscrollFactor = 0.12
   private camera = {
     center: { x: 0, y: 0 },
-    zoom: 1,
+    zoom: 0.1,
     minZoom: 0.7,
     maxZoom: 6,
   }
@@ -148,7 +148,7 @@ export class GameController {
       x: map.worldWidth / 2,
       y: map.worldHeight / 2,
     }
-    this.camera.zoom = 1
+    this.camera.zoom = 3.0
   }
 
   private calculateBaseScale(): number {
