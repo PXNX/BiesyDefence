@@ -4,6 +4,8 @@ import type { TowerProfile } from '@/game/config/constants'
 import type { TowerType } from '@/game/core/types'
 import { createTowerUpgradeSystem } from '@/game/systems/TowerUpgradeSystem'
 
+export const TOWER_DETAILS_PANEL_WIDTH = 240
+
 interface TowerDetailsPanelProps {
   towerType: TowerType
   position: { x: number; y: number }
@@ -34,11 +36,14 @@ export function TowerDetailsPanel({ towerType, position, onClose }: TowerDetails
   }, [])
 
   useEffect(() => {
-    // Adjust position to prevent panel from going off-screen. Anchored to the right of the hovered icon.
-    const panelWidth = 240 // Approximate panel width
+    // Adjust position to prevent panel from going off-screen when anchoring to the left of the toolbar.
+    const panelWidth = TOWER_DETAILS_PANEL_WIDTH
     const panelHeight = 160 // Approximate panel height
 
-    const adjustedX = Math.min(position.x, window.innerWidth - panelWidth - 10)
+    const adjustedX = Math.max(
+      10,
+      Math.min(position.x, window.innerWidth - panelWidth - 10)
+    )
     const adjustedY = Math.min(
       Math.max(position.y - panelHeight / 2, 10),
       window.innerHeight - panelHeight - 10

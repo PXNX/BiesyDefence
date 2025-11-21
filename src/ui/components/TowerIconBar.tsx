@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import { TOWER_PROFILES } from '@/game/config/constants'
 import type { TowerProfile } from '@/game/config/constants'
 import type { TowerType } from '@/game/core/types'
-import { TowerDetailsPanel } from './TowerDetailsPanel'
+import { TowerDetailsPanel, TOWER_DETAILS_PANEL_WIDTH } from './TowerDetailsPanel'
 
 const PLACEHOLDER_SHOP =
   'data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"96\" height=\"96\" viewBox=\"0 0 96 96\"><rect width=\"96\" height=\"96\" rx=\"18\" fill=\"%23181818\"/><text x=\"50%\" y=\"55%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-size=\"18\" fill=\"%23cccccc\">WIP</text></svg>'
@@ -42,12 +42,12 @@ export function TowerIconBar({
   const handleIconHover = (towerType: TowerType, event?: React.MouseEvent | React.FocusEvent) => {
     setHoveredTower(towerType)
     
-    // Calculate panel position above the hovered icon
+    // Calculate panel position left of the hovered icon so it stays outside the toolbar
     const iconElement = iconRefs.current[towerType]
     if (iconElement) {
       const rect = iconElement.getBoundingClientRect()
       setPanelPosition({
-        x: rect.right + 12,
+        x: rect.left - TOWER_DETAILS_PANEL_WIDTH - 12,
         y: rect.top + rect.height / 2,
       })
     }
