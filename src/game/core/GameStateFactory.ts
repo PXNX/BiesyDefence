@@ -49,6 +49,29 @@ const buildPathGridKeys = (nodes: Vector2[]): Set<string> => {
   return keys
 }
 
+const INITIAL_TOWER_TYPES: TowerType[] = ['indica', 'sativa']
+
+const CARDINAL_OFFSETS = [
+  { dx: -1, dy: 0 },
+  { dx: 1, dy: 0 },
+  { dx: 0, dy: -1 },
+  { dx: 0, dy: 1 },
+]
+
+const isAdjacentToPath = (tile: MapTile, map: MapData): boolean => {
+  if (tile.type === 'path') {
+    return false
+  }
+
+  return CARDINAL_OFFSETS.some(({ dx, dy }) => {
+    const neighbor = map.tileLookup.get(gridKey(tile.grid.x + dx, tile.grid.y + dy))
+    return neighbor?.type === 'path'
+  })
+}
+
+const collectPathAdjacentTiles = (map: MapData): MapTile[] =>
+  map.tiles.filter((tile) => isAdjacentToPath(tile, map))
+
 const buildMap = (pathNodes: Vector2[]): MapData => {
   const pathGrid = buildPathGridKeys(PATH_GRID_NODES)
   const tiles: MapTile[] = []
@@ -95,11 +118,6 @@ const buildWaves = (strengthMultiplier: number): Wave[] => {
   }))
 }
 
-const DEFAULT_TOWER_PLACEMENTS: { type: TowerType; grid: Vector2 }[] = [
-  { type: 'indica', grid: { x: 5, y: 13 } },
-  { type: 'sativa', grid: { x: 32, y: 16 } },
-]
-
 const findPlacementTile = (map: MapData, anchor: Vector2): MapTile | undefined => {
   const clamp = (value: number, max: number) => Math.min(Math.max(0, value), max - 1)
   const maxRadius = 4
@@ -122,11 +140,24 @@ const findPlacementTile = (map: MapData, anchor: Vector2): MapTile | undefined =
 
 const createInitialTowers = (map: MapData): Tower[] => {
   const towers: Tower[] = []
+  const availableTiles = collectPathAdjacentTiles(map)
 
-  DEFAULT_TOWER_PLACEMENTS.forEach(({ type, grid }) => {
+  INITIAL_TOWER_TYPES.forEach((type) => {
     const profile = TOWER_PROFILES[type]
-    const tile = findPlacementTile(map, grid)
+    let tile: MapTile | undefined
+
+    if (availableTiles.length > 0) {
+      const index = Math.floor(Math.random() * availableTiles.length)
+      tile = availableTiles.splice(index, 1)[0]
+    }
+
+    if (!tile && PATH_GRID_NODES.length > 0) {
+      const anchor = PATH_GRID_NODES[Math.floor(Math.random() * PATH_GRID_NODES.length)]
+      tile = findPlacementTile(map, anchor)
+    }
+
     if (!tile) {
+      console.warn(`Unable to place initial ${type} tower, skipping placement.`)
       return
     }
 

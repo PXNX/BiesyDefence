@@ -47,9 +47,9 @@ const TOWER_TEXTURE_BY_TYPE: Record<TowerType, TextureKey> = {
   indica: 'tower-indica',
   sativa: 'tower-sativa',
   support: 'tower-support',
-  sniper: 'tower-placeholder',
-  flamethrower: 'tower-placeholder',
-  chain: 'tower-placeholder'
+  sniper: 'tower-sniper',
+  flamethrower: 'tower-flamethrower',
+  chain: 'tower-chain',
 }
 
 const assetPath = (relativePath: string) => {
@@ -83,9 +83,9 @@ const TEXTURE_PATHS: Record<TextureKey, string> = {
   'tower-indica': assetPath('/towers/tower_indica_build_level1.png'),
   'tower-sativa': assetPath('/towers/tower_sativa_build_level1.png'),
   'tower-support': assetPath('/towers/tower_support_build_level1.png'),
-  'tower-sniper': 'data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"96\" height=\"96\" viewBox=\"0 0 96 96\"><rect width=\"96\" height=\"96\" rx=\"16\" fill=\"%23222\"/><text x=\"50%\" y=\"55%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-size=\"18\" fill=\"%23ccc\">WIP</text></svg>',
-  'tower-flamethrower': 'data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"96\" height=\"96\" viewBox=\"0 0 96 96\"><rect width=\"96\" height=\"96\" rx=\"16\" fill=\"%23222\"/><text x=\"50%\" y=\"55%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-size=\"18\" fill=\"%23ccc\">WIP</text></svg>',
-  'tower-chain': 'data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"96\" height=\"96\" viewBox=\"0 0 96 96\"><rect width=\"96\" height=\"96\" rx=\"16\" fill=\"%23222\"/><text x=\"50%\" y=\"55%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-size=\"18\" fill=\"%23ccc\">WIP</text></svg>',
+  'tower-sniper': assetPath('/towers/tower_sniper_build_level1.png'),
+  'tower-flamethrower': assetPath('/towers/tower_flamethrower_build_level1.png'),
+  'tower-chain': assetPath('/towers/tower_chain_build_level1.png'),
   'tower-placeholder': 'data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"96\" height=\"96\" viewBox=\"0 0 96 96\"><rect width=\"96\" height=\"96\" rx=\"16\" fill=\"%23222\"/><text x=\"50%\" y=\"55%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-size=\"18\" fill=\"%23ccc\">WIP</text></svg>',
   'enemy-runner': assetPath('/enemies/enemy_runner.png'),
   'enemy-swift': assetPath('/enemies/enemy_swift_runner.png'),

@@ -11,9 +11,9 @@ const TOWER_ART_PATHS: Record<TowerType, string> = {
   indica: '/towers/tower_indica_shop.png',
   sativa: '/towers/tower_sativa_shop.png',
   support: '/towers/tower_support_shop.png',
-  sniper: PLACEHOLDER_SHOP,
-  flamethrower: PLACEHOLDER_SHOP,
-  chain: PLACEHOLDER_SHOP
+  sniper: '/towers/tower_sniper_shop.png',
+  flamethrower: '/towers/tower_flamethrower_shop.png',
+  chain: '/towers/tower_chain_shop.png'
 }
 
 const TOWER_ENTRIES = Object.entries(TOWER_PROFILES) as [TowerType, TowerProfile][]
