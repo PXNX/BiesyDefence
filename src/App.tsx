@@ -15,6 +15,8 @@ import { audioManager } from '@/game/audio/AudioManager'
 import type { AudioConfig } from '@/game/audio/AudioManager'
 import { ErrorBoundary } from '@/ui/components/ErrorBoundary'
 import { TelemetryPanel } from '@/ui/components/TelemetryPanel'
+import { UpgradePanel } from '@/ui/components/UpgradePanel'
+import './ui/components/UpgradePanel.css'
 
 const initialTower: TowerType = 'indica'
 
@@ -332,6 +334,26 @@ function App() {
     setShowTelemetryPanel((prev) => !prev)
   }, [])
 
+  const handleUpgradeLevel = useCallback(
+    (towerId: string) => {
+      const controller = controllerRef.current
+      if (!controller) return
+      const result = controller.upgradeTowerLevel(towerId)
+      setFeedback(result.message)
+    },
+    []
+  )
+
+  const handleBuyPerk = useCallback(
+    (towerId: string, perkId: string) => {
+      const controller = controllerRef.current
+      if (!controller) return
+      const result = controller.buyTowerPerk(towerId, perkId)
+      setFeedback(result.message)
+    },
+    []
+  )
+
   // Audio control handlers
   const handleMasterVolumeChange = (volume: number) => {
     void unlockAudioContext()
@@ -540,6 +562,16 @@ function App() {
                     countdown={snapshot.nextSpawnCountdown}
                     delay={snapshot.nextSpawnDelay}
                   />
+                )}
+                {snapshot?.hoverTower && (
+                  <div className="upgrade-panel-wrapper">
+                    <UpgradePanel
+                      hoverTower={snapshot.hoverTower}
+                      money={snapshot.money}
+                      onUpgradeLevel={handleUpgradeLevel}
+                      onBuyPerk={handleBuyPerk}
+                    />
+                  </div>
                 )}
               </div>
               {snapshot && (

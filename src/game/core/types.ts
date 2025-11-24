@@ -167,6 +167,17 @@ export interface Tower {
   level?: TowerUpgrade['level']
   chainJumps?: number
   chainFalloff?: number
+  // Upgrade/branch-derived stats
+  upgradeState?: {
+    level: 1 | 2 | 3
+    branch?: 'A' | 'B'
+    perks?: string[]
+  }
+  critChance?: number
+  critMultiplier?: number
+  stunChance?: number
+  stunDuration?: number
+  markDuration?: number
 }
 
 export interface Projectile {
@@ -280,6 +291,7 @@ export interface GameSnapshot {
     level: number
     nextCost: number | null
     name: string
+    upgradeState?: Tower['upgradeState']
   }
   telemetry?: TelemetrySnapshot
   balanceWarnings?: string[]

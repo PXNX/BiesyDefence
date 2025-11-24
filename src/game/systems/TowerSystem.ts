@@ -212,11 +212,13 @@ export const updateTowers = (
 
     // CHAPTER 2: Sativa towers shoot double projectiles with reduced damage
     const projectileCount = tower.type === 'sativa' ? 2 : 1
-    const damagePerProjectile = tower.type === 'sativa' ? Math.floor(tower.damage * 0.6) : tower.damage
-    
+    const baseDamage = tower.type === 'sativa' ? Math.floor(tower.damage * 0.6) : tower.damage
     telemetry?.recordShot(tower)
     const spriteMeta = getProjectileSprite(tower.type, towerDamageType)
     for (let i = 0; i < projectileCount; i++) {
+      const isCrit = tower.critChance ? Math.random() < tower.critChance : false
+      const critMult = isCrit ? tower.critMultiplier ?? 1.5 : 1
+      const damagePerProjectile = Math.max(1, Math.floor(baseDamage * critMult))
       const projectile = acquireProjectile({
         position: { ...tower.position },
         origin: { ...tower.position },

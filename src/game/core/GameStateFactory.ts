@@ -182,6 +182,7 @@ const createInitialTowers = (map: MapData): Tower[] => {
       level: 1,
       chainJumps: profile.chainJumps,
       chainFalloff: profile.chainFalloff,
+      upgradeState: { level: 1, branch: undefined, perks: [] },
     })
   })
 

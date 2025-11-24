@@ -25,6 +25,7 @@ import { releaseProjectile } from '@/game/utils/pool'
 import { clearEnemySpatialGrid, updateEnemySpatialGrid } from '@/game/utils/spatialGrid'
 import { TelemetryCollector } from '@/game/systems/telemetry/TelemetryCollector'
 import { logger } from '@/game/utils/logger'
+import { canBuyPerk, getLevelUpgradeCost, getPerkCost, recomputeTowerStats } from '@/game/utils/upgradeLogic'
 
 const clampValue = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max)
@@ -638,6 +639,38 @@ export class GameController {
     this.notify()
     this.render()
     return true
+  }
+
+  public upgradeTowerLevel(towerId: string): { success: boolean; message: string } {
+    const tower = this.state.towers.find((t) => t.id === towerId)
+    if (!tower) return { success: false, message: 'Tower not found.' }
+    const cost = getLevelUpgradeCost(tower)
+    if (!cost) return { success: false, message: 'Already at max level.' }
+    if (this.state.resources.money < cost) return { success: false, message: `Need $${cost}.` }
+    tower.upgradeState = tower.upgradeState ?? { level: 1, branch: undefined, perks: [] }
+    tower.upgradeState.level = (tower.upgradeState.level ?? 1) + 1 as 1 | 2 | 3
+    this.state.resources.money -= cost
+    recomputeTowerStats(tower)
+    this.notify()
+    return { success: true, message: `Upgraded to level ${tower.upgradeState.level}.` }
+  }
+
+  public buyTowerPerk(towerId: string, perkId: string): { success: boolean; message: string } {
+    const tower = this.state.towers.find((t) => t.id === towerId)
+    if (!tower) return { success: false, message: 'Tower not found.' }
+    if (!canBuyPerk(tower, perkId)) return { success: false, message: 'Perk not available.' }
+    const cost = getPerkCost(tower, perkId)
+    if (this.state.resources.money < cost) return { success: false, message: `Need $${cost}.` }
+    tower.upgradeState = tower.upgradeState ?? { level: 1, branch: undefined, perks: [] }
+    const planBranch = perkId.includes('-A') ? 'A' : perkId.includes('-B') ? 'B' : undefined
+    if (!tower.upgradeState.branch) {
+      tower.upgradeState.branch = planBranch as any
+    }
+    tower.upgradeState.perks = Array.from(new Set([...(tower.upgradeState.perks ?? []), perkId]))
+    this.state.resources.money -= cost
+    recomputeTowerStats(tower)
+    this.notify()
+    return { success: true, message: `Perk purchased: ${perkId}.` }
   }
 
   public quickSetWave(index: number) {
@@ -1443,6 +1476,7 @@ export class GameController {
           level: hoveredTower.level ?? 1,
           nextCost: upgradeInfo.nextUpgrade ? upgradeInfo.upgradeCost : null,
           name: TOWER_PROFILES[hoveredTower.type]?.name ?? hoveredTower.type,
+          upgradeState: hoveredTower.upgradeState,
         }
       }
       

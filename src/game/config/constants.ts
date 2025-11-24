@@ -55,6 +55,8 @@ export interface TowerProfile {
   }
   chainJumps?: number
   chainFalloff?: number
+  critChance?: number
+  critMultiplier?: number
 }
 
 // Chapter 2 Balance: TOWER-ROLE & ROLE DIFFERENTIATION
