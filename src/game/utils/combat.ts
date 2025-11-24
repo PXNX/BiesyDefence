@@ -49,7 +49,8 @@ export const applyDotToEnemy = (
   dps: number,
   duration: number,
   damageType: DamageType,
-  appliedBy: string
+  appliedBy: string,
+  appliedByType?: Tower['type']
 ): void => {
   const resist = enemy.resistances?.dot ?? 0
   const effectiveDps = Math.max(0, dps * (1 - resist))
@@ -61,6 +62,7 @@ export const applyDotToEnemy = (
     dps: effectiveDps,
     damageType,
     appliedBy,
+    appliedByType,
   })
 }
 

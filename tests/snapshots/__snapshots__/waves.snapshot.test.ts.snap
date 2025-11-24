@@ -1,0 +1,6302 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Snapshot: wave compositions per difficulty matches wave schedule snapshot per difficulty 1`] = `
+"[
+  {
+    "difficulty": "easy",
+    "multiplier": 0.85,
+    "waves": [
+      [
+        {
+          "delay": 0.2,
+          "type": "pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "pest"
+        },
+        {
+          "delay": 0.3,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.8,
+          "type": "runner"
+        },
+        {
+          "delay": 1,
+          "type": "runner"
+        }
+      ],
+      [
+        {
+          "delay": 0.3,
+          "type": "pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.85,
+          "type": "runner"
+        },
+        {
+          "delay": 0.85,
+          "type": "runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        }
+      ],
+      [
+        {
+          "delay": 0.2,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.8,
+          "type": "runner"
+        },
+        {
+          "delay": 0.8,
+          "type": "runner"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.75,
+          "type": "runner"
+        },
+        {
+          "delay": 0.75,
+          "type": "runner"
+        },
+        {
+          "delay": 1.2,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.6,
+          "type": "stealth"
+        }
+      ],
+      [
+        {
+          "delay": 0.35,
+          "type": "runner"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.7,
+          "type": "pest"
+        },
+        {
+          "delay": 0.45,
+          "type": "pest"
+        },
+        {
+          "delay": 0.45,
+          "type": "pest"
+        },
+        {
+          "delay": 0.45,
+          "type": "pest"
+        },
+        {
+          "delay": 0.45,
+          "type": "pest"
+        },
+        {
+          "delay": 0.9,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.2,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.2,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.1,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.2,
+          "type": "splitter"
+        }
+      ],
+      [
+        {
+          "delay": 0.4,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.8,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.8,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 1.4,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.2,
+          "type": "splitter"
+        }
+      ],
+      [
+        {
+          "delay": 0.3,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        }
+      ],
+      [
+        {
+          "delay": 0.3,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.7,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.9,
+          "type": "stealth"
+        },
+        {
+          "delay": 1,
+          "type": "stealth"
+        },
+        {
+          "delay": 1,
+          "type": "stealth"
+        }
+      ],
+      [
+        {
+          "delay": 1.5,
+          "type": "bulwark"
+        },
+        {
+          "delay": 0.4,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.7,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.7,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.7,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.7,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 1.4,
+          "type": "regenerator"
+        },
+        {
+          "delay": 1.6,
+          "type": "regenerator"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 1.8,
+          "type": "bulwark"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.8,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 1.2,
+          "type": "regenerator"
+        },
+        {
+          "delay": 1.5,
+          "type": "regenerator"
+        }
+      ],
+      [
+        {
+          "delay": 1.2,
+          "type": "bulwark"
+        },
+        {
+          "delay": 2,
+          "type": "bulwark"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 1,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.1,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.1,
+          "type": "splitter"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 1,
+          "type": "regenerator"
+        },
+        {
+          "delay": 1.4,
+          "type": "regenerator"
+        }
+      ],
+      [
+        {
+          "delay": 1,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.8,
+          "type": "bulwark"
+        },
+        {
+          "delay": 0.35,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        }
+      ],
+      [
+        {
+          "delay": 0.9,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.6,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.6,
+          "type": "bulwark"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        }
+      ],
+      [
+        {
+          "delay": 0.22,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        }
+      ],
+      [
+        {
+          "delay": 0.8,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.4,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.4,
+          "type": "bulwark"
+        },
+        {
+          "delay": 0.4,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        }
+      ],
+      [
+        {
+          "delay": 1.5,
+          "type": "carrier_boss"
+        },
+        {
+          "delay": 1,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.8,
+          "type": "bulwark"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        }
+      ]
+    ]
+  },
+  {
+    "difficulty": "normal",
+    "multiplier": 1,
+    "waves": [
+      [
+        {
+          "delay": 0.2,
+          "type": "pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "pest"
+        },
+        {
+          "delay": 0.3,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.8,
+          "type": "runner"
+        },
+        {
+          "delay": 1,
+          "type": "runner"
+        }
+      ],
+      [
+        {
+          "delay": 0.3,
+          "type": "pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.85,
+          "type": "runner"
+        },
+        {
+          "delay": 0.85,
+          "type": "runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        }
+      ],
+      [
+        {
+          "delay": 0.2,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.8,
+          "type": "runner"
+        },
+        {
+          "delay": 0.8,
+          "type": "runner"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.75,
+          "type": "runner"
+        },
+        {
+          "delay": 0.75,
+          "type": "runner"
+        },
+        {
+          "delay": 1.2,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.6,
+          "type": "stealth"
+        }
+      ],
+      [
+        {
+          "delay": 0.35,
+          "type": "runner"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.7,
+          "type": "pest"
+        },
+        {
+          "delay": 0.45,
+          "type": "pest"
+        },
+        {
+          "delay": 0.45,
+          "type": "pest"
+        },
+        {
+          "delay": 0.45,
+          "type": "pest"
+        },
+        {
+          "delay": 0.45,
+          "type": "pest"
+        },
+        {
+          "delay": 0.45,
+          "type": "pest"
+        },
+        {
+          "delay": 0.9,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.2,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.2,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.1,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.2,
+          "type": "splitter"
+        }
+      ],
+      [
+        {
+          "delay": 0.4,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.8,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.8,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.8,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 1.4,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.2,
+          "type": "splitter"
+        }
+      ],
+      [
+        {
+          "delay": 0.3,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        }
+      ],
+      [
+        {
+          "delay": 0.3,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.7,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.9,
+          "type": "stealth"
+        },
+        {
+          "delay": 1,
+          "type": "stealth"
+        },
+        {
+          "delay": 1,
+          "type": "stealth"
+        }
+      ],
+      [
+        {
+          "delay": 1.5,
+          "type": "bulwark"
+        },
+        {
+          "delay": 0.4,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.7,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.7,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.7,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.7,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.7,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 1.4,
+          "type": "regenerator"
+        },
+        {
+          "delay": 1.6,
+          "type": "regenerator"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 1.8,
+          "type": "bulwark"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.8,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 1.2,
+          "type": "regenerator"
+        },
+        {
+          "delay": 1.5,
+          "type": "regenerator"
+        }
+      ],
+      [
+        {
+          "delay": 1.2,
+          "type": "bulwark"
+        },
+        {
+          "delay": 2,
+          "type": "bulwark"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 1,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.1,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.1,
+          "type": "splitter"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 1,
+          "type": "regenerator"
+        },
+        {
+          "delay": 1.4,
+          "type": "regenerator"
+        }
+      ],
+      [
+        {
+          "delay": 1,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.8,
+          "type": "bulwark"
+        },
+        {
+          "delay": 0.35,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        }
+      ],
+      [
+        {
+          "delay": 0.9,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.6,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.6,
+          "type": "bulwark"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        }
+      ],
+      [
+        {
+          "delay": 0.22,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        }
+      ],
+      [
+        {
+          "delay": 0.8,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.4,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.4,
+          "type": "bulwark"
+        },
+        {
+          "delay": 0.4,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        }
+      ],
+      [
+        {
+          "delay": 1.5,
+          "type": "carrier_boss"
+        },
+        {
+          "delay": 1,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.8,
+          "type": "bulwark"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        }
+      ]
+    ]
+  },
+  {
+    "difficulty": "hard",
+    "multiplier": 1.25,
+    "waves": [
+      [
+        {
+          "delay": 0.2,
+          "type": "pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "pest"
+        },
+        {
+          "delay": 0.3,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.8,
+          "type": "runner"
+        },
+        {
+          "delay": 1,
+          "type": "runner"
+        },
+        {
+          "delay": 1,
+          "type": "runner"
+        }
+      ],
+      [
+        {
+          "delay": 0.3,
+          "type": "pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.85,
+          "type": "runner"
+        },
+        {
+          "delay": 0.85,
+          "type": "runner"
+        },
+        {
+          "delay": 0.85,
+          "type": "runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        }
+      ],
+      [
+        {
+          "delay": 0.2,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.8,
+          "type": "runner"
+        },
+        {
+          "delay": 0.8,
+          "type": "runner"
+        },
+        {
+          "delay": 0.8,
+          "type": "runner"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.75,
+          "type": "runner"
+        },
+        {
+          "delay": 0.75,
+          "type": "runner"
+        },
+        {
+          "delay": 0.75,
+          "type": "runner"
+        },
+        {
+          "delay": 1.2,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.6,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.6,
+          "type": "stealth"
+        }
+      ],
+      [
+        {
+          "delay": 0.35,
+          "type": "runner"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.7,
+          "type": "pest"
+        },
+        {
+          "delay": 0.45,
+          "type": "pest"
+        },
+        {
+          "delay": 0.45,
+          "type": "pest"
+        },
+        {
+          "delay": 0.45,
+          "type": "pest"
+        },
+        {
+          "delay": 0.45,
+          "type": "pest"
+        },
+        {
+          "delay": 0.45,
+          "type": "pest"
+        },
+        {
+          "delay": 0.45,
+          "type": "pest"
+        },
+        {
+          "delay": 0.45,
+          "type": "pest"
+        },
+        {
+          "delay": 0.9,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.2,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.2,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.2,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.1,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.2,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.2,
+          "type": "splitter"
+        }
+      ],
+      [
+        {
+          "delay": 0.4,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.8,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.8,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.8,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.8,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 0.7,
+          "type": "runner"
+        },
+        {
+          "delay": 1.4,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.2,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.2,
+          "type": "splitter"
+        }
+      ],
+      [
+        {
+          "delay": 0.3,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        }
+      ],
+      [
+        {
+          "delay": 0.3,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.7,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.75,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.9,
+          "type": "stealth"
+        },
+        {
+          "delay": 1,
+          "type": "stealth"
+        },
+        {
+          "delay": 1,
+          "type": "stealth"
+        },
+        {
+          "delay": 1,
+          "type": "stealth"
+        }
+      ],
+      [
+        {
+          "delay": 1.5,
+          "type": "bulwark"
+        },
+        {
+          "delay": 0.4,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.65,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.7,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.7,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.7,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.7,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.7,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.7,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.7,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 1.4,
+          "type": "regenerator"
+        },
+        {
+          "delay": 1.6,
+          "type": "regenerator"
+        },
+        {
+          "delay": 1.6,
+          "type": "regenerator"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 0.38,
+          "type": "pest"
+        },
+        {
+          "delay": 1.8,
+          "type": "bulwark"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.32,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.8,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.65,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 1.2,
+          "type": "regenerator"
+        },
+        {
+          "delay": 1.5,
+          "type": "regenerator"
+        },
+        {
+          "delay": 1.5,
+          "type": "regenerator"
+        }
+      ],
+      [
+        {
+          "delay": 1.2,
+          "type": "bulwark"
+        },
+        {
+          "delay": 2,
+          "type": "bulwark"
+        },
+        {
+          "delay": 2,
+          "type": "bulwark"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "runner"
+        },
+        {
+          "delay": 1,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.1,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.1,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.1,
+          "type": "splitter"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 1,
+          "type": "regenerator"
+        },
+        {
+          "delay": 1.4,
+          "type": "regenerator"
+        },
+        {
+          "delay": 1.4,
+          "type": "regenerator"
+        }
+      ],
+      [
+        {
+          "delay": 1,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.8,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.8,
+          "type": "bulwark"
+        },
+        {
+          "delay": 0.35,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        },
+        {
+          "delay": 0.35,
+          "type": "pest"
+        }
+      ],
+      [
+        {
+          "delay": 0.25,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.6,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        }
+      ],
+      [
+        {
+          "delay": 0.9,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.6,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.6,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.6,
+          "type": "bulwark"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.28,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "runner"
+        }
+      ],
+      [
+        {
+          "delay": 0.22,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.45,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.55,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.5,
+          "type": "armored_pest"
+        },
+        {
+          "delay": 0.4,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.26,
+          "type": "swarm"
+        }
+      ],
+      [
+        {
+          "delay": 0.8,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.4,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.4,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.4,
+          "type": "bulwark"
+        },
+        {
+          "delay": 0.4,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "runner"
+        },
+        {
+          "delay": 0.4,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        },
+        {
+          "delay": 0.32,
+          "type": "pest"
+        }
+      ],
+      [
+        {
+          "delay": 1.5,
+          "type": "carrier_boss"
+        },
+        {
+          "delay": 1,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.8,
+          "type": "bulwark"
+        },
+        {
+          "delay": 1.8,
+          "type": "bulwark"
+        },
+        {
+          "delay": 0.35,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.25,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        }
+      ]
+    ]
+  }
+]"
+`;

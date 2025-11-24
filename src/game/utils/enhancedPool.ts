@@ -140,6 +140,8 @@ class ProjectilePool extends ObjectPool<Projectile> {
         position: { x: 0, y: 0 },
         origin: { x: 0, y: 0 },
         targetId: '',
+        sourceId: '',
+        sourceType: undefined,
         speed: 0,
         damage: 0,
         color: '',
@@ -147,16 +149,26 @@ class ProjectilePool extends ObjectPool<Projectile> {
         damageType: 'impact',
         splashRadius: 0,
         splashFactor: 0.5,
+        spriteKey: undefined,
+        spriteSize: undefined,
+        trailColor: undefined,
+        trailWidth: undefined,
       } as Projectile),
       (projectile) => {
         projectile.isExpired = false
         projectile.targetId = ''
+        projectile.sourceId = ''
+        projectile.sourceType = undefined
         projectile.speed = 0
         projectile.damage = 0
         projectile.color = ''
         projectile.damageType = 'impact'
         projectile.splashRadius = 0
         projectile.splashFactor = 0.5
+        projectile.spriteKey = undefined
+        projectile.spriteSize = undefined
+        projectile.trailColor = undefined
+        projectile.trailWidth = undefined
         projectile.position.x = 0
         projectile.position.y = 0
         projectile.origin.x = 0
@@ -186,6 +198,17 @@ class ParticlePool extends ObjectPool<Particle> {
         life: 0,
         maxLife: 0,
         color: '',
+        textureKey: undefined,
+        frameCount: undefined,
+        cols: undefined,
+        rows: undefined,
+        fps: undefined,
+        size: undefined,
+        sizeWorld: undefined,
+        additive: undefined,
+        baseAlpha: undefined,
+        rotateToVelocity: undefined,
+        freezeFrame: undefined,
       } as Particle),
       (particle) => {
         particle.position.x = 0
@@ -196,6 +219,17 @@ class ParticlePool extends ObjectPool<Particle> {
         particle.life = 0
         particle.maxLife = 0
         particle.color = ''
+        particle.textureKey = undefined
+        particle.frameCount = undefined
+        particle.cols = undefined
+        particle.rows = undefined
+        particle.fps = undefined
+        particle.size = undefined
+        particle.sizeWorld = undefined
+        particle.additive = undefined
+        particle.baseAlpha = undefined
+        particle.rotateToVelocity = undefined
+        particle.freezeFrame = undefined
       }
     )
   }
@@ -215,6 +249,8 @@ export const acquireProjectile = (template: Omit<Projectile, 'id'>): Projectile 
   projectile.origin.x = template.origin.x
   projectile.origin.y = template.origin.y
   projectile.targetId = template.targetId
+  projectile.sourceId = template.sourceId
+  projectile.sourceType = template.sourceType
   projectile.speed = template.speed
   projectile.damage = template.damage
   projectile.color = template.color

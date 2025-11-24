@@ -1,8 +1,13 @@
 import type { GameState } from '@/game/core/types'
 import { distanceBetween, normalize } from '@/game/utils/math'
 import { applyDamageToEnemy } from '@/game/utils/combat'
+import type { TelemetryCollector } from '@/game/systems/telemetry/TelemetryCollector'
 
-export const updateEnemies = (state: GameState, deltaSeconds: number): void => {
+export const updateEnemies = (
+  state: GameState,
+  deltaSeconds: number,
+  telemetry?: TelemetryCollector
+): void => {
   const path = state.path
   state.enemies.forEach((enemy) => {
     if (enemy.isDead) {
@@ -33,7 +38,24 @@ export const updateEnemies = (state: GameState, deltaSeconds: number): void => {
         effect.remainingTime -= deltaSeconds
         if (effect.remainingTime > 0) {
           const damage = effect.dps * deltaSeconds
-          applyDamageToEnemy(enemy, damage, effect.damageType)
+          const before = enemy.health
+          if (effect.appliedBy) {
+            enemy.lastHitBy = {
+              towerId: effect.appliedBy,
+              towerType: effect.appliedByType,
+            }
+          }
+          const dealt = applyDamageToEnemy(enemy, damage, effect.damageType)
+          const actual = Math.max(0, before - enemy.health)
+          const overkill = Math.max(0, dealt - actual)
+          telemetry?.recordDamage({
+            towerId: effect.appliedBy,
+            enemyType: enemy.type,
+            damageType: effect.damageType,
+            amount: actual > 0 ? actual : Math.min(before, dealt),
+            overkill,
+            isDot: true,
+          })
           survivors.push(effect)
           if (enemy.isDead) {
             break
@@ -91,5 +113,6 @@ export const updateEnemies = (state: GameState, deltaSeconds: number): void => {
     enemy.position.x += movement.x * travelDistance
     enemy.position.y += movement.y * travelDistance
   })
-}
 
+  telemetry?.trackStatus(state.enemies, deltaSeconds)
+}

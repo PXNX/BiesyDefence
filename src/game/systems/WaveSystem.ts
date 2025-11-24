@@ -8,6 +8,7 @@ export interface WaveSpawnRequest {
   type: EnemyType
   spawnPosition: { x: number; y: number }
   waveIndex: number
+  elapsedTime: number
 }
 
 export interface WaveSystemCallbacks {
@@ -58,7 +59,8 @@ export const updateWaves = (
     callbacks?.onEnemySpawn({
       type: spawn.type,
       spawnPosition,
-      waveIndex: state.currentWaveIndex
+      waveIndex: state.currentWaveIndex,
+      elapsedTime: wave.timer
     })
     
     wave.nextIndex += 1

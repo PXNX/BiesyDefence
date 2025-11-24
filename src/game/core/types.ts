@@ -107,6 +107,10 @@ export interface Enemy {
   reachedGoal: boolean
   rewardClaimed: boolean
   speedMultiplier: number
+  lastHitBy?: {
+    towerId: string
+    towerType?: TowerType
+  }
   effects: {
     slow: {
       duration: number
@@ -124,6 +128,7 @@ export interface Enemy {
       dps: number
       damageType: DamageType
       appliedBy: string
+      appliedByType?: TowerType
     }[]
   }
   resistances?: DamageResistances
@@ -169,6 +174,8 @@ export interface Projectile {
   position: Vector2
   origin: Vector2
   targetId: string
+  sourceId?: string
+  sourceType?: TowerType
   speed: number
   damage: number
   color: string
@@ -176,6 +183,11 @@ export interface Projectile {
   damageType: DamageType
   splashRadius?: number
   splashFactor?: number
+  // Optional sprite rendering
+  spriteKey?: string
+  spriteSize?: number
+  trailColor?: string
+  trailWidth?: number
 }
 
 export interface Particle {
@@ -188,6 +200,18 @@ export interface Particle {
   color: string
   kind?: 'hit' | 'damage'
   value?: number
+  // Optional sprite animation support
+  textureKey?: string
+  frameCount?: number
+  cols?: number
+  rows?: number
+  fps?: number
+  size?: number
+  sizeWorld?: number
+  additive?: boolean
+  baseAlpha?: number
+  rotateToVelocity?: boolean
+  freezeFrame?: boolean
 }
 
 export interface Resources {
@@ -257,6 +281,10 @@ export interface GameSnapshot {
     nextCost: number | null
     name: string
   }
+  telemetry?: TelemetrySnapshot
+  balanceWarnings?: string[]
+  achievements?: AchievementView[]
+  achievementNotifications?: AchievementView[]
 }
 
 export interface WavePreviewEntry {
@@ -276,6 +304,46 @@ export interface LastWaveSummary {
   leaks: number
   reward: number
   score: number
+}
+
+export interface TelemetryTowerStats {
+  towerId: string
+  towerType: TowerType
+  dps: number
+  dpsPerCost: number
+  totalDamage: number
+  shots: number
+  hits: number
+  overkillPercent: number
+}
+
+export interface TelemetrySnapshot {
+  dps: number
+  dpsPerDollar: number
+  overkillPercent: number
+  hitsPerShot: number
+  slowUptime: number
+  dotUptime: number
+  topDpsPerCost: TelemetryTowerStats[]
+  warnings: string[]
+}
+
+export interface AchievementView {
+  id: string
+  name: string
+  description: string
+  category: string
+  progress: number
+  target: number
+  unlocked: boolean
+  rarity?: 'common' | 'rare' | 'epic' | 'legendary'
+  icon?: string
+  rewards?: Array<{
+    type: string
+    value: string | number
+    description?: string
+  }>
+  unlockDate?: string
 }
 
 export interface ViewportSize {

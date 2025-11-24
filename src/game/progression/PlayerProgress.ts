@@ -82,6 +82,9 @@ export interface AchievementProgress {
   unlocked: boolean
   unlockDate?: string
   rewards?: AchievementReward[]
+  rarity?: 'common' | 'rare' | 'epic' | 'legendary'
+  icon?: string
+  hidden?: boolean
 }
 
 export type AchievementCategory = 

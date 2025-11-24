@@ -1,10 +1,11 @@
-import type { GameState, Enemy, Tower } from '@/game/core/types'
+import type { GameState, Enemy, Tower, DamageType } from '@/game/core/types'
 import { distanceBetween } from '@/game/utils/math'
-import { createMuzzleParticles } from '@/game/entities/particles'
+import { createImpactParticles, createImpactSparkSprite, createMuzzleParticles } from '@/game/entities/particles'
 import { acquireProjectile } from '@/game/utils/enhancedPool'
 import { findOptimalTargets, findTargetsInRange } from '@/game/utils/spatialGrid'
 import { logger } from '@/game/utils/logger'
 import { applyDamageToEnemy, applyDotToEnemy, applySlowToEnemy, applyVulnerability } from '@/game/utils/combat'
+import type { TelemetryCollector } from '@/game/systems/telemetry/TelemetryCollector'
 
 // Chapter 5 Performance: Optimized tower targeting with spatial partitioning
 // Prioritizes enemies closer to the goal (higher pathIndex) using efficient spatial queries
@@ -40,11 +41,47 @@ const selectTarget = (tower: Tower, enemies: Enemy[]): Enemy | null => {
   return target
 }
 
+const recordDamageEvent = (
+  telemetry: TelemetryCollector | undefined,
+  tower: Tower,
+  enemy: Enemy,
+  dealt: number,
+  beforeHealth: number,
+  damageType: DamageType,
+  isDot = false
+) => {
+  const actualDamage = Math.min(dealt, beforeHealth)
+  const overkill = Math.max(0, dealt - actualDamage)
+  enemy.lastHitBy = { towerId: tower.id, towerType: tower.type }
+  telemetry?.recordDamage({
+    tower,
+    enemyType: enemy.type,
+    damageType: damageType as any,
+    amount: actualDamage,
+    overkill,
+    isDot,
+  })
+}
+
+const getProjectileSprite = (towerType: Tower['type'], damageType: DamageType) => {
+  if (towerType === 'support') {
+    return { key: 'projectile-support', size: 30, trailColor: '#6be8ff', trailWidth: 6 }
+  }
+  if (towerType === 'sativa' || damageType === 'volley') {
+    return { key: 'projectile-volley', size: 26, trailColor: '#fdf1a2', trailWidth: 4 }
+  }
+  return { key: 'projectile-impact', size: 28, trailColor: undefined, trailWidth: 4 }
+}
+
 // Chapter 2 Balance: IMPLEMENTED TOWER ROLE DIFFERENTIATION
 // - Support: Applies timed slow effects (30% reduction, 2 seconds) + light damage
 // - Sativa: Shoots double projectiles with 60% damage per shot (maintains DPS balance)
 // - Indica: Single powerful shots for focused elimination
-export const updateTowers = (state: GameState, deltaSeconds: number): void => {
+export const updateTowers = (
+  state: GameState,
+  deltaSeconds: number,
+  telemetry?: TelemetryCollector
+): void => {
   state.towers.forEach((tower) => {
     const towerDamageType = tower.damageType ?? 'impact'
     tower.cooldown = Math.max(tower.cooldown - deltaSeconds, 0)
@@ -52,7 +89,14 @@ export const updateTowers = (state: GameState, deltaSeconds: number): void => {
     // CHAPTER 2: Support towers apply slow effects instead of shooting projectiles
     if (tower.type === 'support') {
       if (tower.cooldown <= 0) {
-        const enemiesInRange = findTargetsInRange(tower, state.enemies)
+        telemetry?.recordShot(tower)
+        let enemiesInRange = findTargetsInRange(tower, state.enemies)
+        if (enemiesInRange.length === 0) {
+          // Safety fallback if grid desyncs
+          enemiesInRange = state.enemies
+            .filter((enemy) => !enemy.isDead && !enemy.reachedGoal && distanceBetween(tower.position, enemy.position) <= tower.range)
+            .sort((a, b) => b.pathIndex - a.pathIndex)
+        }
         
         // Apply slow + DoT + vulnerability
         enemiesInRange.forEach(enemy => {
@@ -61,7 +105,7 @@ export const updateTowers = (state: GameState, deltaSeconds: number): void => {
 
           if (tower.dot) {
             const dotType = tower.dot.damageType ?? 'dot'
-            applyDotToEnemy(enemy, tower.dot.dps, tower.dot.duration, dotType, tower.id)
+            applyDotToEnemy(enemy, tower.dot.dps, tower.dot.duration, dotType, tower.id, tower.type)
           }
 
           if (tower.vulnerabilityDebuff) {
@@ -71,8 +115,15 @@ export const updateTowers = (state: GameState, deltaSeconds: number): void => {
         
         // Support towers deal light damage to enemies in range
         enemiesInRange.forEach(enemy => {
-          applyDamageToEnemy(enemy, tower.damage, towerDamageType)
+          const before = enemy.health
+          const dealt = applyDamageToEnemy(enemy, tower.damage, towerDamageType)
+          recordDamageEvent(telemetry, tower, enemy, dealt, before, towerDamageType)
         })
+
+        // Visual cue for support pulse
+        if (enemiesInRange[0]) {
+          state.particles.push(...createMuzzleParticles(tower.position, enemiesInRange[0].position, tower.color))
+        }
         
         tower.cooldown = tower.fireRate
       }
@@ -82,19 +133,29 @@ export const updateTowers = (state: GameState, deltaSeconds: number): void => {
     // CHAIN tower: direct chaining damage, no projectile
     if (tower.type === 'chain') {
       if (tower.cooldown <= 0) {
-        const candidates = findTargetsInRange(tower, state.enemies).filter(
+        let candidates = findTargetsInRange(tower, state.enemies).filter(
           (e) => !e.isDead && !e.reachedGoal
         )
+        if (candidates.length === 0) {
+          candidates = state.enemies
+            .filter((e) => !e.isDead && !e.reachedGoal && distanceBetween(tower.position, e.position) <= tower.range)
+            .sort((a, b) => b.pathIndex - a.pathIndex)
+        }
         if (candidates.length > 0) {
+          telemetry?.recordShot(tower)
           const chainJumps = tower.chainJumps ?? 2
           const falloff = tower.chainFalloff ?? 0.75
           let damage = tower.damage
           let target = candidates[0]
           const hitIds = new Set<string>()
+          state.particles.push(...createMuzzleParticles(tower.position, target.position, tower.color))
           for (let i = 0; i <= chainJumps && target; i += 1) {
             if (hitIds.has(target.id)) break
             hitIds.add(target.id)
-            applyDamageToEnemy(target, damage, towerDamageType)
+            const before = target.health
+            const dealt = applyDamageToEnemy(target, damage, towerDamageType)
+            recordDamageEvent(telemetry, tower, target, dealt, before, towerDamageType)
+            state.particles.push(createImpactSparkSprite(target.position))
             // find next closest not hit
             const next = candidates
               .filter((c) => !hitIds.has(c.id))
@@ -115,11 +176,23 @@ export const updateTowers = (state: GameState, deltaSeconds: number): void => {
     // FLAMETHROWER: cone DoT approximation (apply to all in range)
     if (tower.type === 'flamethrower') {
       if (tower.cooldown <= 0) {
-        const targets = findTargetsInRange(tower, state.enemies)
+        let targets = findTargetsInRange(tower, state.enemies)
+        if (targets.length === 0) {
+          targets = state.enemies
+            .filter((enemy) => !enemy.isDead && !enemy.reachedGoal && distanceBetween(tower.position, enemy.position) <= tower.range)
+            .sort((a, b) => b.pathIndex - a.pathIndex)
+        }
+        telemetry?.recordShot(tower)
+        if (targets[0]) {
+          state.particles.push(...createMuzzleParticles(tower.position, targets[0].position, tower.color))
+        }
         targets.forEach((enemy) => {
-          applyDamageToEnemy(enemy, tower.damage, 'burn')
+          const before = enemy.health
+          const dealt = applyDamageToEnemy(enemy, tower.damage, 'burn')
+          recordDamageEvent(telemetry, tower, enemy, dealt, before, 'burn')
+          state.particles.push(...createImpactParticles(enemy.position, '#fb923c'))
           if (tower.dot) {
-            applyDotToEnemy(enemy, tower.dot.dps, tower.dot.duration, 'burn', tower.id)
+            applyDotToEnemy(enemy, tower.dot.dps, tower.dot.duration, 'burn', tower.id, tower.type)
           }
         })
         tower.cooldown = tower.fireRate
@@ -141,19 +214,27 @@ export const updateTowers = (state: GameState, deltaSeconds: number): void => {
     const projectileCount = tower.type === 'sativa' ? 2 : 1
     const damagePerProjectile = tower.type === 'sativa' ? Math.floor(tower.damage * 0.6) : tower.damage
     
+    telemetry?.recordShot(tower)
+    const spriteMeta = getProjectileSprite(tower.type, towerDamageType)
     for (let i = 0; i < projectileCount; i++) {
-    const projectile = acquireProjectile({
-      position: { ...tower.position },
-      origin: { ...tower.position },
-      targetId: target.id,
-      speed: tower.projectileSpeed,
-      damage: damagePerProjectile,
-      color: tower.color,
-      isExpired: false,
-      damageType: towerDamageType,
-      splashRadius: tower.splashRadius,
-      splashFactor: tower.splashFactor ?? 0.5,
-    })
+      const projectile = acquireProjectile({
+        position: { ...tower.position },
+        origin: { ...tower.position },
+        targetId: target.id,
+        sourceId: tower.id,
+        sourceType: tower.type,
+        speed: tower.projectileSpeed,
+        damage: damagePerProjectile,
+        color: tower.color,
+        isExpired: false,
+        damageType: towerDamageType,
+        splashRadius: tower.splashRadius,
+        splashFactor: tower.splashFactor ?? 0.5,
+        spriteKey: spriteMeta?.key,
+        spriteSize: spriteMeta?.size,
+        trailColor: spriteMeta?.trailColor,
+        trailWidth: spriteMeta?.trailWidth,
+      })
       state.projectiles.push(projectile)
     }
 

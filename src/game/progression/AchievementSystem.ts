@@ -1,16 +1,15 @@
-import type {
-  AchievementProgress,
-  AchievementDefinition,
-  AchievementCategory,
-} from './PlayerProgress'
+import type { AchievementProgress, AchievementDefinition, AchievementCategory } from './PlayerProgress'
+import type { TowerType } from '@/game/core/types'
 import { createLogger } from '@/game/utils/logger'
 
 /**
- * AchievementSystem - Manages achievement tracking and notifications
- * Provides foundation for player engagement and progression features
+ * AchievementSystem - central manager for definitions, progress, notifications and rewards.
+ * Definitions are static, progress is provided by SaveManager or initialized here.
  */
 
 const logger = createLogger('AchievementSystem')
+
+type ProgressSeed = Partial<AchievementProgress> & { id: string }
 
 export class AchievementSystem {
   private static instance: AchievementSystem | null = null
@@ -35,18 +34,15 @@ export class AchievementSystem {
    */
   private initializeAchievements(): void {
     const defaultAchievements: AchievementDefinition[] = [
-      // Progression Achievements
       {
         id: 'first_wave',
         name: 'First Steps',
         description: 'Clear your first wave',
         category: 'progression',
         target: 1,
-        icon: '🎯',
+        icon: 'icon_seedling',
         rarity: 'common',
-        rewards: [
-          { type: 'money', value: 50, description: '50 bonus money' }
-        ],
+        rewards: [{ type: 'money', value: 50, description: '50 bonus money' }],
       },
       {
         id: 'wave_5',
@@ -54,11 +50,9 @@ export class AchievementSystem {
         description: 'Clear 5 waves',
         category: 'progression',
         target: 5,
-        icon: '🌱',
+        icon: 'icon_leaf',
         rarity: 'common',
-        rewards: [
-          { type: 'money', value: 100, description: '100 bonus money' }
-        ],
+        rewards: [{ type: 'money', value: 100, description: '100 bonus money' }],
       },
       {
         id: 'wave_10',
@@ -66,38 +60,42 @@ export class AchievementSystem {
         description: 'Clear 10 waves',
         category: 'progression',
         target: 10,
-        icon: '🌿',
-        rarity: 'common',
+        icon: 'icon_blossom',
+        rarity: 'rare',
+        rewards: [{ type: 'money', value: 200, description: '200 bonus money' }],
+      },
+      {
+        id: 'wave_20',
+        name: 'Master Cultivator',
+        description: 'Clear 20 waves',
+        category: 'progression',
+        target: 20,
+        icon: 'icon_trophy_gold',
+        rarity: 'epic',
         rewards: [
-          { type: 'money', value: 200, description: '200 bonus money' }
+          { type: 'money', value: 500, description: '500 bonus money' },
+          { type: 'title', value: 'Master Cultivator', description: 'Master Cultivator title' },
         ],
       },
       {
-        id: 'wave_25',
-        name: 'Master Cultivator',
-        description: 'Clear 25 waves',
+        id: 'tower_builder',
+        name: 'Builder at Heart',
+        description: 'Place 10 towers',
         category: 'progression',
-        target: 25,
-        icon: '🌳',
-        rarity: 'rare',
-        rewards: [
-          { type: 'money', value: 500, description: '500 bonus money' },
-          { type: 'title', value: 'Master Cultivator', description: 'Master Cultivator title' }
-        ],
+        target: 10,
+        icon: 'icon_grid',
+        rarity: 'common',
+        rewards: [{ type: 'money', value: 120, description: '120 bonus money' }],
       },
-
-      // Efficiency Achievements
       {
         id: 'efficient_defender',
         name: 'Efficient Defender',
         description: 'Complete a game with over 100 money remaining',
         category: 'efficiency',
         target: 1,
-        icon: '💰',
+        icon: 'icon_coin_stack',
         rarity: 'rare',
-        rewards: [
-          { type: 'unlock', value: 'tight_terraces', description: 'Unlock Tight Terraces map' }
-        ],
+        rewards: [{ type: 'unlock', value: 'tight_terraces', description: 'Unlock Tight Terraces map' }],
       },
       {
         id: 'money_hoarder',
@@ -105,26 +103,32 @@ export class AchievementSystem {
         description: 'End a game with over 500 money',
         category: 'efficiency',
         target: 1,
-        icon: '💎',
+        icon: 'icon_vault',
         rarity: 'epic',
         rewards: [
           { type: 'money', value: 1000, description: '1000 bonus money' },
-          { type: 'title', value: 'Hoarder', description: 'Hoarder title' }
+          { type: 'title', value: 'Hoarder', description: 'Hoarder title' },
         ],
       },
-
-      // Skill Achievements
+      {
+        id: 'peak_income',
+        name: 'Rainy Season',
+        description: 'Earn 300 money in a single wave',
+        category: 'efficiency',
+        target: 1,
+        icon: 'icon_rain',
+        rarity: 'rare',
+        rewards: [{ type: 'money', value: 250, description: '250 bonus money' }],
+      },
       {
         id: 'speed_runner',
         name: 'Speed Runner',
         description: 'Clear wave 15 in under 5 minutes',
         category: 'skill',
         target: 1,
-        icon: '⚡',
+        icon: 'icon_lightning',
         rarity: 'rare',
-        rewards: [
-          { type: 'title', value: 'Speed Runner', description: 'Speed Runner title' }
-        ],
+        rewards: [{ type: 'title', value: 'Speed Runner', description: 'Speed Runner title' }],
       },
       {
         id: 'perfect_game',
@@ -132,26 +136,32 @@ export class AchievementSystem {
         description: 'Complete a game without losing any lives',
         category: 'skill',
         target: 1,
-        icon: '🛡️',
+        icon: 'icon_shield',
         rarity: 'epic',
         rewards: [
           { type: 'money', value: 750, description: '750 bonus money' },
-          { type: 'title', value: 'Perfect Defender', description: 'Perfect Defender title' }
+          { type: 'title', value: 'Perfect Defender', description: 'Perfect Defender title' },
         ],
       },
-
-      // Exploration Achievements
+      {
+        id: 'perfect_waves_three',
+        name: 'Spotless',
+        description: 'Finish 3 waves without leaks',
+        category: 'skill',
+        target: 3,
+        icon: 'icon_clean',
+        rarity: 'rare',
+        rewards: [{ type: 'money', value: 180, description: '180 bonus money' }],
+      },
       {
         id: 'map_explorer',
         name: 'Map Explorer',
         description: 'Unlock all three difficulty levels on the default map',
         category: 'exploration',
         target: 3,
-        icon: '🗺️',
+        icon: 'icon_map',
         rarity: 'common',
-        rewards: [
-          { type: 'money', value: 300, description: '300 bonus money' }
-        ],
+        rewards: [{ type: 'money', value: 300, description: '300 bonus money' }],
       },
       {
         id: 'difficulty_master',
@@ -159,44 +169,47 @@ export class AchievementSystem {
         description: 'Complete all difficulty levels on any map',
         category: 'exploration',
         target: 3,
-        icon: '🏆',
-        rarity: 'epic',
+        icon: 'icon_compass',
+        rarity: 'legendary',
         rewards: [
           { type: 'unlock', value: 'circular_garden', description: 'Unlock Circular Garden map' },
-          { type: 'title', value: 'Master', description: 'Master title' }
+          { type: 'title', value: 'Master', description: 'Master title' },
         ],
       },
-
-      // Special/Hidden Achievements
       {
-        id: 'tower_lover',
-        name: 'Tower Lover',
-        description: 'Place 50 towers in a single game',
+        id: 'sniper_elite',
+        name: 'Sniper Elite',
+        description: 'Eliminate 50 enemies with Sniper towers',
         category: 'special',
-        target: 1,
-        icon: '🏗️',
+        target: 50,
+        icon: 'icon_crosshair',
         rarity: 'rare',
-        rewards: [
-          { type: 'money', value: 400, description: '400 bonus money' }
-        ],
-        hidden: true,
+        rewards: [{ type: 'title', value: 'Eagle Eye', description: 'Eagle Eye title' }],
       },
       {
-        id: 'early_bird',
-        name: 'Early Bird',
-        description: 'Play your first game before 9 AM',
+        id: 'chain_reaction',
+        name: 'Chain Reaction',
+        description: 'Eliminate 50 enemies with Chain towers',
         category: 'special',
-        target: 1,
-        icon: '🐦',
+        target: 50,
+        icon: 'icon_chain',
         rarity: 'rare',
-        rewards: [
-          { type: 'money', value: 200, description: '200 bonus money' }
-        ],
-        hidden: true,
+        rewards: [{ type: 'money', value: 320, description: '320 bonus money' }],
+      },
+      {
+        id: 'support_finisher',
+        name: 'Slow and Steady',
+        description: 'Score 20 kills with Support towers',
+        category: 'special',
+        target: 20,
+        icon: 'icon_support',
+        rarity: 'common',
+        rewards: [{ type: 'money', value: 150, description: '150 bonus money' }],
       },
     ]
 
-    defaultAchievements.forEach(achievement => {
+    this.achievements.clear()
+    defaultAchievements.forEach((achievement) => {
       this.achievements.set(achievement.id, achievement)
     })
   }
@@ -205,7 +218,10 @@ export class AchievementSystem {
    * Initialize progress tracking for a player
    */
   public initializeProgress(progress: AchievementProgress[]): void {
-    this.activeProgress = progress.map(p => ({ ...p })) // Create copies
+    const seed = progress ?? []
+    this.activeProgress = Array.from(this.achievements.values()).map((def) =>
+      this.createProgressRecord(def, seed.find((p) => p.id === def.id))
+    )
   }
 
   /**
@@ -226,11 +242,11 @@ export class AchievementSystem {
    * Get current achievement progress
    */
   public getProgress(): AchievementProgress[] {
-    return [...this.activeProgress]
+    return this.activeProgress.map((p) => ({ ...p, rewards: p.rewards ? [...p.rewards] : undefined }))
   }
 
   /**
-   * Check and update achievement progress
+   * Check and update achievement progress with a numeric value
    */
   public updateProgress(achievementId: string, currentValue: number): void {
     const achievement = this.achievements.get(achievementId)
@@ -239,56 +255,35 @@ export class AchievementSystem {
       return
     }
 
-    let progress = this.activeProgress.find(p => p.id === achievementId)
-    
-    // Initialize progress if not exists
-    if (!progress) {
-      progress = {
-        id: achievement.id,
-        name: achievement.name,
-        description: achievement.description,
-        category: achievement.category,
-        progress: 0,
-        target: achievement.target,
-        unlocked: false,
-        rewards: [...achievement.rewards],
-      }
-      this.activeProgress.push(progress)
-    }
-
-    // Update progress
+    const progress = this.ensureProgress(achievement)
     const oldProgress = progress.progress
     progress.progress = Math.min(currentValue, achievement.target)
-    
-    // Check if achievement just unlocked
+
     if (!progress.unlocked && progress.progress >= achievement.target && oldProgress < achievement.target) {
       progress.unlocked = true
       progress.unlockDate = new Date().toISOString()
-      
       logger.info(`Achievement unlocked: ${achievement.name}`)
-      
-      // Add to notification queue
       this.notificationQueue.push({ ...progress })
-      
-      // Apply rewards
       this.applyRewards(progress)
-      
-      // Notify subscribers
       this.notifySubscribers(progress)
     }
   }
 
   /**
-   * Check specific achievement conditions
+   * Track waves cleared aggregate
    */
-  public checkWavesCleared(wavesCleared: number): void {
-    this.updateProgress('first_wave', wavesCleared >= 1 ? 1 : 0)
-    this.updateProgress('wave_5', Math.min(wavesCleared, 5))
-    this.updateProgress('wave_10', Math.min(wavesCleared, 10))
-    this.updateProgress('wave_25', Math.min(wavesCleared, 25))
+  public trackWavesCleared(totalWavesCleared: number): void {
+    this.updateProgress('first_wave', totalWavesCleared >= 1 ? 1 : 0)
+    this.updateProgress('wave_5', Math.min(totalWavesCleared, 5))
+    this.updateProgress('wave_10', Math.min(totalWavesCleared, 10))
+    this.updateProgress('wave_20', Math.min(totalWavesCleared, 20))
   }
 
-  public checkMoneyRemaining(moneyRemaining: number): void {
+  public trackPerfectWaves(perfectWaves: number): void {
+    this.updateProgress('perfect_waves_three', perfectWaves)
+  }
+
+  public trackMoneyRemaining(moneyRemaining: number): void {
     if (moneyRemaining >= 100) {
       this.updateProgress('efficient_defender', 1)
     }
@@ -297,80 +292,65 @@ export class AchievementSystem {
     }
   }
 
-  public checkGameSpeed(waveReached: number, playTimeSeconds: number): void {
-    if (waveReached >= 15 && playTimeSeconds <= 300) { // 5 minutes
+  public trackPeakIncome(income: number): void {
+    if (income >= 300) {
+      this.updateProgress('peak_income', 1)
+    }
+  }
+
+  public trackSpeedrun(waveReached: number, playTimeSeconds: number): void {
+    if (waveReached >= 15 && playTimeSeconds <= 300) {
       this.updateProgress('speed_runner', 1)
     }
   }
 
-  public checkPerfectGame(livesLost: number): void {
+  public trackPerfectGame(livesLost: number): void {
     if (livesLost === 0) {
       this.updateProgress('perfect_game', 1)
     }
   }
 
-  public checkTowerCount(towersPlaced: number): void {
-    if (towersPlaced >= 50) {
-      this.updateProgress('tower_lover', 1)
-    }
+  public trackTowerPlacements(totalPlaced: number): void {
+    this.updateProgress('tower_builder', totalPlaced)
   }
 
-  public checkPlayTime(): void {
-    const hour = new Date().getHours()
-    if (hour < 9) { // Before 9 AM
-      this.updateProgress('early_bird', 1)
+  public trackTowerKills(towerType: TowerType, totalKills: number): void {
+    if (towerType === 'sniper') {
+      this.updateProgress('sniper_elite', totalKills)
     }
-  }
-
-  /**
-   * Apply achievement rewards
-   */
-  private applyRewards(achievement: AchievementProgress): void {
-    if (!achievement.rewards) return
-
-    achievement.rewards.forEach(reward => {
-      switch (reward.type) {
-        case 'money':
-          logger.info(`Achievement reward: +${reward.value} money`)
-          // This would trigger UI notification for bonus money
-          break
-        case 'unlock':
-          logger.info(`Achievement reward: unlocked ${reward.value}`)
-          // This would trigger map/content unlock
-          break
-        case 'title':
-          logger.info(`Achievement reward: ${reward.value} title`)
-          // This would store title for player display
-          break
-      }
-    })
+    if (towerType === 'chain') {
+      this.updateProgress('chain_reaction', totalKills)
+    }
+    if (towerType === 'support') {
+      this.updateProgress('support_finisher', totalKills)
+    }
   }
 
   /**
    * Get next achievement to unlock
    */
   public getNextAchievement(): AchievementProgress | null {
-    const lockedAchievements = this.activeProgress.filter(a => !a.unlocked)
+    const lockedAchievements = this.activeProgress.filter((a) => !a.unlocked)
     if (lockedAchievements.length === 0) return null
 
-    // Sort by progress percentage descending
-    return lockedAchievements.sort((a, b) => {
-      const aProgress = a.progress / a.target
-      const bProgress = b.progress / b.target
-      return bProgress - aProgress
-    })[0]
+    return lockedAchievements
+      .map((progress) => ({
+        ...progress,
+        ratio: progress.target === 0 ? 0 : progress.progress / progress.target,
+      }))
+      .sort((a, b) => b.ratio - a.ratio)[0]
   }
 
-  /**
-   * Get achievement notification queue
-   */
   public getNotifications(): AchievementProgress[] {
     return [...this.notificationQueue]
   }
 
-  /**
-   * Clear notification queue
-   */
+  public drainNotifications(): AchievementProgress[] {
+    const copy = [...this.notificationQueue]
+    this.notificationQueue = []
+    return copy
+  }
+
   public clearNotifications(): void {
     this.notificationQueue = []
   }
@@ -380,18 +360,69 @@ export class AchievementSystem {
    */
   public subscribe(callback: (achievement: AchievementProgress) => void): () => void {
     this.subscribers.add(callback)
-    
-    // Return unsubscribe function
-    return () => {
-      this.subscribers.delete(callback)
-    }
+    return () => this.subscribers.delete(callback)
   }
 
   /**
-   * Notify all subscribers
+   * Get achievements by category
    */
+  public getAchievementsByCategory(category: AchievementCategory): AchievementProgress[] {
+    return this.activeProgress.filter((a) => a.category === category)
+  }
+
+  public getUnlockedCount(): number {
+    return this.activeProgress.filter((a) => a.unlocked).length
+  }
+
+  public getTotalProgress(): number {
+    if (this.activeProgress.length === 0) return 0
+    const totalProgress = this.activeProgress.reduce((sum, achievement) => {
+      return sum + achievement.progress / achievement.target
+    }, 0)
+    return totalProgress / this.activeProgress.length
+  }
+
+  public resetProgress(): void {
+    this.notificationQueue = []
+    this.activeProgress = Array.from(this.achievements.values()).map((def) =>
+      this.createProgressRecord(def)
+    )
+    logger.info('Achievement progress reset')
+  }
+
+  /**
+   * Export achievement data for save file
+   */
+  public exportData(): AchievementProgress[] {
+    return this.getProgress()
+  }
+
+  /**
+   * Internal helpers
+   */
+  private applyRewards(achievement: AchievementProgress): void {
+    if (!achievement.rewards) return
+
+    achievement.rewards.forEach((reward) => {
+      switch (reward.type) {
+        case 'money':
+          logger.info(`Achievement reward: +${reward.value} money`)
+          break
+        case 'unlock':
+          logger.info(`Achievement reward: unlocked ${reward.value}`)
+          break
+        case 'title':
+          logger.info(`Achievement reward: ${reward.value} title`)
+          break
+        case 'cosmetic':
+          logger.info(`Achievement reward: cosmetic ${reward.value}`)
+          break
+      }
+    })
+  }
+
   private notifySubscribers(achievement: AchievementProgress): void {
-    this.subscribers.forEach(callback => {
+    this.subscribers.forEach((callback) => {
       try {
         callback(achievement)
       } catch (error) {
@@ -400,50 +431,35 @@ export class AchievementSystem {
     })
   }
 
-  /**
-   * Get achievements by category
-   */
-  public getAchievementsByCategory(category: AchievementCategory): AchievementProgress[] {
-    return this.activeProgress.filter(a => a.category === category)
+  private ensureProgress(def: AchievementDefinition): AchievementProgress {
+    let progress = this.activeProgress.find((p) => p.id === def.id)
+    if (!progress) {
+      progress = this.createProgressRecord(def)
+      this.activeProgress.push(progress)
+    }
+    return progress
+  }
+
+  private createProgressRecord(def: AchievementDefinition, seed?: ProgressSeed): AchievementProgress {
+    return {
+      id: def.id,
+      name: def.name,
+      description: def.description,
+      category: def.category,
+      progress: seed?.progress ?? 0,
+      target: def.target,
+      unlocked: seed?.unlocked ?? false,
+      unlockDate: seed?.unlockDate,
+      rewards: def.rewards ? [...def.rewards] : undefined,
+      rarity: def.rarity,
+      icon: def.icon,
+    }
   }
 
   /**
-   * Get unlocked achievements count
+   * Testing helper to reset singleton
    */
-  public getUnlockedCount(): number {
-    return this.activeProgress.filter(a => a.unlocked).length
-  }
-
-  /**
-   * Get total progress percentage
-   */
-  public getTotalProgress(): number {
-    if (this.activeProgress.length === 0) return 0
-
-    const totalProgress = this.activeProgress.reduce((sum, achievement) => {
-      return sum + (achievement.progress / achievement.target)
-    }, 0)
-
-    return totalProgress / this.activeProgress.length
-  }
-
-  /**
-   * Reset all progress (for testing or new player)
-   */
-  public resetProgress(): void {
-    this.activeProgress = []
-    this.notificationQueue = []
-    
-    // Reinitialize with base achievements
-    this.initializeAchievements()
-    
-    logger.info('Achievement progress reset')
-  }
-
-  /**
-   * Export achievement data for save file
-   */
-  public exportData(): AchievementProgress[] {
-    return this.activeProgress.map(a => ({ ...a }))
+  public static resetForTests(): void {
+    AchievementSystem.instance = null
   }
 }

@@ -2573,3 +2573,396 @@ input:focus-visible {
   font-size: 0.8rem;
   color: #9ca3af;
 }
+
+/* Telemetry mini dashboard */
+.telemetry-panel {
+  background: rgba(7, 16, 10, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.75rem;
+  color: #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+.telemetry-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.telemetry-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.telemetry-metrics .metric {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.telemetry-metrics .metric.warn {
+  border-color: rgba(248, 113, 113, 0.4);
+  color: #fecaca;
+}
+
+.telemetry-metrics .label {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.telemetry-metrics strong {
+  font-size: 1rem;
+}
+
+.uptime-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 50px;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.uptime-row .bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.uptime-row .bar-fill {
+  height: 100%;
+  transition: width 0.25s ease;
+}
+
+.bar-fill.slow {
+  background: linear-gradient(90deg, #34d399, #10b981);
+}
+
+.bar-fill.dot {
+  background: linear-gradient(90deg, #fb923c, #f87171);
+}
+
+.uptime-row .value {
+  font-variant-numeric: tabular-nums;
+}
+
+.top-towers .section-title,
+.warnings .section-title {
+  font-size: 0.9rem;
+  opacity: 0.85;
+  margin-bottom: 0.25rem;
+}
+
+.tower-row {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 0.4rem 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.tower-row .sub {
+  display: block;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.tower-row .meta {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.telemetry-panel .pill {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  padding: 0.1rem 0.45rem;
+  font-size: 0.75rem;
+}
+
+.telemetry-panel .pill.warn {
+  border-color: rgba(248, 113, 113, 0.6);
+  color: #fecaca;
+}
+
+.warnings ul {
+  margin: 0.25rem 0 0;
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.15rem;
+}
+
+.telemetry-toggle {
+  width: 100%;
+  border: 1px dashed rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.25);
+  color: #e2e8f0;
+  border-radius: 8px;
+  padding: 0.35rem 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.telemetry-toggle:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.telemetry-panel .empty {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+/* Achievement UI */
+.achievement-toast-stack {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.achievement-toast {
+  pointer-events: auto;
+  min-width: 240px;
+  max-width: 300px;
+  background: rgba(10, 16, 12, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 4px solid #6ee7b7;
+  border-radius: 10px;
+  padding: 10px 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.achievement-toast.epic {
+  border-left-color: #f59e0b;
+}
+.achievement-toast.legendary {
+  border-left-color: #f472b6;
+}
+
+.toast-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.rarity-pill {
+  text-transform: capitalize;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+}
+.rarity-pill.rare { border-color: #60a5fa; color: #bfdbfe; }
+.rarity-pill.epic { border-color: #f59e0b; color: #fcd34d; }
+.rarity-pill.legendary { border-color: #f472b6; color: #fbcfe8; }
+
+.toast-dismiss {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.toast-body {
+  display: flex;
+  gap: 10px;
+}
+
+.toast-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  display: grid;
+  place-items: center;
+  color: #cbd5e1;
+  font-size: 1.1rem;
+}
+
+.toast-copy .toast-title {
+  margin: 0;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.toast-copy .toast-sub {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+}
+
+.achievement-panel {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  width: 360px;
+  max-height: 70vh;
+  overflow: hidden;
+  background: rgba(9, 12, 10, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+  z-index: 35;
+  display: flex;
+  flex-direction: column;
+}
+
+.achievement-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.achievement-panel__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 12px;
+}
+
+.filter-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  color: #e2e8f0;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.filter-chip.active {
+  background: rgba(94, 234, 212, 0.14);
+  border-color: rgba(94, 234, 212, 0.4);
+  color: #a5f3fc;
+}
+
+.achievement-panel__list {
+  padding: 10px 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.achievement-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.achievement-card__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.achievement-card__copy {
+  display: flex;
+  gap: 10px;
+}
+
+.achievement-card .title {
+  margin: 0;
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+.achievement-card .desc {
+  margin: 2px 0 0;
+  color: #cbd5e1;
+  font-size: 0.9rem;
+}
+
+.icon-chip {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  display: grid;
+  place-items: center;
+  color: #cbd5e1;
+}
+
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #a3e635);
+}
+
+.progress-label {
+  color: #e2e8f0;
+  font-size: 0.8rem;
+}
+
+.unlocked-pill {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  color: #bbf7d0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+
+.target-pill {
+  background: rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+
+.close-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.empty-hint {
+  color: #cbd5e1;
+  font-size: 0.9rem;
+  margin: 12px 0;
+  opacity: 0.7;
+}

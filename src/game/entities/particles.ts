@@ -39,6 +39,42 @@ export const createHitMarker = (position: Vector2, color: string, value?: number
   value,
 })
 
+export const createImpactSparkSprite = (position: Vector2): Particle => ({
+  id: createEntityId('particle'),
+  position: { ...position },
+  velocity: { x: 0, y: 0 },
+  radius: 0,
+  life: 0.6,
+  maxLife: 0.6,
+  color: '#ffffff',
+  textureKey: 'effect-impact-spark',
+  frameCount: 30,
+  cols: 5,
+  rows: 6,
+  fps: 24,
+  size: 64,
+  additive: true,
+  baseAlpha: 0.85,
+  freezeFrame: true,
+})
+
+export const createSplashIndicatorParticle = (position: Vector2, radius: number): Particle => ({
+  id: createEntityId('particle'),
+  position: { ...position },
+  velocity: { x: 0, y: 0 },
+  radius: 0,
+  life: 0.5,
+  maxLife: 0.5,
+  color: '#6be8ff',
+  textureKey: 'effect-splash-indicator',
+  frameCount: 1,
+  cols: 1,
+  rows: 1,
+  sizeWorld: Math.max(32, radius * 2.2),
+  additive: true,
+  baseAlpha: 0.6,
+})
+
 export const createMuzzleParticles = (
   towerPosition: Vector2,
   targetPosition: Vector2,

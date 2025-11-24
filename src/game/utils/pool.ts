@@ -80,3 +80,8 @@ export const forcePoolCleanup = () => {
     projectilePool.splice(0, projectilePool.length - MAX_POOL_SIZE)
   }
 }
+
+// Test utility to ensure deterministic simulations
+export const resetProjectilePool = () => {
+  projectilePool.splice(0, projectilePool.length)
+}

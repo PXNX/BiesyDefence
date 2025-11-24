@@ -41,6 +41,13 @@ type TextureKey =
   | 'effect-motion-trail'
   | 'effect-shield'
   | 'effect-boss-glow'
+  | 'effect-impact-spark'
+  | 'effect-splash-indicator'
+  | 'effect-dot-burn'
+  | 'effect-dot-burn-strong'
+  | 'projectile-impact'
+  | 'projectile-volley'
+  | 'projectile-support'
   | 'tower-placeholder'
 
 const TOWER_TEXTURE_BY_TYPE: Record<TowerType, TextureKey> = {
@@ -79,7 +86,7 @@ const BADGE_BY_TAG: Partial<Record<EnemyTag, TextureKey>> = {
 const TEXTURE_PATHS: Record<TextureKey, string> = {
   grassBase: assetPath('/textures/grass_base.png'),
   woodBase: assetPath('/textures/wood_base.png'),
-  pathStraight: assetPath('/textures/wood_base.png'),
+  pathStraight: assetPath('/textures/path_straight.png'),
   'tower-indica': assetPath('/towers/tower_indica_build_level1.png'),
   'tower-sativa': assetPath('/towers/tower_sativa_build_level1.png'),
   'tower-support': assetPath('/towers/tower_support_build_level1.png'),
@@ -104,6 +111,13 @@ const TEXTURE_PATHS: Record<TextureKey, string> = {
   'effect-motion-trail': assetPath('/enemies/effect_motion_trail_fast.png'),
   'effect-shield': assetPath('/enemies/effect_shield_overlay.png'),
   'effect-boss-glow': assetPath('/enemies/effect_boss_glow.png'),
+  'effect-impact-spark': assetPath('/effects/impact_spark.png'),
+  'effect-splash-indicator': assetPath('/effects/splash_indicator.png'),
+  'effect-dot-burn': assetPath('/effects/dot_burn_overlay.png'),
+  'effect-dot-burn-strong': assetPath('/effects/dot_burn_overlay2.png'),
+  'projectile-impact': assetPath('/projectiles/impact_projectile.png'),
+  'projectile-volley': assetPath('/projectiles/volley_projectile.png'),
+  'projectile-support': assetPath('/projectiles/support_bolt.png'),
 }
 
 class TextureCache {
@@ -341,6 +355,21 @@ export class CanvasRenderer {
         ctx.save()
         ctx.globalAlpha = 0.35
         ctx.drawImage(glow, x - size / 2, y - size / 2, size, size)
+        ctx.restore()
+      }
+    }
+
+    // DoT overlay
+    const hasDot = enemy.effects?.dot && enemy.effects.dot.length > 0
+    if (hasDot) {
+      const hasBurn = enemy.effects.dot.some((effect) => effect.damageType === 'burn')
+      const overlayKey = hasBurn ? 'effect-dot-burn' : 'effect-dot-burn-strong'
+      const overlay = this.textureCache.getImage(overlayKey)
+      if (overlay && overlay.complete && overlay.naturalWidth > 0) {
+        ctx.save()
+        ctx.globalAlpha = 0.45
+        ctx.globalCompositeOperation = 'lighter'
+        ctx.drawImage(overlay, x - size / 2, y - size / 2, size, size)
         ctx.restore()
       }
     }
@@ -704,37 +733,57 @@ export class CanvasRenderer {
     projectiles.forEach((projectile) => {
       const origin = worldToScreen(projectile.origin.x, projectile.origin.y)
       const current = worldToScreen(projectile.position.x, projectile.position.y)
+      const dx = current.x - origin.x
+      const dy = current.y - origin.y
+      const angle = Math.atan2(dy, dx)
 
-      // Enhanced projectile trail
-      const trailGradient = ctx.createLinearGradient(origin.x, origin.y, current.x, current.y)
-      const gradientColor = ensureValidRgb(projectile.color)
-      const colorStop = (alpha: number) => formatRgba(gradientColor, alpha)
-      trailGradient.addColorStop(0, colorStop(0))
-      trailGradient.addColorStop(0.5, colorStop(0.8))
-      trailGradient.addColorStop(1, colorStop(1))
-      
-      ctx.strokeStyle = trailGradient
-      ctx.lineWidth = 4
-      ctx.globalAlpha = 0.8
-      ctx.beginPath()
-      ctx.moveTo(origin.x, origin.y)
-      ctx.lineTo(current.x, current.y)
-      ctx.stroke()
-      ctx.globalAlpha = 1
+      // Trail (custom color/width optional)
+      const trailColor = projectile.trailColor ?? projectile.color
+      const trailWidth = projectile.trailWidth ?? 4
+      if (trailColor) {
+        const gradientColor = ensureValidRgb(trailColor)
+        const trailGradient = ctx.createLinearGradient(origin.x, origin.y, current.x, current.y)
+        const colorStop = (alpha: number) => formatRgba(gradientColor, alpha)
+        trailGradient.addColorStop(0, colorStop(0))
+        trailGradient.addColorStop(0.5, colorStop(0.8))
+        trailGradient.addColorStop(1, colorStop(1))
+        ctx.strokeStyle = trailGradient
+        ctx.lineWidth = trailWidth
+        ctx.globalAlpha = 0.9
+        ctx.beginPath()
+        ctx.moveTo(origin.x, origin.y)
+        ctx.lineTo(current.x, current.y)
+        ctx.stroke()
+        ctx.globalAlpha = 1
+      }
 
-      // Enhanced projectile head
-      ctx.fillStyle = projectile.color
-      ctx.beginPath()
-      ctx.arc(current.x, current.y, 6, 0, Math.PI * 2)
-      ctx.fill()
-      ctx.fillStyle = 'rgba(255,255,255,0.6)'
-      ctx.beginPath()
-      ctx.arc(current.x - 1, current.y - 1, 4, 0, Math.PI * 2)
-      ctx.fill()
+      const spriteKey = projectile.spriteKey as TextureKey | undefined
+      const sprite = spriteKey ? this.textureCache.getImage(spriteKey) : null
+      const hasSprite = sprite && sprite.complete && sprite.naturalWidth > 0
+
+      if (hasSprite && sprite) {
+        const size = projectile.spriteSize ?? 28
+        ctx.save()
+        ctx.translate(current.x, current.y)
+        ctx.rotate(angle)
+        ctx.globalAlpha = 0.96
+        ctx.drawImage(sprite, -size / 2, -size / 2, size, size)
+        ctx.restore()
+      } else {
+        // Fallback vector projectile
+        ctx.fillStyle = projectile.color
+        ctx.beginPath()
+        ctx.arc(current.x, current.y, 6, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.fillStyle = 'rgba(255,255,255,0.6)'
+        ctx.beginPath()
+        ctx.arc(current.x - 1, current.y - 1, 4, 0, Math.PI * 2)
+        ctx.fill()
+      }
     })
 
     // Enhanced particle system
-    this.drawParticles(ctx, particles, worldToScreen, debugSettings?.showDamageNumbers !== false)
+    this.drawParticles(ctx, particles, worldToScreen, debugSettings?.showDamageNumbers !== false, scale)
 
     // Enhanced enemy rendering
     enemies.forEach((enemy) => {
@@ -892,12 +941,17 @@ export class CanvasRenderer {
     })
   }
 
-  private drawParticles(ctx: CanvasRenderingContext2D, particles: any[], worldToScreen: Function, showDamageNumbers: boolean): void {
-    // Enhanced particle rendering with better visibility
+  private drawParticles(
+    ctx: CanvasRenderingContext2D,
+    particles: any[],
+    worldToScreen: Function,
+    showDamageNumbers: boolean,
+    scale: number
+  ): void {
     particles.forEach((particle) => {
       const { x, y } = worldToScreen(particle.position.x, particle.position.y)
       const lifeRatio = Math.max(0, Math.min(1, particle.life))
-      
+
       if (particle.kind === 'damage') {
         if (!showDamageNumbers) {
           return
@@ -910,19 +964,58 @@ export class CanvasRenderer {
         ctx.globalAlpha = 1
         return
       }
-      
-      // Enhanced particle appearance
+
+      const textureKey = particle.textureKey as TextureKey | undefined
+      const image = textureKey ? this.textureCache.getImage(textureKey) : null
+      const hasSprite = image && image.complete && image.naturalWidth > 0
+
+      if (hasSprite && image) {
+        const frameCount = Math.max(1, particle.frameCount ?? 1)
+        const cols = Math.max(1, particle.cols ?? frameCount)
+        const rows = Math.max(1, particle.rows ?? 1)
+        const fps = particle.fps ?? frameCount / Math.max(particle.maxLife || 0.001, 0.001)
+        const elapsed = (particle.maxLife ?? 0) - particle.life
+        const rawFrame = Math.floor(elapsed * fps)
+        const frameIndex = particle.freezeFrame
+          ? Math.min(frameCount - 1, Math.max(0, rawFrame))
+          : rawFrame % frameCount
+        const frameW = image.naturalWidth / cols
+        const frameH = image.naturalHeight / rows
+        const sx = (frameIndex % cols) * frameW
+        const sy = Math.floor(frameIndex / cols) * frameH
+        const sizePx =
+          particle.size ??
+          (particle.sizeWorld ? particle.sizeWorld * scale : Math.max(16, particle.radius * 2 || 32))
+        const alpha = (particle.baseAlpha ?? 1) * lifeRatio
+        const rotation =
+          particle.rotateToVelocity && (particle.velocity.x !== 0 || particle.velocity.y !== 0)
+            ? Math.atan2(particle.velocity.y, particle.velocity.x)
+            : 0
+
+        ctx.save()
+        if (particle.additive) {
+          ctx.globalCompositeOperation = 'lighter'
+        }
+        ctx.globalAlpha = alpha
+        ctx.translate(x, y)
+        if (rotation !== 0) {
+          ctx.rotate(rotation)
+        }
+        ctx.drawImage(image, sx, sy, frameW, frameH, -sizePx / 2, -sizePx / 2, sizePx, sizePx)
+        ctx.restore()
+        return
+      }
+
+      // Fallback vector particle
       ctx.globalAlpha = lifeRatio
       ctx.fillStyle = particle.color
-      
-      // Add glow effect to particles
       ctx.shadowColor = particle.color
       ctx.shadowBlur = 4
-      
+
       ctx.beginPath()
       ctx.arc(x, y, particle.radius, 0, Math.PI * 2)
       ctx.fill()
-      
+
       if (particle.kind === 'hit') {
         ctx.strokeStyle = '#fef08a'
         ctx.lineWidth = 2
@@ -933,8 +1026,7 @@ export class CanvasRenderer {
         ctx.lineTo(x, y + 6)
         ctx.stroke()
       }
-      
-      // Reset shadow
+
       ctx.shadowBlur = 0
       ctx.globalAlpha = 1
     })

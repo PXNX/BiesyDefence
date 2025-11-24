@@ -488,4 +488,11 @@ export class MapManager {
     this.currentMap = defaultMap
     this.currentDifficulty = 'normal'
   }
+
+  /**
+   * Test-only reset to clear singleton state for deterministic harness runs.
+   */
+  public static resetForTests(): void {
+    MapManager.instance = null
+  }
 }

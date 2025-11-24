@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 import { GameController } from '@/game/core/GameController'
-import type { GameSnapshot, GameStatus, TowerType, EnemyType } from '@/game/core/types'
+import type { GameSnapshot, GameStatus, TowerType, EnemyType, AchievementView } from '@/game/core/types'
 import { StatsCornerLayout } from '@/ui/components/StatsCornerLayout'
 import { GameControlPanel } from '@/ui/components/GameControlPanel'
 import { SpawnTicker } from '@/ui/components/SpawnTicker'
@@ -9,9 +9,12 @@ import { TowerIconBar } from '@/ui/components/TowerIconBar'
 import { WavePreviewPanel } from '@/ui/components/WavePreviewPanel'
 import { WaveSummaryCard } from '@/ui/components/WaveSummaryCard'
 import { EnemyIntelPanel } from '@/ui/components/EnemyIntelPanel'
+import { AchievementToast } from '@/ui/components/AchievementToast'
+import { AchievementPanel } from '@/ui/components/AchievementPanel'
 import { audioManager } from '@/game/audio/AudioManager'
 import type { AudioConfig } from '@/game/audio/AudioManager'
 import { ErrorBoundary } from '@/ui/components/ErrorBoundary'
+import { TelemetryPanel } from '@/ui/components/TelemetryPanel'
 
 const initialTower: TowerType = 'indica'
 
@@ -41,6 +44,9 @@ function App() {
   const [liveAnnouncement, setLiveAnnouncement] = useState<string | null>(null)
   const prevStatusRef = useRef<GameStatus | null>(null)
   const announcementTimerRef = useRef<number | null>(null)
+  const [showTelemetryPanel, setShowTelemetryPanel] = useState(true)
+  const [showAchievementPanel, setShowAchievementPanel] = useState(false)
+  const [achievementToasts, setAchievementToasts] = useState<AchievementView[]>([])
 
   useEffect(() => {
     const initializeAudio = async () => {
@@ -209,6 +215,27 @@ function App() {
   }, [snapshot])
 
   useEffect(() => {
+    if (!snapshot?.achievementNotifications || snapshot.achievementNotifications.length === 0) {
+      return
+    }
+
+    setAchievementToasts((prev) => {
+      const existing = new Set(prev.map((a) => a.id))
+      const fresh = snapshot.achievementNotifications!.filter((item) => !existing.has(item.id))
+      fresh.forEach((item) => {
+        window.setTimeout(() => {
+          setAchievementToasts((current) => current.filter((t) => t.id !== item.id))
+        }, 4200)
+      })
+      return [...prev, ...fresh]
+    })
+  }, [snapshot?.achievementNotifications])
+
+  const dismissToast = useCallback((id: string) => {
+    setAchievementToasts((prev) => prev.filter((item) => item.id !== id))
+  }, [])
+
+  useEffect(() => {
     return () => {
       if (announcementTimerRef.current) {
         window.clearTimeout(announcementTimerRef.current)
@@ -301,6 +328,9 @@ function App() {
   const handleToggleHowToPlay = () => {
     setShowHowToPlay((prev) => !prev)
   }
+  const handleToggleTelemetry = useCallback(() => {
+    setShowTelemetryPanel((prev) => !prev)
+  }, [])
 
   // Audio control handlers
   const handleMasterVolumeChange = (volume: number) => {
@@ -389,6 +419,10 @@ function App() {
             handleNextWave()
           }
           break
+        case 'KeyT':
+          event.preventDefault()
+          handleToggleTelemetry()
+          break
         case 'Digit1':
           event.preventDefault()
           handleSpeedChange(1)
@@ -426,6 +460,7 @@ function App() {
     handleNextWave,
     handleSpeedChange,
     handleRetry,
+    handleToggleTelemetry,
     showGameOverOverlay,
   ])
 
@@ -513,12 +548,12 @@ function App() {
                     speed={snapshot.gameSpeed ?? 1}
                     onSpeedChange={handleSpeedChange}
                     isPaused={snapshot.status === 'paused'}
-                  onPauseToggle={handlePause}
-                  audioConfig={audioConfig}
-                  onToggleMute={handleToggleMute}
-                  onMasterVolumeChange={handleMasterVolumeChange}
-                  hoverTower={snapshot.hoverTower}
-                />
+                    onPauseToggle={handlePause}
+                    audioConfig={audioConfig}
+                    onToggleMute={handleToggleMute}
+                    onMasterVolumeChange={handleMasterVolumeChange}
+                    hoverTower={snapshot.hoverTower}
+                  />
                   <TowerIconBar
                     className="tower-dock-bar"
                     orientation="vertical"
@@ -526,6 +561,12 @@ function App() {
                     onSelectTower={(towerType: string) => handleSelectTower(towerType as TowerType)}
                     feedback={feedback}
                     money={snapshot?.money ?? 0}
+                  />
+                  <TelemetryPanel
+                    telemetry={snapshot.telemetry}
+                    warnings={snapshot.balanceWarnings ?? []}
+                    visible={showTelemetryPanel}
+                    onToggle={handleToggleTelemetry}
                   />
                 </aside>
               )}
@@ -556,6 +597,15 @@ function App() {
                   <div className="meta-pill">
                     <span>Wave</span>
                     <strong>{waveLabel}</strong>
+                  </div>
+                  <div className="meta-pill">
+                    <button
+                      type="button"
+                      className="ghost"
+                      onClick={() => setShowAchievementPanel((prev) => !prev)}
+                    >
+                      Achievements
+                    </button>
                   </div>
                 </div>
               </div>
@@ -644,6 +694,14 @@ function App() {
           </button>
         </div>
       </div>
+      <AchievementToast items={achievementToasts} onDismiss={dismissToast} />
+      {snapshot && (
+        <AchievementPanel
+          achievements={snapshot.achievements ?? []}
+          visible={showAchievementPanel}
+          onClose={() => setShowAchievementPanel(false)}
+        />
+      )}
     </div>
   </ErrorBoundary>
   )

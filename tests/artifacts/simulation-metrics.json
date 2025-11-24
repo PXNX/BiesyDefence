@@ -1,0 +1,566 @@
+[
+  {
+    "difficulty": "normal",
+    "mapId": "default",
+    "seed": 1337,
+    "waves": [
+      {
+        "dps": 296000,
+        "dpsPerDollar": 2041.3793103448277,
+        "leaks": 0,
+        "overkillPercent": 18.243243243243242,
+        "reward": 26,
+        "score": 96,
+        "wave": 1
+      },
+      {
+        "dps": 6.8486916951080765,
+        "dpsPerDollar": 0.04723235651798673,
+        "leaks": 0,
+        "overkillPercent": 5.647840531561462,
+        "reward": 46,
+        "score": 195,
+        "wave": 2
+      },
+      {
+        "dps": 8.452508004268942,
+        "dpsPerDollar": 0.058293158650130635,
+        "leaks": 0,
+        "overkillPercent": 4.545454545454546,
+        "reward": 61,
+        "score": 316,
+        "wave": 3
+      },
+      {
+        "dps": 6.78281068524971,
+        "dpsPerDollar": 0.04677800472586007,
+        "leaks": 0,
+        "overkillPercent": 13.698630136986301,
+        "reward": 74,
+        "score": 372,
+        "wave": 4
+      },
+      {
+        "dps": 9.14285714285714,
+        "dpsPerDollar": 0.06305418719211821,
+        "leaks": 0,
+        "overkillPercent": 5.724789915966388,
+        "reward": 88,
+        "score": 426,
+        "wave": 5
+      },
+      {
+        "dps": 13.417849898580124,
+        "dpsPerDollar": 0.09253689585227672,
+        "leaks": 0,
+        "overkillPercent": 8.488284202569918,
+        "reward": 107,
+        "score": 590,
+        "wave": 6
+      },
+      {
+        "dps": 8.160813308687613,
+        "dpsPerDollar": 0.05628147109439734,
+        "leaks": 0,
+        "overkillPercent": 1.9026047565118949,
+        "reward": 120,
+        "score": 629,
+        "wave": 7
+      },
+      {
+        "dps": 10.801335559265443,
+        "dpsPerDollar": 0.07449196937424443,
+        "leaks": 0,
+        "overkillPercent": 5.757341576506955,
+        "reward": 140,
+        "score": 748,
+        "wave": 8
+      },
+      {
+        "dps": 12.71166666666667,
+        "dpsPerDollar": 0.08766666666666668,
+        "leaks": 0,
+        "overkillPercent": 2.1109217254490633,
+        "reward": 162,
+        "score": 935,
+        "wave": 9
+      },
+      {
+        "dps": 10.213096559378469,
+        "dpsPerDollar": 0.07043514868536875,
+        "leaks": 0,
+        "overkillPercent": 1.0867202782003913,
+        "reward": 180,
+        "score": 977,
+        "wave": 10
+      },
+      {
+        "dps": 11.281276238455076,
+        "dpsPerDollar": 0.07780190509279362,
+        "leaks": 0,
+        "overkillPercent": 6.609109854123255,
+        "reward": 202,
+        "score": 1091,
+        "wave": 11
+      },
+      {
+        "dps": 10.251633986928098,
+        "dpsPerDollar": 0.07070092404777999,
+        "leaks": 0,
+        "overkillPercent": 2.2314313037934346,
+        "reward": 221,
+        "score": 1131,
+        "wave": 12
+      },
+      {
+        "dps": 12.352891156462583,
+        "dpsPerDollar": 0.08519235280319022,
+        "leaks": 0,
+        "overkillPercent": 1.734700901769123,
+        "reward": 247,
+        "score": 1273,
+        "wave": 13
+      },
+      {
+        "dps": 10.188099808061422,
+        "dpsPerDollar": 0.07026275729697531,
+        "leaks": 0,
+        "overkillPercent": 5.04898266767145,
+        "reward": 268,
+        "score": 1301,
+        "wave": 14
+      },
+      {
+        "dps": 13.7703141928494,
+        "dpsPerDollar": 0.09496768408861656,
+        "leaks": 0,
+        "overkillPercent": 0.8182533438237632,
+        "reward": 289,
+        "score": 1331,
+        "wave": 15
+      },
+      {
+        "dps": 11.006012024048097,
+        "dpsPerDollar": 0.0759035312003317,
+        "leaks": 0,
+        "overkillPercent": 0.5462490895848506,
+        "reward": 312,
+        "score": 1354,
+        "wave": 16
+      },
+      {
+        "dps": 13.191564147627414,
+        "dpsPerDollar": 0.09097630446639596,
+        "leaks": 0,
+        "overkillPercent": 3.037569944044767,
+        "reward": 338,
+        "score": 1422,
+        "wave": 17
+      },
+      {
+        "dps": 9.235820895522389,
+        "dpsPerDollar": 0.06369531652084406,
+        "leaks": 0,
+        "overkillPercent": 2.8442146089204954,
+        "reward": 363,
+        "score": 1450,
+        "wave": 18
+      },
+      {
+        "dps": 12.062797335870597,
+        "dpsPerDollar": 0.08319170576462481,
+        "leaks": 0,
+        "overkillPercent": 2.650260293421679,
+        "reward": 390,
+        "score": 1492,
+        "wave": 19
+      },
+      {
+        "dps": 15.740177439797211,
+        "dpsPerDollar": 0.10855294786067042,
+        "leaks": 0,
+        "overkillPercent": 7.294806249248148e-15,
+        "reward": 417,
+        "score": 1492,
+        "wave": 20
+      }
+    ],
+    "wavesRun": 20
+  },
+  {
+    "difficulty": "normal",
+    "mapId": "canyon_split",
+    "seed": 1337,
+    "waves": [
+      {
+        "dps": 322000,
+        "dpsPerDollar": 2220.689655172414,
+        "leaks": 0,
+        "overkillPercent": 17.391304347826086,
+        "reward": 27,
+        "score": 112,
+        "wave": 1
+      },
+      {
+        "dps": 5.911431513903193,
+        "dpsPerDollar": 0.040768493199332366,
+        "leaks": 0,
+        "overkillPercent": 14.285714285714285,
+        "reward": 47,
+        "score": 211,
+        "wave": 2
+      },
+      {
+        "dps": 9.072978303747535,
+        "dpsPerDollar": 0.0625722641637761,
+        "leaks": 0,
+        "overkillPercent": 1.3043478260869565,
+        "reward": 64,
+        "score": 380,
+        "wave": 3
+      },
+      {
+        "dps": 6.410256410256411,
+        "dpsPerDollar": 0.04420866489832007,
+        "leaks": 0,
+        "overkillPercent": 9.333333333333334,
+        "reward": 79,
+        "score": 468,
+        "wave": 4
+      },
+      {
+        "dps": 9.816979051819178,
+        "dpsPerDollar": 0.0677033038056495,
+        "leaks": 0,
+        "overkillPercent": 10.017969451931723,
+        "reward": 95,
+        "score": 601,
+        "wave": 5
+      },
+      {
+        "dps": 13.432921027592778,
+        "dpsPerDollar": 0.09264083467305365,
+        "leaks": 0,
+        "overkillPercent": 9.151437880719644,
+        "reward": 114,
+        "score": 773,
+        "wave": 6
+      },
+      {
+        "dps": 9.947546531302876,
+        "dpsPerDollar": 0.06860376918139914,
+        "leaks": 0,
+        "overkillPercent": 3.0277258037081167,
+        "reward": 131,
+        "score": 859,
+        "wave": 7
+      },
+      {
+        "dps": 10.8887171561051,
+        "dpsPerDollar": 0.0750946010765869,
+        "leaks": 0,
+        "overkillPercent": 4.82611781405252,
+        "reward": 151,
+        "score": 977,
+        "wave": 8
+      },
+      {
+        "dps": 11.491499227202471,
+        "dpsPerDollar": 0.0792517188082929,
+        "leaks": 0,
+        "overkillPercent": 2.9186281102891747,
+        "reward": 174,
+        "score": 1177,
+        "wave": 9
+      },
+      {
+        "dps": 11.130081300813002,
+        "dpsPerDollar": 0.07675918138491725,
+        "leaks": 0,
+        "overkillPercent": 0.9130752373995623,
+        "reward": 192,
+        "score": 1200,
+        "wave": 10
+      },
+      {
+        "dps": 12.057722308892357,
+        "dpsPerDollar": 0.08315670557856798,
+        "leaks": 0,
+        "overkillPercent": 4.709535515590634,
+        "reward": 215,
+        "score": 1342,
+        "wave": 11
+      },
+      {
+        "dps": 10.7071320182094,
+        "dpsPerDollar": 0.07384228978075448,
+        "leaks": 0,
+        "overkillPercent": 0.4251700680272112,
+        "reward": 235,
+        "score": 1382,
+        "wave": 12
+      },
+      {
+        "dps": 13.026898734177214,
+        "dpsPerDollar": 0.0898406809253601,
+        "leaks": 0,
+        "overkillPercent": 2.0405684440665643,
+        "reward": 259,
+        "score": 1488,
+        "wave": 13
+      },
+      {
+        "dps": 10.238305383936444,
+        "dpsPerDollar": 0.07060900264783754,
+        "leaks": 0,
+        "overkillPercent": 4.620689655172429,
+        "reward": 280,
+        "score": 1516,
+        "wave": 14
+      },
+      {
+        "dps": 15.010040160642564,
+        "dpsPerDollar": 0.10351751834925907,
+        "leaks": 0,
+        "overkillPercent": 0.4816053511705721,
+        "reward": 304,
+        "score": 1559,
+        "wave": 15
+      },
+      {
+        "dps": 11.961397058823518,
+        "dpsPerDollar": 0.08249239350912771,
+        "leaks": 0,
+        "overkillPercent": 0.4610419548178889,
+        "reward": 328,
+        "score": 1582,
+        "wave": 16
+      },
+      {
+        "dps": 13.302782324058912,
+        "dpsPerDollar": 0.09174332637282008,
+        "leaks": 0,
+        "overkillPercent": 3.740157480314964,
+        "reward": 355,
+        "score": 1664,
+        "wave": 17
+      },
+      {
+        "dps": 9.095238095238095,
+        "dpsPerDollar": 0.06272577996715928,
+        "leaks": 0,
+        "overkillPercent": 1.3290374546919084,
+        "reward": 380,
+        "score": 1678,
+        "wave": 18
+      },
+      {
+        "dps": 12.498226950354605,
+        "dpsPerDollar": 0.0861946686231352,
+        "leaks": 0,
+        "overkillPercent": 2.298198326003693,
+        "reward": 409,
+        "score": 1733,
+        "wave": 19
+      },
+      {
+        "dps": 14.940490081680275,
+        "dpsPerDollar": 0.10303786263227777,
+        "leaks": 0,
+        "overkillPercent": 0,
+        "reward": 437,
+        "score": 1733,
+        "wave": 20
+      }
+    ],
+    "wavesRun": 20
+  },
+  {
+    "difficulty": "normal",
+    "mapId": "tri_route",
+    "seed": 1337,
+    "waves": [
+      {
+        "dps": 302000,
+        "dpsPerDollar": 2082.7586206896553,
+        "leaks": 0,
+        "overkillPercent": 20.52980132450331,
+        "reward": 26,
+        "score": 80,
+        "wave": 1
+      },
+      {
+        "dps": 5.155004428697962,
+        "dpsPerDollar": 0.035551754680675604,
+        "leaks": 0,
+        "overkillPercent": 4.4673539518900345,
+        "reward": 45,
+        "score": 166,
+        "wave": 2
+      },
+      {
+        "dps": 7,
+        "dpsPerDollar": 0.04827586206896552,
+        "leaks": 0,
+        "overkillPercent": 13.30049261083744,
+        "reward": 61,
+        "score": 287,
+        "wave": 3
+      },
+      {
+        "dps": 5.6880733944954125,
+        "dpsPerDollar": 0.03922809237583043,
+        "leaks": 0,
+        "overkillPercent": 11.612903225806452,
+        "reward": 74,
+        "score": 347,
+        "wave": 4
+      },
+      {
+        "dps": 8.443916349809882,
+        "dpsPerDollar": 0.05823390586075781,
+        "leaks": 0,
+        "overkillPercent": 6.709445007317353,
+        "reward": 88,
+        "score": 427,
+        "wave": 5
+      },
+      {
+        "dps": 12.127768313458267,
+        "dpsPerDollar": 0.08363978147212597,
+        "leaks": 0,
+        "overkillPercent": 8.16828206208737,
+        "reward": 107,
+        "score": 591,
+        "wave": 6
+      },
+      {
+        "dps": 8.262079062957541,
+        "dpsPerDollar": 0.056979855606603735,
+        "leaks": 0,
+        "overkillPercent": 4.678362573099416,
+        "reward": 122,
+        "score": 669,
+        "wave": 7
+      },
+      {
+        "dps": 9.096467391304348,
+        "dpsPerDollar": 0.06273425787106447,
+        "leaks": 0,
+        "overkillPercent": 2.9873039581777445,
+        "reward": 141,
+        "score": 787,
+        "wave": 8
+      },
+      {
+        "dps": 11.012898845892732,
+        "dpsPerDollar": 0.07595102652339815,
+        "leaks": 0,
+        "overkillPercent": 1.4054987054617207,
+        "reward": 166,
+        "score": 1011,
+        "wave": 9
+      },
+      {
+        "dps": 8.488147497805093,
+        "dpsPerDollar": 0.058538948260724775,
+        "leaks": 0,
+        "overkillPercent": 1.86181216383947,
+        "reward": 183,
+        "score": 1034,
+        "wave": 10
+      },
+      {
+        "dps": 10.786254295532647,
+        "dpsPerDollar": 0.07438796065884584,
+        "leaks": 0,
+        "overkillPercent": 5.021027144131517,
+        "reward": 208,
+        "score": 1200,
+        "wave": 11
+      },
+      {
+        "dps": 8.907395069953358,
+        "dpsPerDollar": 0.061430310827264537,
+        "leaks": 0,
+        "overkillPercent": 2.0942408376963364,
+        "reward": 227,
+        "score": 1240,
+        "wave": 12
+      },
+      {
+        "dps": 11.476190476190476,
+        "dpsPerDollar": 0.07914614121510673,
+        "leaks": 0,
+        "overkillPercent": 2.5628508664876746,
+        "reward": 254,
+        "score": 1410,
+        "wave": 13
+      },
+      {
+        "dps": 9.160945842868033,
+        "dpsPerDollar": 0.06317893684736575,
+        "leaks": 0,
+        "overkillPercent": 1.0657785179017638,
+        "reward": 275,
+        "score": 1438,
+        "wave": 14
+      },
+      {
+        "dps": 12.483156028368791,
+        "dpsPerDollar": 0.0860907312301296,
+        "leaks": 0,
+        "overkillPercent": 0.738583907392944,
+        "reward": 297,
+        "score": 1468,
+        "wave": 15
+      },
+      {
+        "dps": 9.844073190135232,
+        "dpsPerDollar": 0.06789015993196712,
+        "leaks": 0,
+        "overkillPercent": 1.1314045579440775,
+        "reward": 321,
+        "score": 1491,
+        "wave": 16
+      },
+      {
+        "dps": 11.61248185776487,
+        "dpsPerDollar": 0.08008608177768875,
+        "leaks": 0,
+        "overkillPercent": 2.8496437945256865,
+        "reward": 345,
+        "score": 1533,
+        "wave": 17
+      },
+      {
+        "dps": 7.261734287987271,
+        "dpsPerDollar": 0.05008092612405014,
+        "leaks": 0,
+        "overkillPercent": 2.892199824715166,
+        "reward": 371,
+        "score": 1561,
+        "wave": 18
+      },
+      {
+        "dps": 10.960125097732599,
+        "dpsPerDollar": 0.07558706963953517,
+        "leaks": 0,
+        "overkillPercent": 1.5979454986446036,
+        "reward": 398,
+        "score": 1589,
+        "wave": 19
+      },
+      {
+        "dps": 13.364467005076138,
+        "dpsPerDollar": 0.09216873796604233,
+        "leaks": 0,
+        "overkillPercent": 1.3763931754696566e-14,
+        "reward": 425,
+        "score": 1589,
+        "wave": 20
+      }
+    ],
+    "wavesRun": 20
+  }
+]

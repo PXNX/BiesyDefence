@@ -3,6 +3,7 @@ import type {
   SaveFile,
   AchievementProgress,
 } from './PlayerProgress'
+import { AchievementSystem } from './AchievementSystem'
 import { createLogger } from '@/game/utils/logger'
 
 /**
@@ -15,15 +16,17 @@ const logger = createLogger('SaveManager')
 export class SaveManager {
   private static instance: SaveManager | null = null
   private readonly STORAGE_KEY = 'biesydefence_save'
-  private readonly SAVE_VERSION = '1.0.0'
+  private readonly SAVE_VERSION = '1.1.0'
   private readonly GAME_VERSION = '0.1.0'
   
   private currentProgress?: PlayerProgress
   private savePending = false
   private saveQueue: Array<() => void> = []
+  private autosaveTimer?: number
 
   private constructor() {
     this.initializeSaveSystem()
+    this.startAutosaveTimer()
   }
 
   public static getInstance(): SaveManager {
@@ -31,6 +34,13 @@ export class SaveManager {
       SaveManager.instance = new SaveManager()
     }
     return SaveManager.instance
+  }
+
+  public static resetForTests(): void {
+    if (SaveManager.instance?.autosaveTimer) {
+      clearInterval(SaveManager.instance.autosaveTimer)
+    }
+    SaveManager.instance = null
   }
 
   /**
@@ -123,68 +133,19 @@ export class SaveManager {
    * Initialize default achievement system
    */
   private initializeDefaultAchievements(): AchievementProgress[] {
-    return [
-      {
-        id: 'first_wave',
-        name: 'First Steps',
-        description: 'Clear your first wave',
-        category: 'progression',
-        progress: 0,
-        target: 1,
-        unlocked: false,
-        rewards: [{ type: 'money', value: 50, description: '50 bonus money' }],
-      },
-      {
-        id: 'wave_5',
-        name: 'Getting Started',
-        description: 'Clear 5 waves',
-        category: 'progression',
-        progress: 0,
-        target: 5,
-        unlocked: false,
-        rewards: [{ type: 'money', value: 100, description: '100 bonus money' }],
-      },
-      {
-        id: 'wave_10',
-        name: 'Growing Strong',
-        description: 'Clear 10 waves',
-        category: 'progression',
-        progress: 0,
-        target: 10,
-        unlocked: false,
-        rewards: [{ type: 'money', value: 200, description: '200 bonus money' }],
-      },
-      {
-        id: 'efficient_defender',
-        name: 'Efficient Defender',
-        description: 'Complete a game with over 100 money remaining',
-        category: 'efficiency',
-        progress: 0,
-        target: 1,
-        unlocked: false,
-        rewards: [{ type: 'unlock', value: 'tight_terraces', description: 'Unlock Tight Terraces map' }],
-      },
-      {
-        id: 'speed_runner',
-        name: 'Speed Runner',
-        description: 'Clear wave 15 in under 5 minutes',
-        category: 'skill',
-        progress: 0,
-        target: 1,
-        unlocked: false,
-        rewards: [{ type: 'title', value: 'Speed Runner', description: 'Speed Runner title' }],
-      },
-      {
-        id: 'map_explorer',
-        name: 'Map Explorer',
-        description: 'Unlock all three difficulty levels on the default map',
-        category: 'exploration',
-        progress: 0,
-        target: 3,
-        unlocked: false,
-        rewards: [{ type: 'money', value: 300, description: '300 bonus money' }],
-      },
-    ]
+    const achievementSystem = AchievementSystem.getInstance()
+    return achievementSystem.getAchievementDefinitions().map((def) => ({
+      id: def.id,
+      name: def.name,
+      description: def.description,
+      category: def.category,
+      progress: 0,
+      target: def.target,
+      unlocked: false,
+      rewards: def.rewards ? [...def.rewards] : undefined,
+      rarity: def.rarity,
+      icon: def.icon,
+    }))
   }
 
   /**
@@ -198,6 +159,10 @@ export class SaveManager {
       }
 
       const parsedData = JSON.parse(savedData) as SaveFile
+      if (!this.validateSaveFile(parsedData)) {
+        logger.warn('Corrupted save detected, resetting to defaults')
+        return null
+      }
       return parsedData.progress
     } catch (error) {
       logger.error('Failed to load save data:', error)
@@ -212,18 +177,20 @@ export class SaveManager {
     // Basic migration logic - can be extended for future versions
     if (progress.version !== this.SAVE_VERSION) {
       logger.info(`Migrating save data from version ${progress.version} to ${this.SAVE_VERSION}`)
-      
+
       // Add default fields if missing
       progress.version = this.SAVE_VERSION
       progress.saveDate = new Date().toISOString()
-      
-      // Migrate from older versions here
-      if (progress.version === '0.1.0') {
-        // Add new fields with default values
-        if (!progress.customContent) {
-          progress.customContent = {
-            customMaps: [],
-          }
+
+      if (!progress.customContent) {
+        progress.customContent = { customMaps: [] }
+      }
+
+      if (!progress.personalRecords) {
+        progress.personalRecords = {
+          fastestWin: { wave: 0, time: 0, mapId: '' },
+          highestMoneyEnd: { wave: 0, money: 0, mapId: '' },
+          mostTowersPlaced: { wave: 0, count: 0, mapId: '' },
         }
       }
     }
@@ -423,6 +390,22 @@ export class SaveManager {
   }
 
   /**
+   * Start autosave timer every 60s
+   */
+  private startAutosaveTimer(): void {
+    const timer = setInterval(() => this.performSave(), 60000)
+    // store timer id for cleanup if needed
+    this.autosaveTimer = timer as unknown as number
+  }
+
+  /**
+   * Trigger an immediate autosave (e.g., after run end)
+   */
+  public autosaveNow(): void {
+    this.performSave()
+  }
+
+  /**
    * Perform the actual save operation
    */
   private performSave(): void {
@@ -470,6 +453,17 @@ export class SaveManager {
     }
     
     return result
+  }
+
+  /**
+   * Validate integrity of a parsed save file
+   */
+  private validateSaveFile(file: SaveFile | null): file is SaveFile {
+    if (!file || typeof file !== 'object') return false
+    if (!file.metadata || !file.progress) return false
+    if (typeof file.metadata.version !== 'string') return false
+    if (typeof file.progress !== 'object') return false
+    return true
   }
 
   /**

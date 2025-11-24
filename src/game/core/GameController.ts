@@ -18,9 +18,13 @@ import { updateWaves, type WaveSystemCallbacks, getWaveStatus } from '@/game/sys
 import { createEnemy, ENEMY_PROFILES } from '@/game/entities/enemies'
 import { createTowerUpgradeSystem } from '@/game/systems/TowerUpgradeSystem'
 import { MapManager } from '@/game/maps/MapManager'
+import { AchievementSystem } from '@/game/progression/AchievementSystem'
+import { SaveManager } from '@/game/progression/SaveManager'
 import { createEntityId } from '@/game/utils/id'
 import { releaseProjectile } from '@/game/utils/pool'
 import { clearEnemySpatialGrid, updateEnemySpatialGrid } from '@/game/utils/spatialGrid'
+import { TelemetryCollector } from '@/game/systems/telemetry/TelemetryCollector'
+import { logger } from '@/game/utils/logger'
 
 const clampValue = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max)
@@ -98,9 +102,40 @@ export class GameController {
   private waveLeakCount = 0
   private lastWaveSummary: GameSnapshot['lastWaveSummary'] = null
   private lastWaveCompletedAt = 0
+  private telemetry = new TelemetryCollector()
+  private lastLoggedBalanceWarnings: string[] = []
+  private achievementSystem = AchievementSystem.getInstance()
+  private saveManager = SaveManager.getInstance()
+  private runStartTime = 0
+  private runStartWallClock = 0
+  private totalLeaksThisRun = 0
+  private towersPlaced = 0
+  private towerKillCounts: Record<TowerType, number> = {
+    indica: 0,
+    sativa: 0,
+    support: 0,
+    sniper: 0,
+    flamethrower: 0,
+    chain: 0,
+  }
+  private peakMoney = 0
+  private peakIncomePerWave = 0
+  private perfectWavesThisRun = 0
+  private runStartLives = 0
 
   constructor() {
     this.state = createInitialState()
+    this.telemetry.registerTowers(this.state.towers)
+    this.towersPlaced = this.state.towers.length
+    this.peakMoney = this.state.resources.money
+    try {
+      const progress = this.saveManager.getProgress()
+      this.achievementSystem.initializeProgress(progress.achievements)
+    } catch (error) {
+      logger.warn('Failed to hydrate achievements from save, using defaults', error)
+      this.achievementSystem.initializeProgress([])
+    }
+    this.achievementSystem.trackTowerPlacements(this.towersPlaced)
     // Add window focus handling
     this.setupWindowFocusHandlers()
     this.boundMouseMove = this.handleMouseMove.bind(this)
@@ -357,6 +392,28 @@ export class GameController {
       this.resetGame()
     }
 
+    if (this.state.status === 'idle') {
+      this.runStartTime = performance.now()
+      this.runStartWallClock = Date.now()
+      this.totalLeaksThisRun = 0
+      this.waveKillCount = 0
+      this.waveRewardGained = 0
+      this.waveLeakCount = 0
+      this.peakIncomePerWave = 0
+      this.perfectWavesThisRun = 0
+      this.runStartLives = this.state.resources.lives
+      this.towerKillCounts = {
+        indica: 0,
+        sativa: 0,
+        support: 0,
+        sniper: 0,
+        flamethrower: 0,
+        chain: 0,
+      }
+      this.achievementSystem.trackTowerPlacements(this.towersPlaced)
+      this.achievementSystem.trackWavesCleared(0)
+    }
+
     this.state.status = 'running'
     this.running = true
     this.lastTimestamp = performance.now()
@@ -565,6 +622,7 @@ export class GameController {
     this.waveRewardGained = 0
     this.waveLeakCount = 0
     this.currentWaveNoLeak = true
+    this.lastLoggedBalanceWarnings = []
     // Early starter bonus if the player triggers quickly after completion
     let earlyStarterBonus = 0
     const now = performance.now()
@@ -572,9 +630,11 @@ export class GameController {
       earlyStarterBonus = Math.max(5, Math.round(5 + (this.state.currentWaveIndex + 1) * 2))
       this.state.resources.money += earlyStarterBonus
       this.waveRewardGained += earlyStarterBonus
+      this.peakMoney = Math.max(this.peakMoney, this.state.resources.money)
     }
 
     this.state.wavePhase = 'active'
+    this.telemetry.startWave(this.state.currentWaveIndex)
     this.notify()
     this.render()
     return true
@@ -651,15 +711,15 @@ export class GameController {
     
     // Update systems in correct order
     updateWaves(this.state, deltaSeconds, waveCallbacks)
-    updateEnemies(this.state, deltaSeconds)
+    updateEnemies(this.state, deltaSeconds, this.telemetry)
 
     // Update spatial grid only when enemy positions or states actually change
     if (this.syncEnemyPositions()) {
       updateEnemySpatialGrid(this.state.enemies)
     }
     
-    updateTowers(this.state, deltaSeconds)
-    updateProjectiles(this.state, deltaSeconds)
+    updateTowers(this.state, deltaSeconds, this.telemetry)
+    updateProjectiles(this.state, deltaSeconds, this.telemetry)
     updateParticles(this.state, deltaSeconds)
     updateEconomy(this.state)
 
@@ -693,9 +753,15 @@ export class GameController {
   /**
    * Handle enemy spawn requests from WaveSystem
    */
-  private handleEnemySpawn(request: { type: any; spawnPosition: { x: number; y: number }; waveIndex: number }): void {
+  private handleEnemySpawn(request: {
+    type: any
+    spawnPosition: { x: number; y: number }
+    waveIndex: number
+    elapsedTime: number
+  }): void {
     const enemy = createEnemy(request.type, request.spawnPosition, request.waveIndex)
     this.state.enemies.push(enemy)
+    this.telemetry.recordEnemySpawn(enemy, request.waveIndex, request.elapsedTime)
   }
 
   /**
@@ -720,6 +786,8 @@ export class GameController {
       this.state.resources.money += interest
       this.waveRewardGained += interest
     }
+    this.peakIncomePerWave = Math.max(this.peakIncomePerWave, this.waveRewardGained)
+    this.peakMoney = Math.max(this.peakMoney, this.state.resources.money)
 
     this.lastWaveCompletedAt = performance.now()
     this.lastWaveSummary = {
@@ -729,6 +797,21 @@ export class GameController {
       reward: this.waveRewardGained,
       score: this.state.resources.score,
     }
+
+    // Achievement hooks
+    this.achievementSystem.trackWavesCleared(waveIndex + 1)
+    if (this.currentWaveNoLeak) {
+      this.perfectWavesThisRun += 1
+      this.achievementSystem.trackPerfectWaves(this.perfectWavesThisRun)
+    }
+    this.achievementSystem.trackPeakIncome(this.waveRewardGained)
+
+    // Speedrun check (wave 15 under 5 minutes)
+    if (this.runStartTime > 0) {
+      const elapsed = (performance.now() - this.runStartTime) / 1000
+      this.achievementSystem.trackSpeedrun(waveIndex + 1, elapsed)
+    }
+
     this.notify()
   }
 
@@ -748,6 +831,7 @@ export class GameController {
       this.state.wavePhase = 'finalized'
       this.state.resources.lives = 0 // Ensure lives don't go negative
       console.log('Game Over! All lives lost.')
+      this.finalizeRun(false)
     }
   }
 
@@ -764,6 +848,7 @@ export class GameController {
     this.state.resources.lives = Math.max(0, this.state.resources.lives - damage)
     this.currentWaveNoLeak = false
     this.waveLeakCount += 1
+    this.totalLeaksThisRun += 1
     
     console.log(`Life lost: ${damage} damage. Lives: ${previousLives} → ${this.state.resources.lives}`)
     
@@ -774,6 +859,25 @@ export class GameController {
     
     // Force immediate HUD update for critical life changes
     this.notifyCritical()
+  }
+
+  private finalizeRun(victory: boolean): void {
+    const elapsedSeconds = this.runStartTime > 0 ? (performance.now() - this.runStartTime) / 1000 : 0
+    const wavesCleared = this.state.currentWaveIndex + 1
+    const livesLost = Math.max(0, this.runStartLives - this.state.resources.lives)
+    this.achievementSystem.trackWavesCleared(wavesCleared)
+    this.achievementSystem.trackPerfectWaves(this.perfectWavesThisRun)
+    this.achievementSystem.trackPeakIncome(this.peakIncomePerWave)
+    this.achievementSystem.trackMoneyRemaining(this.state.resources.money)
+    this.achievementSystem.trackSpeedrun(wavesCleared, elapsedSeconds)
+    this.achievementSystem.trackPerfectGame(livesLost)
+
+    try {
+      this.saveManager.updateWaveProgress(wavesCleared, victory, this.state.resources.money)
+      this.saveManager.autosaveNow()
+    } catch (error) {
+      logger.warn('Autosave failed after run end', error)
+    }
   }
 
   /**
@@ -795,6 +899,7 @@ export class GameController {
     if (allWavesCompleted && activeEnemies === 0 && this.state.resources.lives > 0) {
       this.state.status = 'won'
       console.log('Victory achieved!')
+      this.finalizeRun(true)
       this.notifyCritical()
     }
   }
@@ -808,6 +913,8 @@ export class GameController {
     
     // Reset game state to initial values
     this.state = createInitialState()
+    this.telemetry.reset()
+    this.telemetry.registerTowers(this.state.towers)
     this.enemyPositionCache.clear()
     this.resetCamera()
     
@@ -823,6 +930,24 @@ export class GameController {
     this.lastWaveSummary = null
     this.autoWaveEnabled = true
     this.lastWaveCompletedAt = 0
+    this.lastLoggedBalanceWarnings = []
+    this.totalLeaksThisRun = 0
+    this.towersPlaced = this.state.towers.length
+    this.peakMoney = this.state.resources.money
+    this.peakIncomePerWave = 0
+    this.perfectWavesThisRun = 0
+    this.runStartLives = this.state.resources.lives
+    this.runStartTime = 0
+    this.runStartWallClock = 0
+    this.towerKillCounts = {
+      indica: 0,
+      sativa: 0,
+      support: 0,
+      sniper: 0,
+      flamethrower: 0,
+      chain: 0,
+    }
+    this.achievementSystem.trackTowerPlacements(this.towersPlaced)
     
     // Reset game speed and debug settings
     this.gameSpeed = 1
@@ -895,6 +1020,12 @@ export class GameController {
             enemy.rewardClaimed = true
             this.waveKillCount += 1
             this.waveRewardGained += enemy.stats.reward
+            if (enemy.lastHitBy?.towerType) {
+              const type = enemy.lastHitBy.towerType
+              this.towerKillCounts[type] = (this.towerKillCounts[type] ?? 0) + 1
+              this.achievementSystem.trackTowerKills(type, this.towerKillCounts[type])
+            }
+            this.peakMoney = Math.max(this.peakMoney, this.state.resources.money)
 
             // Handle on-death spawns (e.g., carrier boss releasing swarm)
             if (enemy.stats.onDeathSpawn) {
@@ -914,6 +1045,12 @@ export class GameController {
                   { noReward: true, noLifeDamage: true }
                 )
                 this.state.enemies.push(spawned)
+                const waveTimer = this.state.waves[this.state.currentWaveIndex]?.timer ?? 0
+                this.telemetry.recordEnemySpawn(
+                  spawned,
+                  this.state.currentWaveIndex,
+                  waveTimer
+                )
               }
             }
           } else {
@@ -1119,6 +1256,19 @@ export class GameController {
       showRanges: false,
       showHitboxes: false,
       gameSpeed: 1,
+      achievements: [],
+      achievementNotifications: [],
+      telemetry: {
+        dps: 0,
+        dpsPerDollar: 0,
+        overkillPercent: 0,
+        hitsPerShot: 0,
+        slowUptime: 0,
+        dotUptime: 0,
+        topDpsPerCost: [],
+        warnings: [],
+      },
+      balanceWarnings: [],
     }
   }
 
@@ -1313,6 +1463,17 @@ export class GameController {
 
       const wavePreview = this.buildWavePreview()
       const lastWaveSummary = this.lastWaveSummary ?? null
+      const telemetrySnapshot = this.telemetry.buildSnapshot()
+      const balanceWarnings = this.telemetry.getBalanceWarnings()
+      if (balanceWarnings.join('|') !== this.lastLoggedBalanceWarnings.join('|')) {
+        if (balanceWarnings.length > 0) {
+          logger.warn('Balance heuristics triggered', { warnings: balanceWarnings }, 'balance')
+        }
+        this.lastLoggedBalanceWarnings = balanceWarnings
+      }
+
+      const achievementNotifications = this.achievementSystem.drainNotifications()
+      const achievements = this.achievementSystem.getProgress()
 
       // Create snapshot with validated data from GameState
       const snapshot: GameSnapshot = {
@@ -1361,6 +1522,10 @@ export class GameController {
         gameSpeed: this.gameSpeed,
         // Hover tower info
         hoverTower: hoverTowerSummary,
+        telemetry: telemetrySnapshot,
+        balanceWarnings,
+        achievements,
+        achievementNotifications,
       }
       
       // Final validation of snapshot data
@@ -1375,28 +1540,62 @@ export class GameController {
    * Validate snapshot data before sending to UI
    */
   private validateSnapshot(snapshot: GameSnapshot): GameSnapshot {
+    const telemetryDefaults = {
+      dps: 0,
+      dpsPerDollar: 0,
+      overkillPercent: 0,
+      hitsPerShot: 0,
+      slowUptime: 0,
+      dotUptime: 0,
+      topDpsPerCost: [],
+      warnings: [],
+    }
+
+    const telemetry = snapshot.telemetry ?? telemetryDefaults
+    const normalizedTelemetry = {
+      ...telemetryDefaults,
+      ...telemetry,
+      dps: Number.isFinite(telemetry.dps) ? telemetry.dps : 0,
+      dpsPerDollar: Number.isFinite(telemetry.dpsPerDollar) ? telemetry.dpsPerDollar : 0,
+      overkillPercent: Number.isFinite(telemetry.overkillPercent) ? telemetry.overkillPercent : 0,
+      hitsPerShot: Number.isFinite(telemetry.hitsPerShot) ? telemetry.hitsPerShot : 0,
+      slowUptime: Number.isFinite(telemetry.slowUptime) ? telemetry.slowUptime : 0,
+      dotUptime: Number.isFinite(telemetry.dotUptime) ? telemetry.dotUptime : 0,
+      topDpsPerCost: telemetry.topDpsPerCost ?? [],
+      warnings: telemetry.warnings ?? [],
+    }
+
     return {
       ...snapshot,
       money: Math.max(0, Number.isFinite(snapshot.money) ? snapshot.money : 0),
       lives: Math.max(0, Number.isFinite(snapshot.lives) ? snapshot.lives : 0),
       score: Math.max(0, Number.isFinite(snapshot.score) ? snapshot.score : 0),
       fps: Math.max(0, Number.isFinite(snapshot.fps) ? snapshot.fps : 0),
-      gameSpeed: Math.max(0.25, Math.min(8, Number.isFinite(snapshot.gameSpeed) ? snapshot.gameSpeed : 1)),
+      gameSpeed: Math.max(
+        0.25,
+        Math.min(8, Number.isFinite(snapshot.gameSpeed) ? snapshot.gameSpeed : 1)
+      ),
       wave: {
         current: Math.max(1, Number.isFinite(snapshot.wave.current) ? snapshot.wave.current : 1),
         total: Math.max(1, Number.isFinite(snapshot.wave.total) ? snapshot.wave.total : 1),
         queued: Math.max(0, Number.isFinite(snapshot.wave.queued) ? snapshot.wave.queued : 0),
       },
-      nextSpawnCountdown: snapshot.nextSpawnCountdown !== null && Number.isFinite(snapshot.nextSpawnCountdown)
-        ? Math.max(0, snapshot.nextSpawnCountdown)
-        : null,
-      nextSpawnDelay: snapshot.nextSpawnDelay !== null && Number.isFinite(snapshot.nextSpawnDelay)
-        ? Math.max(0, snapshot.nextSpawnDelay)
-        : null,
+      nextSpawnCountdown:
+        snapshot.nextSpawnCountdown !== null && Number.isFinite(snapshot.nextSpawnCountdown)
+          ? Math.max(0, snapshot.nextSpawnCountdown)
+          : null,
+      nextSpawnDelay:
+        snapshot.nextSpawnDelay !== null && Number.isFinite(snapshot.nextSpawnDelay)
+          ? Math.max(0, snapshot.nextSpawnDelay)
+          : null,
       wavePreview: snapshot.wavePreview ?? [],
       lastWaveSummary: snapshot.lastWaveSummary ?? null,
       autoWaveEnabled: Boolean(snapshot.autoWaveEnabled),
       showDamageNumbers: snapshot.showDamageNumbers ?? true,
+      telemetry: normalizedTelemetry,
+      balanceWarnings: snapshot.balanceWarnings ?? [],
+      achievements: snapshot.achievements ?? [],
+      achievementNotifications: snapshot.achievementNotifications ?? [],
     }
   }
 
@@ -1504,8 +1703,13 @@ export class GameController {
       chainJumps: profile.chainJumps,
       chainFalloff: profile.chainFalloff,
     })
+    const newTower = this.state.towers[this.state.towers.length - 1]
+    this.telemetry.registerTower(newTower)
+    this.towersPlaced += 1
+    this.achievementSystem.trackTowerPlacements(this.towersPlaced)
 
     this.state.resources.money -= profile.cost
+    this.peakMoney = Math.max(this.peakMoney, this.state.resources.money)
     this.notify()
     if (this.lastHoverWorld) {
       this.recalculateHover(this.lastHoverWorld)
