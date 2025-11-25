@@ -15,8 +15,8 @@ import { audioManager } from '@/game/audio/AudioManager'
 import type { AudioConfig } from '@/game/audio/AudioManager'
 import { ErrorBoundary } from '@/ui/components/ErrorBoundary'
 import { TelemetryPanel } from '@/ui/components/TelemetryPanel'
-import { UpgradePanel } from '@/ui/components/UpgradePanel'
-import './ui/components/UpgradePanel.css'
+import { TowerRadialMenu } from '@/ui/components/TowerRadialMenu'
+import './ui/components/TowerRadialMenu.css'
 
 const initialTower: TowerType = 'indica'
 
@@ -256,6 +256,12 @@ function App() {
       return
     }
 
+    const selection = controller.selectTowerAtScreen(event.clientX, event.clientY)
+    if (selection.hitTower) {
+      setFeedback(selection.message)
+      return
+    }
+
     if (!selectedTower) {
       setFeedback('Select a tower to build.')
       return
@@ -269,6 +275,7 @@ function App() {
     event.preventDefault()
     const controller = controllerRef.current
     controller?.setPreviewTowerType(null)
+    controller?.clearSelection()
     controller?.clearHover()
     setSelectedTower(null)
     setFeedback('Tower selection cancelled')
@@ -340,6 +347,9 @@ function App() {
       if (!controller) return
       const result = controller.upgradeTowerLevel(towerId)
       setFeedback(result.message)
+      if (result.success) {
+        audioManager.playSoundEffect('tower-upgrade')
+      }
     },
     []
   )
@@ -350,6 +360,9 @@ function App() {
       if (!controller) return
       const result = controller.buyTowerPerk(towerId, perkId)
       setFeedback(result.message)
+      if (result.success) {
+        audioManager.playSoundEffect('tower-upgrade')
+      }
     },
     []
   )
@@ -563,17 +576,15 @@ function App() {
                     delay={snapshot.nextSpawnDelay}
                   />
                 )}
-                {snapshot?.hoverTower && (
-                  <div className="upgrade-panel-wrapper">
-                    <UpgradePanel
-                      hoverTower={snapshot.hoverTower}
-                      money={snapshot.money}
-                      onUpgradeLevel={handleUpgradeLevel}
-                      onBuyPerk={handleBuyPerk}
-                    />
-                  </div>
-                )}
               </div>
+              {snapshot?.hoverTower && snapshot.hoverTower.screenPosition && (
+                <TowerRadialMenu
+                  hoverTower={snapshot.hoverTower}
+                  money={snapshot.money}
+                  onUpgradeLevel={handleUpgradeLevel}
+                  onBuyPerk={handleBuyPerk}
+                />
+              )}
               {snapshot && (
                 <aside className="side-dock-panel" aria-label="Controls and towers">
                   <GameControlPanel

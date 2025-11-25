@@ -292,6 +292,8 @@ export interface GameSnapshot {
     nextCost: number | null
     name: string
     upgradeState?: Tower['upgradeState']
+    range?: number
+    screenPosition?: { x: number; y: number }
   }
   telemetry?: TelemetrySnapshot
   balanceWarnings?: string[]

@@ -670,13 +670,41 @@ export class CanvasRenderer {
     ctx.setLineDash([])
   }
 
+  private drawSelectionAura(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    range: number,
+    tileSize: number
+  ): void {
+    const paddedRange = Math.max(range, tileSize * 0.9)
+    ctx.save()
+    const gradient = ctx.createRadialGradient(x, y, paddedRange * 0.65, x, y, paddedRange + 14)
+    gradient.addColorStop(0, 'rgba(120, 255, 140, 0.08)')
+    gradient.addColorStop(1, 'rgba(120, 255, 140, 0.22)')
+    ctx.fillStyle = gradient
+    ctx.beginPath()
+    ctx.arc(x, y, paddedRange + 10, 0, Math.PI * 2)
+    ctx.fill()
+
+    ctx.strokeStyle = 'rgba(125, 255, 160, 0.7)'
+    ctx.lineWidth = 3
+    ctx.setLineDash([8, 4])
+    ctx.beginPath()
+    ctx.arc(x, y, paddedRange, 0, Math.PI * 2)
+    ctx.stroke()
+    ctx.setLineDash([])
+    ctx.restore()
+  }
+
   render(
     ctx: CanvasRenderingContext2D,
     state: GameState,
     viewport: ViewportSize,
     highlight?: CanvasHighlight | null,
     debugSettings?: { showRanges: boolean; showHitboxes: boolean; showDamageNumbers?: boolean },
-    camera?: { center: Vector2; zoom: number }
+    camera?: { center: Vector2; zoom: number },
+    selectedTower?: { position: Vector2; range: number }
   ): ViewportTransform {
     const { width, height } = viewport
     const { map, towers, enemies, projectiles, particles } = state
@@ -709,6 +737,11 @@ export class CanvasRenderer {
 
     // Draw path with enhanced visual appeal
     this.drawPath(ctx, state.path, worldToScreen, tileSize)
+
+    if (selectedTower) {
+      const { x, y } = worldToScreen(selectedTower.position.x, selectedTower.position.y)
+      this.drawSelectionAura(ctx, x, y, selectedTower.range * scale, tileSize)
+    }
 
     if (highlight) {
       this.drawHighlight(ctx, highlight, worldToScreen, tileSize, scale)

@@ -48,6 +48,7 @@ export class GameController {
   private viewportTransform?: ViewportTransform
   private subscribers = new Set<(snapshot: GameSnapshot) => void>()
   private hoverState: CanvasHighlight | null = null
+  private selectedTowerId: string | null = null
   private lastHoverWorld: Vector2 | null = null
   private previewTowerType: TowerType | null = 'indica'
   private gameSpeed: number = 1
@@ -497,6 +498,49 @@ export class GameController {
     this.render()
   }
 
+  private findTowerAtWorld(world: Vector2) {
+    const map = this.state.map
+    const gridX = Math.floor(world.x / map.cellSize)
+    const gridY = Math.floor(world.y / map.cellSize)
+    const gridKey = `${gridX}:${gridY}`
+    return this.state.towers.find((t) => t.gridKey === gridKey)
+  }
+
+  /**
+   * Select tower under the cursor; returns true if a tower was hit.
+   */
+  public selectTowerAtScreen(screenX: number, screenY: number): {
+    hitTower: boolean
+    towerId?: string
+    message: string
+  } {
+    const world = this.screenToWorld(screenX, screenY)
+    if (!world) {
+      this.clearSelection()
+      return { hitTower: false, message: 'Click inside the playfield.' }
+    }
+    const tower = this.findTowerAtWorld(world)
+    if (!tower) {
+      this.clearSelection()
+      return { hitTower: false, message: 'No tower here.' }
+    }
+
+    this.selectedTowerId = tower.id
+    const tile = this.state.map.tileLookup.get(tower.gridKey)
+    this.hoverState = tile
+      ? { tile, position: tile.center, previewRange: tower.range, valid: true }
+      : null
+    this.render()
+    this.notify()
+    return { hitTower: true, towerId: tower.id, message: `${TOWER_PROFILES[tower.type].name} selected.` }
+  }
+
+  public clearSelection() {
+    this.selectedTowerId = null
+    this.render()
+    this.notify()
+  }
+
   public placeTowerFromScreen(
     screenX: number,
     screenY: number,
@@ -552,40 +596,18 @@ export class GameController {
    * Upgrade the tower currently under hover (if any)
    */
   public upgradeHoveredTower(): { success: boolean; message: string } {
-    if (!this.hoverState || !this.hoverState.tile) {
+    let target: (typeof this.state.towers)[number] | undefined
+    if (this.selectedTowerId) {
+      target = this.state.towers.find((t) => t.id === this.selectedTowerId)
+    } else if (this.hoverState?.tile) {
+      target = this.state.towers.find((t) => t.gridKey === this.hoverState?.tile.key)
+    }
+
+    if (!target) {
       return { success: false, message: 'No tower selected to upgrade.' }
     }
 
-    const gridKey = this.hoverState.tile.key
-    const tower = this.state.towers.find((t) => t.gridKey === gridKey)
-    if (!tower) {
-      return { success: false, message: 'No tower on this tile.' }
-    }
-
-    const towerLevel = tower.level ?? 1
-    const upgradePath = createTowerUpgradeSystem(tower.type, towerLevel)
-    if (!upgradePath.canUpgrade || !upgradePath.nextUpgrade) {
-      return { success: false, message: 'Tower is already at max level.' }
-    }
-
-    const cost = upgradePath.upgradeCost
-    if (this.state.resources.money < cost) {
-      return { success: false, message: `Need $${cost} to upgrade.` }
-    }
-
-    // Apply upgrade based on base profile and multiplier
-    const baseProfile = TOWER_PROFILES[tower.type]
-    const m = upgradePath.nextUpgrade.statMultiplier
-    tower.level = upgradePath.nextUpgrade.level
-    tower.damage = Math.round(baseProfile.damage * m)
-    tower.range = Math.round(baseProfile.range * m)
-    tower.fireRate = Math.max(0.1, baseProfile.fireRate / m) // faster fire rate with higher multiplier
-    tower.projectileSpeed = Math.round(baseProfile.projectileSpeed * m)
-    tower.cooldown = Math.min(tower.cooldown, tower.fireRate)
-
-    this.state.resources.money -= cost
-    this.notify()
-    return { success: true, message: `Upgraded to level ${tower.level}.` }
+    return this.upgradeTowerLevel(target.id)
   }
 
   public beginNextWave(): boolean {
@@ -651,6 +673,7 @@ export class GameController {
     tower.upgradeState.level = (tower.upgradeState.level ?? 1) + 1 as 1 | 2 | 3
     this.state.resources.money -= cost
     recomputeTowerStats(tower)
+    this.render()
     this.notify()
     return { success: true, message: `Upgraded to level ${tower.upgradeState.level}.` }
   }
@@ -661,14 +684,17 @@ export class GameController {
     if (!canBuyPerk(tower, perkId)) return { success: false, message: 'Perk not available.' }
     const cost = getPerkCost(tower, perkId)
     if (this.state.resources.money < cost) return { success: false, message: `Need $${cost}.` }
+    const plan = TOWER_UPGRADES[tower.type]
+    const perk = plan?.perks.find((p) => p.id === perkId)
     tower.upgradeState = tower.upgradeState ?? { level: 1, branch: undefined, perks: [] }
-    const planBranch = perkId.includes('-A') ? 'A' : perkId.includes('-B') ? 'B' : undefined
+    const branch = perk?.branch ?? (perkId.includes('-A') ? 'A' : perkId.includes('-B') ? 'B' : undefined)
     if (!tower.upgradeState.branch) {
-      tower.upgradeState.branch = planBranch as any
+      tower.upgradeState.branch = branch as any
     }
     tower.upgradeState.perks = Array.from(new Set([...(tower.upgradeState.perks ?? []), perkId]))
     this.state.resources.money -= cost
     recomputeTowerStats(tower)
+    this.render()
     this.notify()
     return { success: true, message: `Perk purchased: ${perkId}.` }
   }
@@ -686,6 +712,7 @@ export class GameController {
     this.resetWaveState(clamped)
     this.state.wavePhase = 'idle'
     this.state.particles = []
+    this.selectedTowerId = null
     this.notify()
     this.render()
   }
@@ -990,9 +1017,10 @@ export class GameController {
       showDamageNumbers: true,
     }
     
-    // Clear hover state
+    // Clear hover/selection state
     this.hoverState = null
     this.lastHoverWorld = null
+    this.selectedTowerId = null
     
     // Notify subscribers of the reset
     this.notifyCritical()
@@ -1314,6 +1342,10 @@ export class GameController {
     const finalScale = Math.max(baseScale * this.camera.zoom, 0.0001)
     this.clampCameraCenter(finalScale)
 
+    const selectedTower = this.selectedTowerId
+      ? this.state.towers.find((t) => t.id === this.selectedTowerId)
+      : undefined
+
     const transform = this.renderer.render(
       this.context,
       this.state,
@@ -1323,7 +1355,8 @@ export class GameController {
       {
         center: this.camera.center,
         zoom: this.camera.zoom,
-      }
+      },
+      selectedTower ? { position: selectedTower.position, range: selectedTower.range } : undefined
     )
     this.viewportTransform = transform
   }
@@ -1467,16 +1500,34 @@ export class GameController {
       const hoveredTower = hoverTile
         ? this.state.towers.find((t) => t.gridKey === hoverTile.key)
         : undefined
+      const selectedTower = this.selectedTowerId
+        ? this.state.towers.find((t) => t.id === this.selectedTowerId)
+        : undefined
+      const towerForUi = selectedTower ?? hoveredTower
       let hoverTowerSummary: GameSnapshot['hoverTower'] = undefined
-      if (hoveredTower) {
-        const upgradeInfo = createTowerUpgradeSystem(hoveredTower.type, hoveredTower.level ?? 1)
+      if (towerForUi) {
+        const levelCost = getLevelUpgradeCost(towerForUi)
+        const level = towerForUi.upgradeState?.level ?? towerForUi.level ?? 1
+        let screenPosition: { x: number; y: number } | undefined
+        if (this.canvas && this.viewportTransform) {
+          const rect = this.canvas.getBoundingClientRect()
+          const pixelScale = this.canvas.width / rect.width || 1
+          screenPosition = {
+            x: rect.left + (this.viewportTransform.offsetX + towerForUi.position.x * this.viewportTransform.scale) / pixelScale,
+            y: rect.top + (this.viewportTransform.offsetY + towerForUi.position.y * this.viewportTransform.scale) / pixelScale,
+          }
+        }
+
+        const upgradeInfo = createTowerUpgradeSystem(towerForUi.type, level)
         hoverTowerSummary = {
-          id: hoveredTower.id,
-          type: hoveredTower.type,
-          level: hoveredTower.level ?? 1,
-          nextCost: upgradeInfo.nextUpgrade ? upgradeInfo.upgradeCost : null,
-          name: TOWER_PROFILES[hoveredTower.type]?.name ?? hoveredTower.type,
-          upgradeState: hoveredTower.upgradeState,
+          id: towerForUi.id,
+          type: towerForUi.type,
+          level,
+          nextCost: levelCost ?? (upgradeInfo.nextUpgrade ? upgradeInfo.upgradeCost : null),
+          name: TOWER_PROFILES[towerForUi.type]?.name ?? towerForUi.type,
+          upgradeState: towerForUi.upgradeState,
+          range: towerForUi.range,
+          screenPosition,
         }
       }
       

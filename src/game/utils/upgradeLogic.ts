@@ -69,16 +69,18 @@ export const recomputeTowerStats = (tower: Tower): Tower => {
   const agg = emptyEffects()
 
   const upgradeState = tower.upgradeState ?? { level: 1, branch: undefined, perks: [] }
+  tower.upgradeState = upgradeState
   const perks = plan?.perks.filter((p) => upgradeState.perks?.includes(p.id)) ?? []
   perks.forEach((p) => applyPerk(agg, p))
 
   const level = upgradeState.level ?? 1
   const levelMult = level === 3 ? 1.5 : level === 2 ? 1.25 : 1
+  tower.level = level
 
-  tower.range = Math.max(40, Math.round((baseProfile.range + agg.rangeAdd) * 1))
+  tower.range = Math.max(40, Math.round((baseProfile.range + agg.rangeAdd) * levelMult))
   tower.damage = Math.round(baseProfile.damage * agg.damageMult * levelMult)
   tower.fireRate = Math.max(0.1, baseProfile.fireRate / (agg.fireRateMult * levelMult))
-  tower.projectileSpeed = Math.max(0, baseProfile.projectileSpeed)
+  tower.projectileSpeed = Math.max(0, baseProfile.projectileSpeed * levelMult)
   tower.splashRadius = Math.max(0, (baseProfile.splashRadius ?? 0) + agg.splashRadiusAdd)
   tower.splashFactor = Math.max(0, (baseProfile.splashFactor ?? 0) + agg.splashFactorAdd)
   tower.chainJumps = Math.max(0, (baseProfile.chainJumps ?? 0) + agg.chainJumpsAdd)
@@ -111,6 +113,7 @@ export const recomputeTowerStats = (tower: Tower): Tower => {
   tower.stunChance = agg.stunChance
   tower.stunDuration = agg.stunDuration
   tower.markDuration = agg.markDuration
+  tower.cooldown = Math.min(tower.cooldown, tower.fireRate)
 
   return tower
 }
