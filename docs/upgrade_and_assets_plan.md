@@ -23,6 +23,12 @@ Konsolidierte Infos aus früheren Plänen (ToDo, Balancing_Logic, Assets_Grafics
 5) **Nice-to-have**
    - Terrain-Variationen (Pfad/Gras), Enemy-Pulse/Stealth/Regenerator Overlays (reiner Polish).
 
+## UI/UX schnelle Gewinne (aus UI_Tasks destilliert)
+- **Tower Interaktion & Feedback:** Selection-Glow, Build/Upgrade-Effekt (kurzer Glow/Particle), Projektil-Trails klarer färben; Radial-States (ready/locked/branch-locked) visuell unterscheiden.
+- **Resource & Wave Clarity light:** Animierter Money-Tick + kurzer Income-Flash; Wave-Intel-Badge mit Threat-Icons (Boss/Swarm/Fast/Armor) neben bestehendem SpawnTicker/WavePreview.
+- **Buttons/Micro-Interactions:** Hover/Press-States mit sanften Transforms + Success/Fail Feedback; Reduzierte Motion-Option respektieren (keine übertriebenen Shakes).
+- **Typography/Icon Pass:** Konsistente UI-Font-Hierarchie, stat-Icons für Range/Splash/Slow/Chain/Crit/DoT im Upgrade-Radial/Panel verwenden.
+
 ## Upgrade/Perk Assets (Icons & Frames)
 - **Perk/Branch-Icons (64px, PNG/SVG tintbar):**
   - Indica: Rupture, Penetrator
@@ -52,4 +58,3 @@ Konsolidierte Infos aus früheren Plänen (ToDo, Balancing_Logic, Assets_Grafics
 ## Balancing/Tests (ToDo)
 - Zahlen-Checks für Splash/DoT/Slow/Crit, Streak-Bonus, Bulwark/Carrier HP/Rewards.
 - Headless/Autoplay pro Difficulty; Unit-Tests Resist/Slow-Cap/Streak; UI-Tests für Upgrade/Perk-Lock/Affordability.
-
