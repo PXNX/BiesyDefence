@@ -105,3 +105,70 @@ export const createMuzzleParticles = (
     }
   })
 }
+
+export const createRingEffect = (
+  position: Vector2,
+  radiusWorld: number,
+  color: string,
+  life = 0.6,
+  alpha = 0.5
+): Particle => ({
+  id: createEntityId('particle'),
+  position: { ...position },
+  velocity: { x: 0, y: 0 },
+  radius: Math.max(6, radiusWorld * 0.35),
+  life,
+  maxLife: life,
+  color,
+  additive: true,
+  baseAlpha: alpha,
+  sizeWorld: Math.max(32, radiusWorld * 2),
+})
+
+export const createSparkBurst = (position: Vector2, color: string, count = 8): Particle[] => {
+  const out: Particle[] = []
+  for (let i = 0; i < count; i += 1) {
+    const v = normalize(randomUnit())
+    out.push({
+      id: createEntityId('particle'),
+      position: { ...position },
+      velocity: { x: v.x * randomBetween(120, 180), y: v.y * randomBetween(120, 180) },
+      radius: randomBetween(3, 6),
+      life: randomBetween(0.25, 0.45),
+      maxLife: 0.45,
+      color,
+      additive: true,
+      baseAlpha: 0.9,
+    })
+  }
+  return out
+}
+
+export const createPuddleEffect = (position: Vector2, color: string, radius = 38): Particle[] => [
+  createRingEffect(position, radius, color, 1.2, 0.45),
+  {
+    id: createEntityId('particle'),
+    position: { ...position },
+    velocity: { x: 0, y: 0 },
+    radius,
+    life: 1.1,
+    maxLife: 1.1,
+    color,
+    baseAlpha: 0.28,
+  },
+]
+
+export const createWeakpointMarker = (position: Vector2): Particle[] => [
+  createRingEffect(position, 24, 'rgba(255,90,90,0.9)', 0.5, 0.85),
+  {
+    id: createEntityId('particle'),
+    position: { ...position },
+    velocity: { x: 0, y: -20 },
+    radius: 6,
+    life: 0.45,
+    maxLife: 0.45,
+    color: 'rgba(255,220,200,0.9)',
+    additive: true,
+    baseAlpha: 0.9,
+  },
+]

@@ -16,12 +16,24 @@ type TextureKey =
   | 'grassBase'
   | 'woodBase'
   | 'pathStraight'
-  | 'tower-indica'
-  | 'tower-sativa'
-  | 'tower-support'
-  | 'tower-sniper'
-  | 'tower-flamethrower'
-  | 'tower-chain'
+  | 'tower-indica-l1'
+  | 'tower-indica-l2'
+  | 'tower-indica-l3'
+  | 'tower-sativa-l1'
+  | 'tower-sativa-l2'
+  | 'tower-sativa-l3'
+  | 'tower-support-l1'
+  | 'tower-support-l2'
+  | 'tower-support-l3'
+  | 'tower-sniper-l1'
+  | 'tower-sniper-l2'
+  | 'tower-sniper-l3'
+  | 'tower-flamethrower-l1'
+  | 'tower-flamethrower-l2'
+  | 'tower-flamethrower-l3'
+  | 'tower-chain-l1'
+  | 'tower-chain-l2'
+  | 'tower-chain-l3'
   // Enemies
   | 'enemy-runner'
   | 'enemy-swift'
@@ -50,13 +62,13 @@ type TextureKey =
   | 'projectile-support'
   | 'tower-placeholder'
 
-const TOWER_TEXTURE_BY_TYPE: Record<TowerType, TextureKey> = {
-  indica: 'tower-indica',
-  sativa: 'tower-sativa',
-  support: 'tower-support',
-  sniper: 'tower-sniper',
-  flamethrower: 'tower-flamethrower',
-  chain: 'tower-chain',
+const TOWER_TEXTURE_BY_TYPE: Record<TowerType, Record<1 | 2 | 3, TextureKey>> = {
+  indica: { 1: 'tower-indica-l1', 2: 'tower-indica-l2', 3: 'tower-indica-l3' },
+  sativa: { 1: 'tower-sativa-l1', 2: 'tower-sativa-l2', 3: 'tower-sativa-l3' },
+  support: { 1: 'tower-support-l1', 2: 'tower-support-l2', 3: 'tower-support-l3' },
+  sniper: { 1: 'tower-sniper-l1', 2: 'tower-sniper-l2', 3: 'tower-sniper-l3' },
+  flamethrower: { 1: 'tower-flamethrower-l1', 2: 'tower-flamethrower-l2', 3: 'tower-flamethrower-l3' },
+  chain: { 1: 'tower-chain-l1', 2: 'tower-chain-l2', 3: 'tower-chain-l3' },
 }
 
 const assetPath = (relativePath: string) => {
@@ -87,12 +99,24 @@ const TEXTURE_PATHS: Record<TextureKey, string> = {
   grassBase: assetPath('/textures/grass_base.png'),
   woodBase: assetPath('/textures/wood_base.png'),
   pathStraight: assetPath('/textures/path_straight.png'),
-  'tower-indica': assetPath('/towers/tower_indica_build_level1.png'),
-  'tower-sativa': assetPath('/towers/tower_sativa_build_level1.png'),
-  'tower-support': assetPath('/towers/tower_support_build_level1.png'),
-  'tower-sniper': assetPath('/towers/tower_sniper_build_level1.png'),
-  'tower-flamethrower': assetPath('/towers/tower_flamethrower_build_level1.png'),
-  'tower-chain': assetPath('/towers/tower_chain_build_level1.png'),
+  'tower-indica-l1': assetPath('/towers/tower_indica_build_level1.png'),
+  'tower-indica-l2': assetPath('/towers/tower_indica_build_level2.png'),
+  'tower-indica-l3': assetPath('/towers/tower_indica_build_level3.png'),
+  'tower-sativa-l1': assetPath('/towers/tower_sativa_build_level1.png'),
+  'tower-sativa-l2': assetPath('/towers/tower_sativa_build_level2.png'),
+  'tower-sativa-l3': assetPath('/towers/tower_sativa_build_level3.png'),
+  'tower-support-l1': assetPath('/towers/tower_support_build_level1.png'),
+  'tower-support-l2': assetPath('/towers/tower_support_build_level2.png'),
+  'tower-support-l3': assetPath('/towers/tower_support_build_level3.png'),
+  'tower-sniper-l1': assetPath('/towers/tower_sniper_build_level1.png'),
+  'tower-sniper-l2': assetPath('/towers/tower_sniper_build_level2.png'),
+  'tower-sniper-l3': assetPath('/towers/tower_sniper_build_level3.png'),
+  'tower-flamethrower-l1': assetPath('/towers/tower_flamethrower_build_level1.png'),
+  'tower-flamethrower-l2': assetPath('/towers/tower_flamethrower_build_level2.png'),
+  'tower-flamethrower-l3': assetPath('/towers/tower_flamethrower_build_level3.png'),
+  'tower-chain-l1': assetPath('/towers/tower_chain_build_level1.png'),
+  'tower-chain-l2': assetPath('/towers/tower_chain_build_level2.png'),
+  'tower-chain-l3': assetPath('/towers/tower_chain_build_level3.png'),
   'tower-placeholder': 'data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"96\" height=\"96\" viewBox=\"0 0 96 96\"><rect width=\"96\" height=\"96\" rx=\"16\" fill=\"%23222\"/><text x=\"50%\" y=\"55%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-size=\"18\" fill=\"%23ccc\">WIP</text></svg>',
   'enemy-runner': assetPath('/enemies/enemy_runner.png'),
   'enemy-swift': assetPath('/enemies/enemy_swift_runner.png'),
@@ -287,8 +311,15 @@ export class CanvasRenderer {
     }
   }
 
-  private drawTowerSprite(ctx: CanvasRenderingContext2D, x: number, y: number, towerType: TowerType, tileSize: number, level: number | undefined): void {
-    const textureKey = TOWER_TEXTURE_BY_TYPE[towerType] ?? 'tower-placeholder'
+  private drawTowerSprite(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    tower: { type: TowerType; level?: number; upgradeState?: { branch?: 'A' | 'B' } },
+    tileSize: number
+  ): void {
+    const lvl = (tower.level ?? 1) as 1 | 2 | 3
+    const textureKey = TOWER_TEXTURE_BY_TYPE[tower.type]?.[lvl] ?? TOWER_TEXTURE_BY_TYPE[tower.type]?.[1] ?? 'tower-placeholder'
     const sprite = textureKey ? this.textureCache.getImage(textureKey) : null
     if (!sprite || !sprite.complete || sprite.naturalWidth === 0) {
       return
@@ -299,10 +330,20 @@ export class CanvasRenderer {
     ctx.globalAlpha = 0.92
     ctx.shadowColor = palette.accentStrong
     ctx.shadowBlur = 4
+
+    // Branch tint overlay for quick readability
+    if (tower.upgradeState?.branch) {
+      const branchColor = tower.upgradeState.branch === 'A' ? 'rgba(108, 235, 255, 0.65)' : 'rgba(255, 210, 120, 0.65)'
+      ctx.beginPath()
+      ctx.arc(x, y, spriteSize / 2 + 4, 0, Math.PI * 2)
+      ctx.fillStyle = branchColor
+      ctx.fill()
+    }
+
     ctx.drawImage(sprite, x - spriteSize / 2, y - spriteSize / 2, spriteSize, spriteSize)
     // Upgrade halo based on level
-    if ((level ?? 1) > 1) {
-      const intensity = Math.min(1, ((level ?? 1) - 1) * 0.6)
+    if (lvl > 1) {
+      const intensity = Math.min(1, (lvl - 1) * 0.6)
       ctx.shadowBlur = 5 + 4 * intensity
       ctx.strokeStyle = `rgba(255,255,255,${0.45 * intensity})`
       ctx.lineWidth = 3
@@ -753,7 +794,7 @@ export class CanvasRenderer {
       
       // Enhanced shadow system for depth perception
       this.drawTowerShadow(ctx, x, y, tileSize)
-      this.drawTowerSprite(ctx, x, y, tower.type, tileSize, tower.level)
+      this.drawTowerSprite(ctx, x, y, tower, tileSize)
       // Enhanced accent details
       this.drawTowerAccent(ctx, x, y - 6, tileSize, tower.type, tower.color)
     })

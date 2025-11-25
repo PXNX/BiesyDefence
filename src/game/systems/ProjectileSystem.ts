@@ -1,6 +1,14 @@
 import type { GameState } from '@/game/core/types'
 import { distanceBetween, normalize } from '@/game/utils/math'
-import { createHitMarker, createImpactParticles, createImpactSparkSprite, createSplashIndicatorParticle } from '@/game/entities/particles'
+import {
+  createHitMarker,
+  createImpactParticles,
+  createImpactSparkSprite,
+  createSplashIndicatorParticle,
+  createRingEffect,
+  createWeakpointMarker,
+  createSparkBurst,
+} from '@/game/entities/particles'
 import { applyDamageToEnemy, findSplashTargets } from '@/game/utils/combat'
 import type { TelemetryCollector } from '@/game/systems/telemetry/TelemetryCollector'
 
@@ -28,6 +36,11 @@ export const updateProjectiles = (
     const travelDistance = projectile.speed * deltaSeconds
 
     if (distToTarget <= travelDistance) {
+      const sourceTower = projectile.sourceId
+        ? state.towers.find((t) => t.id === projectile.sourceId)
+        : undefined
+      const hasPerk = (prefix: string) =>
+        Boolean(sourceTower?.upgradeState?.perks?.some((id) => id.includes(prefix)))
       const dmgType = projectile.damageType ?? 'impact'
       const before = target.health
       const dealt = applyDamageToEnemy(target, projectile.damage, dmgType)
@@ -75,6 +88,14 @@ export const updateProjectiles = (
       state.particles.push(createImpactSparkSprite(target.position))
       if (projectile.splashRadius && projectile.splashRadius > 0) {
         state.particles.push(createSplashIndicatorParticle(target.position, projectile.splashRadius))
+      }
+      // Perk-driven visuals
+      if (sourceTower?.type === 'sativa' && hasPerk('shrapnel')) {
+        state.particles.push(createRingEffect(target.position, 34, 'rgba(255, 248, 180, 0.55)', 0.45, 0.65))
+        state.particles.push(...createSparkBurst(target.position, 'rgba(255, 234, 150, 0.9)', 6))
+      }
+      if (sourceTower?.type === 'sniper' && (hasPerk('weak') || hasPerk('execution'))) {
+        state.particles.push(...createWeakpointMarker(target.position))
       }
       if (target.health === 0) {
         target.isDead = true

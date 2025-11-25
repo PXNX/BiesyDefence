@@ -1,4 +1,4 @@
-import type React from 'react'
+import React, { useMemo, useState } from 'react'
 import { TOWER_UPGRADES, type BranchId } from '@/game/config/upgrades'
 import type { GameSnapshot } from '@/game/core/types'
 
@@ -36,7 +36,10 @@ export function TowerRadialMenu({ hoverTower, money, onUpgradeLevel, onBuyPerk }
     top: `${hoverTower.screenPosition.y}px`,
   }
 
-  const actions = [
+  const [flashKey, setFlashKey] = useState<string | null>(null)
+
+  const actions = useMemo(
+    () => [
     {
       key: 'core',
       className: 'core',
@@ -75,7 +78,7 @@ export function TowerRadialMenu({ hoverTower, money, onUpgradeLevel, onBuyPerk }
       onClick: () => perkB && !lockedB && onBuyPerk(hoverTower.id, perkB.id),
       visible: Boolean(perkB),
     },
-  ].filter((item) => item.visible)
+  ].filter((item) => item.visible), [branchSelected, hoverTower.id, hoverTower.nextCost, hoverTower.type, level, levelAffordable, lockedA, lockedB, maxedLevel, money, onBuyPerk, onUpgradeLevel, perkA, perkB])
 
   return (
     <div className="tower-radial" style={centerStyle}>
@@ -90,13 +93,30 @@ export function TowerRadialMenu({ hoverTower, money, onUpgradeLevel, onBuyPerk }
         const start = -90
         const angle = start + step * idx
 
+        const isReady = !item.disabled && item.cost !== undefined && item.cost <= money
+        const isBranchLocked = item.className.includes('locked') && item.className.includes('branch')
+        const isFlashing = flashKey === item.key
+        const handleClick = () => {
+          if (item.disabled) return
+          setFlashKey(item.key)
+          window.setTimeout(() => setFlashKey(null), 320)
+          item.onClick()
+        }
+
         return (
           <button
             key={item.key}
-            className={`radial-node ${item.className} ${item.disabled ? 'disabled' : ''} ${
-              !item.disabled && item.cost !== undefined && item.cost <= money ? 'ready' : ''
-            }`}
-            onClick={item.onClick}
+            className={[
+              'radial-node',
+              item.className,
+              item.disabled ? 'disabled' : '',
+              isReady ? 'ready' : '',
+              isBranchLocked ? 'branch-locked' : '',
+              isFlashing ? 'flash' : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
+            onClick={handleClick}
             disabled={item.disabled}
             title={item.title}
             style={{ '--angle': `${angle}deg`, '--radius': `${radiusPx}px` } as React.CSSProperties}

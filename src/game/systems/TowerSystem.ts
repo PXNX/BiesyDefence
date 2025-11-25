@@ -1,6 +1,13 @@
 import type { GameState, Enemy, Tower, DamageType } from '@/game/core/types'
 import { distanceBetween } from '@/game/utils/math'
-import { createImpactParticles, createImpactSparkSprite, createMuzzleParticles } from '@/game/entities/particles'
+import {
+  createImpactParticles,
+  createImpactSparkSprite,
+  createMuzzleParticles,
+  createPuddleEffect,
+  createRingEffect,
+  createSparkBurst,
+} from '@/game/entities/particles'
 import { acquireProjectile } from '@/game/utils/enhancedPool'
 import { findOptimalTargets, findTargetsInRange } from '@/game/utils/spatialGrid'
 import { logger } from '@/game/utils/logger'
@@ -83,6 +90,7 @@ export const updateTowers = (
   telemetry?: TelemetryCollector
 ): void => {
   state.towers.forEach((tower) => {
+    const hasPerk = (needle: string) => Boolean(tower.upgradeState?.perks?.some((id) => id.includes(needle)))
     const towerDamageType = tower.damageType ?? 'impact'
     tower.cooldown = Math.max(tower.cooldown - deltaSeconds, 0)
     
@@ -111,6 +119,10 @@ export const updateTowers = (
           if (tower.vulnerabilityDebuff) {
             applyVulnerability(enemy, tower.vulnerabilityDebuff.amount, tower.vulnerabilityDebuff.duration)
           }
+
+          if (hasPerk('cryo')) {
+            state.particles.push(createRingEffect(enemy.position, 36, 'rgba(140, 220, 255, 0.7)', 0.5, 0.7))
+          }
         })
         
         // Support towers deal light damage to enemies in range
@@ -118,6 +130,11 @@ export const updateTowers = (
           const before = enemy.health
           const dealt = applyDamageToEnemy(enemy, tower.damage, towerDamageType)
           recordDamageEvent(telemetry, tower, enemy, dealt, before, towerDamageType)
+
+          // Toxin virulent puff on kill
+          if (enemy.health <= 0 && hasPerk('toxin-2')) {
+            state.particles.push(...createSparkBurst(enemy.position, 'rgba(110, 255, 150, 0.8)', 12))
+          }
         })
 
         // Visual cue for support pulse
@@ -156,6 +173,13 @@ export const updateTowers = (
             const dealt = applyDamageToEnemy(target, damage, towerDamageType)
             recordDamageEvent(telemetry, tower, target, dealt, before, towerDamageType)
             state.particles.push(createImpactSparkSprite(target.position))
+            if (hasPerk('storm')) {
+              state.particles.push(...createSparkBurst(target.position, 'rgba(126, 214, 255, 0.9)', 10))
+            }
+            if (hasPerk('arc')) {
+              const splash = Math.max(24, tower.splashRadius ?? 30)
+              state.particles.push(createRingEffect(target.position, splash, 'rgba(180, 150, 255, 0.65)', 0.5, 0.7))
+            }
             // find next closest not hit
             const next = candidates
               .filter((c) => !hitIds.has(c.id))
@@ -193,6 +217,9 @@ export const updateTowers = (
           state.particles.push(...createImpactParticles(enemy.position, '#fb923c'))
           if (tower.dot) {
             applyDotToEnemy(enemy, tower.dot.dps, tower.dot.duration, 'burn', tower.id, tower.type)
+          }
+          if (hasPerk('napalm')) {
+            state.particles.push(...createPuddleEffect(enemy.position, 'rgba(255,132,79,0.55)', 44))
           }
         })
         tower.cooldown = tower.fireRate
