@@ -39,8 +39,14 @@ export class MapManager {
     this.availableMaps.set(defaultMap.id, defaultMap)
     const canyon = this.createCanyonSplitMap()
     const triRoute = this.createTriRouteMap()
+    const serpentine = this.createSerpentineMap()
+    const loopback = this.createLoopbackMap()
+    const crossroad = this.createCrossroadMap()
     this.availableMaps.set(canyon.id, canyon)
     this.availableMaps.set(triRoute.id, triRoute)
+    this.availableMaps.set(serpentine.id, serpentine)
+    this.availableMaps.set(loopback.id, loopback)
+    this.availableMaps.set(crossroad.id, crossroad)
     this.currentMap = defaultMap
   }
 
@@ -156,6 +162,116 @@ export class MapManager {
     }
   }
 
+  private createSerpentineMap(): MapConfiguration {
+    return {
+      id: 'serpentine',
+      name: 'Serpentine Weave',
+      description: 'Breite S-Kurven mit Höhenwechseln, ideal für Splash und Korridor-Setups.',
+      width: 62,
+      height: 42,
+      cellSize: 48,
+      pathNodes: [
+        { x: 0, y: 10 },
+        { x: 12, y: 10 },
+        { x: 12, y: 4 },
+        { x: 24, y: 4 },
+        { x: 24, y: 20 },
+        { x: 36, y: 20 },
+        { x: 36, y: 8 },
+        { x: 50, y: 8 },
+        { x: 50, y: 28 },
+        { x: 61, y: 28 },
+      ],
+      randomPath: false,
+      theme: 'wetlands',
+      backgroundColor: '#0a1210',
+      pathColor: '#7d6b4c',
+      grassColor: '#1f3b25',
+      metadata: {
+        version: '2.1.0',
+        author: 'BiesyDefence Team',
+        created: '2025-11-26',
+        estimatedDuration: '18-25 minutes',
+        difficulty: ['easy', 'normal', 'hard'],
+        tags: ['serpentine', 'splash-friendly', 'midcore'],
+      },
+    }
+  }
+
+  private createLoopbackMap(): MapConfiguration {
+    return {
+      id: 'loopback',
+      name: 'Loopback Terrace',
+      description: 'Ein doppelter Rücklauf mit engen Terrassen – ideal für Multi-Hit und Ketten.',
+      width: 64,
+      height: 38,
+      cellSize: 48,
+      pathNodes: [
+        { x: 0, y: 6 },
+        { x: 18, y: 6 },
+        { x: 18, y: 14 },
+        { x: 8, y: 14 },
+        { x: 8, y: 24 },
+        { x: 28, y: 24 },
+        { x: 28, y: 10 },
+        { x: 44, y: 10 },
+        { x: 44, y: 26 },
+        { x: 60, y: 26 },
+      ],
+      randomPath: false,
+      theme: 'terrace',
+      backgroundColor: '#101012',
+      pathColor: '#9a825e',
+      grassColor: '#233127',
+      metadata: {
+        version: '2.1.0',
+        author: 'BiesyDefence Team',
+        created: '2025-11-26',
+        estimatedDuration: '20-28 minutes',
+        difficulty: ['normal', 'hard'],
+        tags: ['loop', 'terrace', 'anti-rush'],
+      },
+    }
+  }
+
+  private createCrossroadMap(): MapConfiguration {
+    return {
+      id: 'crossroad',
+      name: 'Crossroad Reach',
+      description: 'Kreuzende Pfade mit diagonalen Stichen – fordert breite Abdeckung und Slow/Chain.',
+      width: 60,
+      height: 40,
+      cellSize: 48,
+      pathNodes: [
+        { x: 0, y: 12 },
+        { x: 14, y: 12 },
+        { x: 14, y: 6 },
+        { x: 22, y: 6 },
+        { x: 22, y: 18 },
+        { x: 10, y: 18 },
+        { x: 10, y: 28 },
+        { x: 30, y: 28 },
+        { x: 30, y: 16 },
+        { x: 46, y: 16 },
+        { x: 46, y: 30 },
+        { x: 59, y: 30 },
+      ],
+      randomPath: false,
+      theme: 'crossroad',
+      backgroundColor: '#0c1215',
+      pathColor: '#8b7a64',
+      grassColor: '#1d3328',
+      metadata: {
+        version: '2.1.0',
+        author: 'BiesyDefence Team',
+        created: '2025-11-26',
+        estimatedDuration: '18-26 minutes',
+        difficulty: ['easy', 'normal', 'hard'],
+        tags: ['cross', 'slow-chain', 'midcore'],
+      },
+    }
+  }
+
   /**
    * Register a new map configuration
    */
@@ -217,13 +333,16 @@ export class MapManager {
     const worldHeight = height * cellSize
 
     const { seed, random } = this.createRandomSource()
-    const pathNodes = mapConfig.randomPath ? this.generateRandomPath(mapConfig, random) : mapConfig.pathNodes
+    const basePaths = mapConfig.paths && mapConfig.paths.length > 0
+      ? mapConfig.paths
+      : [mapConfig.randomPath ? this.generateRandomPath(mapConfig, random) : mapConfig.pathNodes]
+    const pathNodes = basePaths[0]
 
     const tiles: MapTile[] = []
     const tileLookup = new Map<string, MapTile>()
     const pathGridKeys = new Set<string>()
 
-    this.generatePathGridKeys(pathNodes, pathGridKeys)
+    basePaths.forEach((path) => this.generatePathGridKeys(path, pathGridKeys))
 
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
@@ -247,6 +366,13 @@ export class MapManager {
       }
     }
 
+    const spawnPoints = (mapConfig.spawnPoints && mapConfig.spawnPoints.length > 0
+      ? mapConfig.spawnPoints
+      : basePaths.map((p) => p[0]).filter(Boolean)) as MapPathNode[]
+    const exitPoints = (mapConfig.exitPoints && mapConfig.exitPoints.length > 0
+      ? mapConfig.exitPoints
+      : basePaths.map((p) => p[p.length - 1]).filter(Boolean)) as MapPathNode[]
+
     return {
       width,
       height,
@@ -257,6 +383,15 @@ export class MapManager {
       tileLookup,
       pathNodes,
       pathGridKeys,
+      paths: basePaths,
+      spawnPoints,
+      exitPoints,
+      theme: {
+        name: mapConfig.theme,
+        backgroundColor: mapConfig.backgroundColor,
+        pathColor: mapConfig.pathColor,
+        grassColor: mapConfig.grassColor,
+      },
     }
   }
 
@@ -319,6 +454,13 @@ export class MapManager {
       return array[0]
     }
     return Math.floor(Math.random() * 0xffffffff)
+  }
+
+  public getRandomMapId(): string {
+    const ids = Array.from(this.availableMaps.keys())
+    if (ids.length === 0) return 'default'
+    const idx = Math.floor(Math.random() * ids.length)
+    return ids[idx]
   }
 
   private generateRandomPath(

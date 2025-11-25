@@ -818,8 +818,13 @@ export class GameController {
     spawnPosition: { x: number; y: number }
     waveIndex: number
     elapsedTime: number
+    routeIndex?: number
   }): void {
-    const enemy = createEnemy(request.type, request.spawnPosition, request.waveIndex)
+    const route =
+      (this.state.paths && request.routeIndex !== undefined
+        ? this.state.paths[request.routeIndex]
+        : this.state.paths?.[0]) ?? this.state.path
+    const enemy = createEnemy(request.type, request.spawnPosition, request.waveIndex, { route })
     this.state.enemies.push(enemy)
     this.telemetry.recordEnemySpawn(enemy, request.waveIndex, request.elapsedTime)
   }

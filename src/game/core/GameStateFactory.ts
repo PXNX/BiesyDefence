@@ -196,7 +196,7 @@ export const createInitialState = (options?: {
   useNewSystem?: boolean
 }): GameState => {
   const mapManager = MapManager.getInstance()
-  const mapId = options?.mapId ?? 'default'
+  const mapId = options?.mapId ?? mapManager.getRandomMapId()
   const difficulty = options?.difficulty ?? 'normal'
   mapManager.setDifficulty(difficulty)
 
@@ -205,7 +205,7 @@ export const createInitialState = (options?: {
     mapData = mapManager.loadMap(mapId, difficulty)
   } catch (error) {
     console.warn(`Failed to load map '${mapId}', falling back to legacy layout:`, error)
-    const legacyPathNodes = PATH_GRID_NODES.map(gridToWorld)
+  const legacyPathNodes = PATH_GRID_NODES.map(gridToWorld)
     mapData = buildMap(legacyPathNodes)
   }
 
@@ -217,9 +217,20 @@ export const createInitialState = (options?: {
 
   const initialTowers = createInitialTowers(mapData)
 
+  const pathsWorld = mapData.paths?.map((p) => p.map(gridToWorld))
+  const primaryPath = pathsWorld?.[0] ?? mapData.pathNodes.map(gridToWorld)
+
+  const spawnPoints = (mapData.spawnPoints ?? [mapData.pathNodes[0]])
+    .map(gridToWorld)
+
   return {
-    map: mapData,
-    path: mapData.pathNodes.map(gridToWorld),
+    map: {
+      ...mapData,
+      paths: pathsWorld,
+      spawnPoints,
+    },
+    path: primaryPath,
+    paths: pathsWorld,
     enemies: [],
     towers: initialTowers,
     projectiles: [],

@@ -8,7 +8,6 @@ export const updateEnemies = (
   deltaSeconds: number,
   telemetry?: TelemetryCollector
 ): void => {
-  const path = state.path
   state.enemies.forEach((enemy) => {
     if (enemy.isDead) {
       return
@@ -71,13 +70,14 @@ export const updateEnemies = (
       enemy.health = Math.min(enemy.maxHealth, enemy.health + regenAmount)
     }
 
-    const nextIndex = Math.min(enemy.pathIndex + 1, path.length - 1)
-    const targetNode = path[nextIndex]
+    const route = enemy.route ?? state.paths?.[0] ?? state.path
+    const nextIndex = Math.min(enemy.pathIndex + 1, route.length - 1)
+    const targetNode = route[nextIndex]
     if (!targetNode) {
       return
     }
 
-    if (enemy.pathIndex >= path.length - 1) {
+    if (enemy.pathIndex >= route.length - 1) {
       if (!enemy.reachedGoal) {
         enemy.reachedGoal = true
         enemy.isDead = true
@@ -98,8 +98,8 @@ export const updateEnemies = (
     if (distToTarget <= travelDistance) {
       enemy.position.x = targetNode.x
       enemy.position.y = targetNode.y
-      enemy.pathIndex = Math.min(nextIndex, path.length - 1)
-      if (enemy.pathIndex >= path.length - 1 && !enemy.reachedGoal) {
+      enemy.pathIndex = Math.min(nextIndex, route.length - 1)
+      if (enemy.pathIndex >= route.length - 1 && !enemy.reachedGoal) {
         enemy.reachedGoal = true
         enemy.isDead = true
         enemy.rewardClaimed = true

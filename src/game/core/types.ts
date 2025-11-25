@@ -26,6 +26,15 @@ export interface MapData {
   tileLookup: Map<string, MapTile>
   pathNodes: Vector2[]
   pathGridKeys: Set<string>
+  paths?: Vector2[][]
+  spawnPoints?: Vector2[]
+  exitPoints?: Vector2[]
+  theme?: {
+    name: string
+    backgroundColor: string
+    pathColor: string
+    grassColor: string
+  }
 }
 
 export type TowerType = 'indica' | 'sativa' | 'support' | 'sniper' | 'flamethrower' | 'chain'
@@ -101,6 +110,7 @@ export interface Enemy {
   stats: EnemyStats
   position: Vector2
   pathIndex: number
+  route?: Vector2[]
   health: number
   maxHealth: number
   isDead: boolean
@@ -249,6 +259,7 @@ export type WavePhase = 'idle' | 'active' | 'completed' | 'finalized'
 export interface GameState {
   map: MapData
   path: Vector2[]
+  paths?: Vector2[][]
   enemies: Enemy[]
   towers: Tower[]
   projectiles: Projectile[]

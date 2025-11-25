@@ -66,7 +66,19 @@ export interface MapConfiguration {
   width: number
   height: number
   cellSize: number
+  /**
+   * Legacy single path definition (grid coordinates). If `paths` is provided, use that instead.
+   */
   pathNodes: MapPathNode[]
+  /**
+   * Optional multiple routes (each array is a path in grid coords).
+   */
+  paths?: MapPathNode[][]
+  /**
+   * Optional explicit spawn/exit points (grid coords). If omitted, derived from path start/end.
+   */
+  spawnPoints?: MapPathNode[]
+  exitPoints?: MapPathNode[]
   randomPath?: boolean
   theme: string
   backgroundColor: string

@@ -893,8 +893,14 @@ export class CanvasRenderer {
 
     ctx.save()
     const grassPattern = this.textureCache.getPattern(ctx, 'grassBase')
-    ctx.fillStyle = grassPattern ?? palette.grass
+    ctx.fillStyle = grassPattern ?? (map.theme?.grassColor ?? palette.grass)
     ctx.fillRect(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y)
+    if (map.theme?.grassColor) {
+      ctx.fillStyle = map.theme.grassColor
+      ctx.globalAlpha = 0.22
+      ctx.fillRect(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y)
+      ctx.globalAlpha = 1
+    }
     ctx.restore()
 
     this.drawPathTiles(ctx, map, worldToScreen, tileSize)
@@ -930,7 +936,7 @@ export class CanvasRenderer {
   ): void {
     const pathPattern = this.textureCache.getPattern(ctx, 'pathStraight')
     ctx.save()
-    ctx.fillStyle = pathPattern ?? palette.path
+    ctx.fillStyle = pathPattern ?? (map.theme?.pathColor ?? palette.path)
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)'
     ctx.lineWidth = Math.max(1, tileSize * 0.02)
 
@@ -945,6 +951,16 @@ export class CanvasRenderer {
     })
 
     ctx.restore()
+
+    if (map.theme?.pathColor) {
+      const topLeft = worldToScreen(0, 0)
+      const bottomRight = worldToScreen(map.worldWidth, map.worldHeight)
+      ctx.save()
+      ctx.fillStyle = map.theme.pathColor
+      ctx.globalAlpha = 0.16
+      ctx.fillRect(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y)
+      ctx.restore()
+    }
   }
 
   private drawPath(ctx: CanvasRenderingContext2D, path: any[], worldToScreen: Function, tileSize: number): void {

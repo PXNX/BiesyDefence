@@ -145,7 +145,7 @@ export const createEnemy = (
   type: EnemyType,
   spawnPosition: Vector2,
   waveIndex = 0,
-  options?: { noReward?: boolean; noLifeDamage?: boolean }
+  options?: { noReward?: boolean; noLifeDamage?: boolean; route?: Vector2[] }
 ): Enemy => {
   const base = ENEMY_PROFILES[type] ?? ENEMY_PROFILES.pest
   const difficultyConfig = MapManager.getInstance().getCurrentDifficultyConfig()
@@ -171,6 +171,7 @@ export const createEnemy = (
     stats,
     position: { ...spawnPosition },
     pathIndex: 0,
+    route: options?.route,
     health: stats.health,
     maxHealth: stats.health,
     isDead: false,

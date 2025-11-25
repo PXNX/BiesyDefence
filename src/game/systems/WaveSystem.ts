@@ -9,6 +9,7 @@ export interface WaveSpawnRequest {
   spawnPosition: { x: number; y: number }
   waveIndex: number
   elapsedTime: number
+  routeIndex?: number
 }
 
 export interface WaveSystemCallbacks {
@@ -38,17 +39,20 @@ export const updateWaves = (
   let spawn = wave.spawnQueue[wave.nextIndex]
   while (spawn && wave.timer >= spawn.delay) {
     wave.timer -= spawn.delay
-    const gridOrigin = state.map.pathNodes[0]
+    const spawnPoints = state.map.spawnPoints && state.map.spawnPoints.length > 0
+      ? state.map.spawnPoints
+      : state.path.length > 0
+        ? [state.path[0]]
+        : []
+    const paths = state.paths && state.paths.length > 0 ? state.paths : [state.path]
+    const spawnIndex = spawnPoints.length > 0 ? Math.floor(Math.random() * spawnPoints.length) : 0
+    const gridOrigin = spawnPoints[spawnIndex]
     if (!gridOrigin) {
       console.warn('WaveSystem: cannot spawn enemies because path nodes are missing')
       break
     }
 
-    const worldOrigin =
-      state.path[0] ?? {
-        x: gridOrigin.x * state.map.cellSize + state.map.cellSize / 2,
-        y: gridOrigin.y * state.map.cellSize + state.map.cellSize / 2,
-      }
+    const worldOrigin = gridOrigin
 
     const jitterRadius = Math.max(2, state.map.cellSize * 0.15)
     const spawnPosition = {
@@ -60,7 +64,8 @@ export const updateWaves = (
       type: spawn.type,
       spawnPosition,
       waveIndex: state.currentWaveIndex,
-      elapsedTime: wave.timer
+      elapsedTime: wave.timer,
+      routeIndex: paths.length > 1 ? spawnIndex % paths.length : 0,
     })
     
     wave.nextIndex += 1
