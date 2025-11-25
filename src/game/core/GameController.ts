@@ -1509,9 +1509,11 @@ export class GameController {
         const levelCost = getLevelUpgradeCost(towerForUi)
         const level = towerForUi.upgradeState?.level ?? towerForUi.level ?? 1
         let screenPosition: { x: number; y: number } | undefined
+        let screenRadius: number | undefined
         if (this.canvas && this.viewportTransform) {
           const rect = this.canvas.getBoundingClientRect()
           const pixelScale = this.canvas.width / rect.width || 1
+          screenRadius = (towerForUi.range ?? 0) * this.viewportTransform.scale / pixelScale
           screenPosition = {
             x: rect.left + (this.viewportTransform.offsetX + towerForUi.position.x * this.viewportTransform.scale) / pixelScale,
             y: rect.top + (this.viewportTransform.offsetY + towerForUi.position.y * this.viewportTransform.scale) / pixelScale,
@@ -1528,6 +1530,7 @@ export class GameController {
           upgradeState: towerForUi.upgradeState,
           range: towerForUi.range,
           screenPosition,
+          screenRadius,
         }
       }
       

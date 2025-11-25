@@ -294,6 +294,7 @@ export interface GameSnapshot {
     upgradeState?: Tower['upgradeState']
     range?: number
     screenPosition?: { x: number; y: number }
+    screenRadius?: number
   }
   telemetry?: TelemetrySnapshot
   balanceWarnings?: string[]

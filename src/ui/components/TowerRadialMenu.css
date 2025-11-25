@@ -2,8 +2,8 @@
   position: fixed;
   width: 220px;
   height: 220px;
-  /* Slight left/up bias so nodes frame the tower center nicely */
-  transform: translate(calc(-50% - 10px), calc(-50% - 8px));
+  /* Subtle left/up bias (~35% of node width) so nodes frame the tower center */
+  transform: translate(calc(-55%), calc(-50% - 6px));
   pointer-events: none;
   z-index: 8;
 }
@@ -40,7 +40,7 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: rotate(var(--angle)) translate(-50%, -116px) rotate(calc(-1 * var(--angle)));
+  transform: rotate(var(--angle)) translate(0, calc(-1 * var(--radius, 116px))) rotate(calc(-1 * var(--angle))) translate(-50%, -50%);
   min-width: 116px;
   padding: 10px 12px;
   border-radius: 14px;
@@ -113,7 +113,7 @@
 }
 
 .radial-node:hover:not(:disabled) {
-  transform: rotate(var(--angle)) translate(-50%, -122px) rotate(calc(-1 * var(--angle)));
+  transform: rotate(var(--angle)) translate(0, calc(-1 * var(--radius, 116px) - 6px)) rotate(calc(-1 * var(--angle))) translate(-50%, -50%);
   box-shadow:
     0 0 22px rgba(120, 255, 200, 0.55),
     inset 0 0 18px rgba(255, 255, 255, 0.12);
@@ -144,11 +144,11 @@
 
   .radial-node {
     min-width: 96px;
-    transform: rotate(var(--angle)) translate(-50%, -96px) rotate(calc(-1 * var(--angle)));
+    transform: rotate(var(--angle)) translate(0, calc(-1 * var(--radius, 96px))) rotate(calc(-1 * var(--angle))) translate(-50%, -50%);
   }
 
   .radial-node:hover:not(:disabled) {
-    transform: rotate(var(--angle)) translate(-50%, -100px) rotate(calc(-1 * var(--angle)));
+    transform: rotate(var(--angle)) translate(0, calc(-1 * var(--radius, 96px) - 6px)) rotate(calc(-1 * var(--angle))) translate(-50%, -50%);
   }
 
   .radial-center {
