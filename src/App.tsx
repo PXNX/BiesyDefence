@@ -17,6 +17,7 @@ import { ErrorBoundary } from '@/ui/components/ErrorBoundary'
 import { TelemetryPanel } from '@/ui/components/TelemetryPanel'
 import { TowerRadialMenu } from '@/ui/components/TowerRadialMenu'
 import './ui/components/TowerRadialMenu.css'
+import { TOWER_UPGRADES } from '@/game/config/upgrades'
 
 const initialTower: TowerType = 'indica'
 
@@ -367,6 +368,35 @@ function App() {
     []
   )
 
+  // Hotkeys: Core upgrade (1/2/3), Branch A (Q/W), Branch B (E/R)
+  const tryUpgradeHotkey = useCallback(
+    (action: 'core' | 'branchA' | 'branchB') => {
+      const controller = controllerRef.current
+      const targetTower = snapshot?.hoverTower
+      if (!controller || !targetTower) return
+
+      if (action === 'core') {
+        const result = controller.upgradeTowerLevel(targetTower.id)
+        setFeedback(result.message)
+        if (result.success) audioManager.playSoundEffect('tower-upgrade')
+        return
+      }
+
+      const plan = TOWER_UPGRADES[targetTower.type]
+      const owned = new Set(targetTower.upgradeState?.perks ?? [])
+      const branchId = action === 'branchA' ? 'A' : 'B'
+      const nextPerk = plan?.perks.filter((p) => p.branch === branchId && !owned.has(p.id))[0]
+      if (!nextPerk) {
+        setFeedback(`Keine Perks mehr in Branch ${branchId}.`)
+        return
+      }
+      const result = controller.buyTowerPerk(targetTower.id, nextPerk.id)
+      setFeedback(result.message)
+      if (result.success) audioManager.playSoundEffect('tower-upgrade')
+    },
+    [snapshot]
+  )
+
   // Audio control handlers
   const handleMasterVolumeChange = (volume: number) => {
     void unlockAudioContext()
@@ -485,6 +515,77 @@ function App() {
       }
     }
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Ignore if typing in input fields
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+        return
+      }
+
+      switch (event.code) {
+        case 'Space':
+          event.preventDefault()
+          if (snapshot?.status === 'running') {
+            handlePause()
+          } else {
+            handleStart()
+          }
+          break
+        case 'KeyR':
+          event.preventDefault()
+          handleReset()
+          break
+        case 'KeyN':
+          event.preventDefault()
+          if (snapshot?.nextWaveAvailable) {
+            handleNextWave()
+          }
+          break
+        case 'KeyT':
+          event.preventDefault()
+          handleToggleTelemetry()
+          break
+        case 'Digit1':
+        case 'Digit2':
+        case 'Digit3':
+          event.preventDefault()
+          tryUpgradeHotkey('core')
+          break
+        case 'KeyQ':
+        case 'KeyW':
+          event.preventDefault()
+          tryUpgradeHotkey('branchA')
+          break
+        case 'KeyE':
+        case 'KeyR':
+          event.preventDefault()
+          tryUpgradeHotkey('branchB')
+          break
+        case 'Digit1':
+          event.preventDefault()
+          handleSpeedChange(1)
+          break
+        case 'Digit2':
+          event.preventDefault()
+          handleSpeedChange(2)
+          break
+        case 'Digit3':
+          event.preventDefault()
+          handleSpeedChange(4)
+          break
+        case 'Escape':
+          event.preventDefault()
+          if (showGameOverOverlay) {
+            handleRetry()
+          } else {
+            controllerRef.current?.setPreviewTowerType(null)
+            controllerRef.current?.clearHover()
+            setSelectedTower(null)
+            setFeedback('Tower selection cancelled')
+          }
+          break
+      }
+    }
+
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [
@@ -497,6 +598,7 @@ function App() {
     handleRetry,
     handleToggleTelemetry,
     showGameOverOverlay,
+    tryUpgradeHotkey,
   ])
 
   useEffect(() => {

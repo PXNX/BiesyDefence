@@ -75,6 +75,20 @@ export const applyVulnerability = (
   enemy.effects.vulnerability.push({ amount, remainingTime: duration })
 }
 
+export const applyStunToEnemy = (
+  enemy: Enemy,
+  duration: number,
+  appliedBy: string
+): void => {
+  const multiplier = 0 // full stop
+  enemy.effects.slow.push({
+    duration,
+    remainingTime: duration,
+    multiplier,
+    appliedBy,
+  })
+}
+
 export const findSplashTargets = (
   origin: { x: number; y: number },
   enemies: Enemy[],

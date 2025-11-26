@@ -9,7 +9,7 @@ import {
   createWeakpointMarker,
   createSparkBurst,
 } from '@/game/entities/particles'
-import { applyDamageToEnemy, findSplashTargets } from '@/game/utils/combat'
+import { applyDamageToEnemy, applyVulnerability, findSplashTargets } from '@/game/utils/combat'
 import type { TelemetryCollector } from '@/game/systems/telemetry/TelemetryCollector'
 
 export const updateProjectiles = (
@@ -97,6 +97,16 @@ export const updateProjectiles = (
       if (sourceTower?.type === 'sniper' && (hasPerk('weak') || hasPerk('execution'))) {
         state.particles.push(...createWeakpointMarker(target.position))
       }
+      if (sourceTower?.markDuration && sourceTower.markDuration > 0) {
+        applyVulnerability(target, 0.15, sourceTower.markDuration)
+      }
+      if (sourceTower?.type === 'sativa' && hasPerk('shrapnel')) {
+        const shrapnelRadius = projectile.splashRadius ?? 28
+        const shrapnelTargets = findSplashTargets(target.position, state.enemies, shrapnelRadius, target.id)
+        const factor = Math.max(0.25, projectile.splashFactor ?? 0.4)
+        shrapnelTargets.forEach((e) => applyDamageToEnemy(e, projectile.damage * factor, dmgType))
+      }
+
       if (target.health === 0) {
         target.isDead = true
         state.particles.push(...createImpactParticles(target.position, projectile.color))

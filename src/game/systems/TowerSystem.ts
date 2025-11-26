@@ -11,7 +11,13 @@ import {
 import { acquireProjectile } from '@/game/utils/enhancedPool'
 import { findOptimalTargets, findTargetsInRange } from '@/game/utils/spatialGrid'
 import { logger } from '@/game/utils/logger'
-import { applyDamageToEnemy, applyDotToEnemy, applySlowToEnemy, applyVulnerability } from '@/game/utils/combat'
+import {
+  applyDamageToEnemy,
+  applyDotToEnemy,
+  applySlowToEnemy,
+  applyVulnerability,
+  applyStunToEnemy,
+} from '@/game/utils/combat'
 import type { TelemetryCollector } from '@/game/systems/telemetry/TelemetryCollector'
 
 // Chapter 5 Performance: Optimized tower targeting with spatial partitioning
@@ -109,7 +115,15 @@ export const updateTowers = (
         // Apply slow + DoT + vulnerability
         enemiesInRange.forEach(enemy => {
           const slowCfg = tower.slow ?? { multiplier: 0.7, duration: 2.0 }
-          applySlowToEnemy(enemy, slowCfg.multiplier, slowCfg.duration, tower.id)
+          // Cryo-Perk verstärkt Slow
+          const extraSlow = hasPerk('cryo-1') ? 0.1 : 0
+          const extraDuration = hasPerk('cryo-1') ? 0.5 : 0
+          applySlowToEnemy(
+            enemy,
+            Math.max(0.3, slowCfg.multiplier - extraSlow),
+            slowCfg.duration + extraDuration,
+            tower.id
+          )
 
           if (tower.dot) {
             const dotType = tower.dot.damageType ?? 'dot'
@@ -123,6 +137,9 @@ export const updateTowers = (
           if (hasPerk('cryo')) {
             state.particles.push(createRingEffect(enemy.position, 36, 'rgba(140, 220, 255, 0.7)', 0.5, 0.7))
           }
+          if (hasPerk('cryo-2') && Math.random() < (tower.stunChance ?? 0.1)) {
+            applyStunToEnemy(enemy, tower.stunDuration ?? 0.6, tower.id)
+          }
         })
         
         // Support towers deal light damage to enemies in range
@@ -134,6 +151,13 @@ export const updateTowers = (
           // Toxin virulent puff on kill
           if (enemy.health <= 0 && hasPerk('toxin-2')) {
             state.particles.push(...createSparkBurst(enemy.position, 'rgba(110, 255, 150, 0.8)', 12))
+            const spreadTargets = findTargetsInRange(
+              { ...tower, range: Math.max(28, tower.range * 0.5) } as Tower,
+              state.enemies
+            ).filter((e) => e.id !== enemy.id && !e.isDead && !e.reachedGoal)
+            spreadTargets.forEach((e) =>
+              applyDotToEnemy(e, tower.dot ? tower.dot.dps * 0.6 : 4, tower.dot ? tower.dot.duration * 0.6 : 2, 'dot', tower.id, tower.type)
+            )
           }
         })
 
@@ -175,10 +199,23 @@ export const updateTowers = (
             state.particles.push(createImpactSparkSprite(target.position))
             if (hasPerk('storm')) {
               state.particles.push(...createSparkBurst(target.position, 'rgba(126, 214, 255, 0.9)', 10))
+              if (tower.stunChance && Math.random() < tower.stunChance) {
+                applyStunToEnemy(target, tower.stunDuration ?? 0.6, tower.id)
+              }
             }
             if (hasPerk('arc')) {
               const splash = Math.max(24, tower.splashRadius ?? 30)
               state.particles.push(createRingEffect(target.position, splash, 'rgba(180, 150, 255, 0.65)', 0.5, 0.7))
+              const splashFactor = Math.max(0.3, tower.splashFactor ?? 0.5)
+              const splashTargets = findTargetsInRange(
+                { ...tower, range: splash } as Tower,
+                state.enemies
+              ).filter((e) => !hitIds.has(e.id) && !e.isDead && !e.reachedGoal)
+              splashTargets.forEach((e) => {
+                const b = e.health
+                const d = applyDamageToEnemy(e, damage * splashFactor, towerDamageType)
+                recordDamageEvent(telemetry, tower, e, d, b, towerDamageType)
+              })
             }
             // find next closest not hit
             const next = candidates

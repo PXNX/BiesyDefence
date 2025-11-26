@@ -11,14 +11,12 @@ Konsolidierte Infos aus früheren Plänen (ToDo, Balancing_Logic, Assets_Grafics
 
 ## Offene Arbeit (Priorität)
 1) **Upgrade-UI Feinschliff**
-   - Hotkeys (Core 1/2/3, Branch-A Q/W, Branch-B E/R); Kauf-Toast/SFX; Stat-Icons im Radial/Panel; UI-Frame/Connectoren/Tier-Badges.
-   - Optional: Branch-Cosmetics (Scope/Emitter/Coils/Nozzle/Focus/Armor-Decal).
-2) **Perk-Logik & VFX abschließen**
-   - Chain: Stun-Effekt (Storm) wirklich anwenden; Arc-Splash-Schaden/Falloff implementieren.
-   - Mark/Weakpoint/Execution: Mark-Bonus im Combat verankern (z. B. Bonus-DMG-Fenster).
-   - Shrapnel AoE-Schaden nach Aufschlag; Cryo-Effekt-Verstärkung; Toxin/Virulent Spread-on-Death sicherstellen.
+   - Hotkeys/SFX umgesetzt. Radial nutzt TestAssets-Frames und kleine Stat-Icons. Noch offen: Stat-Icons/Tier-Badges ins Panel/HUD; optional Branch-Cosmetics (Scope/Emitter/Coils/Nozzle/Focus/Armor-Decal).
+2) **Perk-Logik & VFX**
+   - Erledigt: Chain-Stun (Storm) aktiv, Arc-Splash-Schaden aktiv; Mark/Weakpoint als Vulnerability-Bonus; Shrapnel-Splash auf Treffer; Virulent Spread (AoE DoT), Cryo verstärkt Slow + Stun-Chance.
+   - Offen: Feinjustierung Stun/Splash/Slow-Werte; weitere Cryo/Toxin-Balancing.
 3) **Assets für Upgrades/Perks**
-   - UI-Frame (Holz/Metall), Stat-Icons, Tier-Badges. Perk-Icons vorhanden, aber Rahmen/Icons fehlen.
+   - UI-Frame/Connectoren (TestAssets ui_upgrade_arrow, upgrade_path_a/b, upgrade_selected) teils im Radial; Stat-Icons ergänzt. Offen: Panel/HUD-Integration, Tier-Badges (level3_badge etc.).
 4) **Balancing & Tests**
    - Splash/DoT/Slow/Crit, Streak-Bonus, Bulwark/Carrier HP/Rewards feintunen.
    - Autoplay/Headless pro Difficulty (20 Waves); Unit-Checks Resist/Slow-Cap/Streak; UI-Tests Upgrade/Perk-Lock/Affordability.
@@ -43,8 +41,8 @@ Konsolidierte Infos aus früheren Plänen (ToDo, Balancing_Logic, Assets_Grafics
 - **Tier-Badges & Stat-Icons:** L1/L2/L3 Badges; Icons für Range/Splash/Slow/Chain/Crit/DoT.
 
 ## Perk-VFX (Produktion)
-- Implementiert: Napalm-Pfütze (Burn-DoT Boden), Shrapnel-Mini-Ring (VFX), Storm-Spark (VFX), Arc-Ring (VFX), Cryo-Ring (VFX), Toxin-Puff (Spread on death), Weakpoint/Execution Marker.
-- Offen: Stun/Arc-Schaden/Mark-Bonus als Gameplay-Effekt; Branch-Cosmetics (Overlay) für bessere Lesbarkeit.
+- Implementiert: Napalm-Pfütze (Burn-DoT Boden), Shrapnel-Mini-Ring (VFX), Storm-Spark (VFX), Arc-Ring (VFX), Cryo-Ring (VFX), Toxin-Puff (Spread on death), Weakpoint/Execution Marker; Chain-Stun/Arc-Splash/Mark-Bonus/ Shrapnel-Splash jetzt gameplay-wirksam.
+- Offen: Cryo-Verstärkung, weiterführende Toxin/Virulent-Logik, Branch-Cosmetics (Overlay) für bessere Lesbarkeit.
 
 ## Neue Assets aus `public/TestAssets` (Einsatzplan)
 - **Projektile/VFX (Tower/Perks):**
