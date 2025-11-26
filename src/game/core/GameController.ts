@@ -686,10 +686,10 @@ export class GameController {
     if (this.state.resources.money < cost) return { success: false, message: `Need $${cost}.` }
     const plan = TOWER_UPGRADES[tower.type]
     const perk = plan?.perks.find((p) => p.id === perkId)
+    if (!perk) return { success: false, message: 'Perk not defined for this tower.' }
     tower.upgradeState = tower.upgradeState ?? { level: 1, branch: undefined, perks: [] }
-    const branch = perk?.branch ?? (perkId.includes('-A') ? 'A' : perkId.includes('-B') ? 'B' : undefined)
     if (!tower.upgradeState.branch) {
-      tower.upgradeState.branch = branch as any
+      tower.upgradeState.branch = perk.branch
     }
     tower.upgradeState.perks = Array.from(new Set([...(tower.upgradeState.perks ?? []), perkId]))
     this.state.resources.money -= cost
