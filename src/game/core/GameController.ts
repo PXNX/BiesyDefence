@@ -26,6 +26,7 @@ import { clearEnemySpatialGrid, updateEnemySpatialGrid } from '@/game/utils/spat
 import { TelemetryCollector } from '@/game/systems/telemetry/TelemetryCollector'
 import { logger } from '@/game/utils/logger'
 import { canBuyPerk, getLevelUpgradeCost, getPerkCost, recomputeTowerStats } from '@/game/utils/upgradeLogic'
+import { TOWER_UPGRADES } from '@/game/config/upgrades'
 
 const clampValue = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max)
@@ -1767,6 +1768,10 @@ export class GameController {
       return { success: false, message: 'Paths are reserved for enemies.' }
     }
 
+    if (tile.type !== 'grass') {
+      return { success: false, message: 'This tile is reserved for map bonuses.' }
+    }
+
     if (this.state.towers.some((tower) => tower.gridKey === gridKey)) {
       return { success: false, message: 'A tower already guards this tile.' }
     }
@@ -1871,7 +1876,7 @@ export class GameController {
     const profile = TOWER_PROFILES[this.previewTowerType]
     const hasTower = this.state.towers.some((tower) => tower.gridKey === gridKey)
     const valid =
-      tile.type !== 'path' &&
+      tile.type === 'grass' &&
       !hasTower &&
       Boolean(profile) &&
       this.state.resources.money >= (profile?.cost ?? 0)

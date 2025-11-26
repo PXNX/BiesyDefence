@@ -84,6 +84,12 @@ export interface MapConfiguration {
   backgroundColor: string
   pathColor: string
   grassColor: string
+  tileset?: {
+    grassTextureKey?: string
+    pathTextureKey?: string
+    overlayTextureKey?: string
+  }
+  specialTiles?: Array<{ type: 'gold_well' | 'rune'; grid: Vector2 }>
   unlockRequirement?: {
     type: 'waves_cleared' | 'achievement'
     value: string

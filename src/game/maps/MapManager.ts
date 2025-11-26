@@ -79,6 +79,10 @@ export class MapManager {
       backgroundColor: '#09120a',
       pathColor: '#b08b5e',
       grassColor: '#2b4c25',
+      tileset: {
+        grassTextureKey: 'textureGrassCannabis',
+        pathTextureKey: 'stonePath',
+      },
       metadata: {
         version: '2.0.0',
         author: 'BiesyDefence Team',
@@ -115,6 +119,10 @@ export class MapManager {
       backgroundColor: '#0f0b07',
       pathColor: '#b88a55',
       grassColor: '#2d261b',
+      tileset: {
+        grassTextureKey: 'grassTile',
+        pathTextureKey: 'stonePath',
+      },
       metadata: {
         version: '2.0.0',
         author: 'BiesyDefence Team',
@@ -151,6 +159,10 @@ export class MapManager {
       backgroundColor: '#081012',
       pathColor: '#6b8f71',
       grassColor: '#12211d',
+      tileset: {
+        grassTextureKey: 'grassTile',
+        pathTextureKey: 'stonePath',
+      },
       metadata: {
         version: '2.0.0',
         author: 'BiesyDefence Team',
@@ -187,6 +199,10 @@ export class MapManager {
       backgroundColor: '#0a1210',
       pathColor: '#7d6b4c',
       grassColor: '#1f3b25',
+      tileset: {
+        grassTextureKey: 'swampTerrain',
+        pathTextureKey: 'stonePath',
+      },
       metadata: {
         version: '2.1.0',
         author: 'BiesyDefence Team',
@@ -223,6 +239,10 @@ export class MapManager {
       backgroundColor: '#101012',
       pathColor: '#9a825e',
       grassColor: '#233127',
+      tileset: {
+        grassTextureKey: 'grassTile',
+        pathTextureKey: 'stonePath',
+      },
       metadata: {
         version: '2.1.0',
         author: 'BiesyDefence Team',
@@ -261,6 +281,10 @@ export class MapManager {
       backgroundColor: '#0c1215',
       pathColor: '#8b7a64',
       grassColor: '#1d3328',
+      tileset: {
+        grassTextureKey: 'grassTile',
+        pathTextureKey: 'stonePath',
+      },
       metadata: {
         version: '2.1.0',
         author: 'BiesyDefence Team',
@@ -366,6 +390,20 @@ export class MapManager {
       }
     }
 
+    const specialConfigs =
+      mapConfig.specialTiles && mapConfig.specialTiles.length > 0
+        ? mapConfig.specialTiles
+        : this.generateDefaultSpecialTiles(pathGridKeys, width, height)
+
+    specialConfigs.forEach((special) => {
+      const key = `${special.grid.x}:${special.grid.y}`
+      const tile = tileLookup.get(key)
+      if (tile && tile.type !== 'path') {
+        tile.type = special.type
+        tile.specialType = special.type
+      }
+    })
+
     const spawnPoints = (mapConfig.spawnPoints && mapConfig.spawnPoints.length > 0
       ? mapConfig.spawnPoints
       : basePaths.map((p) => p[0]).filter(Boolean)) as MapPathNode[]
@@ -391,7 +429,11 @@ export class MapManager {
         backgroundColor: mapConfig.backgroundColor,
         pathColor: mapConfig.pathColor,
         grassColor: mapConfig.grassColor,
+        grassTextureKey: mapConfig.tileset?.grassTextureKey,
+        pathTextureKey: mapConfig.tileset?.pathTextureKey,
+        overlayTextureKey: mapConfig.tileset?.overlayTextureKey,
       },
+      specialTiles: specialConfigs,
     }
   }
 
@@ -534,6 +576,35 @@ export class MapManager {
 
   private lerp(min: number, max: number, t: number): number {
     return min + (max - min) * t
+  }
+
+  private generateDefaultSpecialTiles(
+    pathGridKeys: Set<string>,
+    width: number,
+    height: number
+  ): Array<{ type: 'gold_well' | 'rune'; grid: MapPathNode }> {
+    const specials: Array<{ type: 'gold_well' | 'rune'; grid: MapPathNode }> = []
+    const isPath = (x: number, y: number) => pathGridKeys.has(`${x}:${y}`)
+    const candidates: MapPathNode[] = []
+    for (let y = 1; y < height - 1; y += 1) {
+      for (let x = 1; x < width - 1; x += 1) {
+        if (isPath(x, y)) continue
+        const adjacent =
+          isPath(x + 1, y) || isPath(x - 1, y) || isPath(x, y + 1) || isPath(x, y - 1)
+        if (adjacent) {
+          candidates.push({ x, y })
+        }
+      }
+    }
+
+    if (candidates.length > 0) {
+      specials.push({ type: 'gold_well', grid: candidates[0] })
+    }
+    if (candidates.length > 1) {
+      specials.push({ type: 'rune', grid: candidates[candidates.length - 1] })
+    }
+
+    return specials
   }
 
   /**

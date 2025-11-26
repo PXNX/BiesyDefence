@@ -59,7 +59,7 @@ const CARDINAL_OFFSETS = [
 ]
 
 const isAdjacentToPath = (tile: MapTile, map: MapData): boolean => {
-  if (tile.type === 'path') {
+  if (tile.type !== 'grass') {
     return false
   }
 
@@ -128,14 +128,14 @@ const findPlacementTile = (map: MapData, anchor: Vector2): MapTile | undefined =
         const gridX = clamp(anchor.x + dx, map.width)
         const gridY = clamp(anchor.y + dy, map.height)
         const tile = map.tileLookup.get(`${gridX}:${gridY}`)
-        if (tile && tile.type !== 'path') {
+        if (tile && tile.type === 'grass') {
           return tile
         }
       }
     }
   }
 
-  return map.tiles.find((tile) => tile.type !== 'path')
+  return map.tiles.find((tile) => tile.type === 'grass')
 }
 
 const createInitialTowers = (map: MapData): Tower[] => {

@@ -8,6 +8,16 @@ import {
   createRingEffect,
   createWeakpointMarker,
   createSparkBurst,
+  createDamageImpactOverlay,
+  createChainArcImpact,
+  createStormImpact,
+  createNapalmPuddle,
+  createFireTrail,
+  createShrapnelImpact,
+  createCryoRing,
+  createToxinCloud,
+  createCritMarker,
+  createDotMarker,
 } from '@/game/entities/particles'
 import { applyDamageToEnemy, applyVulnerability, findSplashTargets } from '@/game/utils/combat'
 import type { TelemetryCollector } from '@/game/systems/telemetry/TelemetryCollector'
@@ -86,6 +96,8 @@ export const updateProjectiles = (
       projectile.isExpired = true
       state.particles.push(createHitMarker(target.position, projectile.color, Math.round(dealt)))
       state.particles.push(createImpactSparkSprite(target.position))
+      const overlay = createDamageImpactOverlay(target.position, dmgType)
+      if (overlay) state.particles.push(overlay)
       if (projectile.splashRadius && projectile.splashRadius > 0) {
         state.particles.push(createSplashIndicatorParticle(target.position, projectile.splashRadius))
       }
@@ -93,12 +105,15 @@ export const updateProjectiles = (
       if (sourceTower?.type === 'sativa' && hasPerk('shrapnel')) {
         state.particles.push(createRingEffect(target.position, 34, 'rgba(255, 248, 180, 0.55)', 0.45, 0.65))
         state.particles.push(...createSparkBurst(target.position, 'rgba(255, 234, 150, 0.9)', 6))
+        state.particles.push(...createShrapnelImpact(target.position, projectile.splashRadius ?? 42))
       }
       if (sourceTower?.type === 'sniper' && (hasPerk('weak') || hasPerk('execution'))) {
         state.particles.push(...createWeakpointMarker(target.position))
+        state.particles.push(createCritMarker(target.position))
       }
       if (sourceTower?.markDuration && sourceTower.markDuration > 0) {
         applyVulnerability(target, 0.15, sourceTower.markDuration)
+        state.particles.push(createDotMarker(target.position))
       }
       if (sourceTower?.type === 'sativa' && hasPerk('shrapnel')) {
         const shrapnelRadius = projectile.splashRadius ?? 28
@@ -112,6 +127,13 @@ export const updateProjectiles = (
         state.particles.push(...createImpactParticles(target.position, projectile.color))
       } else {
         state.particles.push(...createImpactParticles(target.position, '#fdf1a2'))
+      }
+      // Chain perks visuals on hit
+      if (sourceTower?.type === 'chain' && hasPerk('arc')) {
+        state.particles.push(createChainArcImpact(target.position))
+      }
+      if (sourceTower?.type === 'chain' && hasPerk('storm')) {
+        state.particles.push(createStormImpact(target.position))
       }
       return
     }

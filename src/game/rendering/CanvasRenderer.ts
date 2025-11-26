@@ -16,15 +16,24 @@ type TextureKey =
   | 'grassBase'
   | 'woodBase'
   | 'pathStraight'
+  | 'stonePath'
+  | 'grassTile'
+  | 'swampTerrain'
+  | 'textureGrassCannabis'
+  | 'gold-well-tile'
+  | 'rune-tile'
   | 'tower-indica-l1'
   | 'tower-indica-l2'
   | 'tower-indica-l3'
+  | 'tower-indica-l2-enhanced'
   | 'tower-sativa-l1'
   | 'tower-sativa-l2'
   | 'tower-sativa-l3'
+  | 'tower-sativa-l2-enhanced'
   | 'tower-support-l1'
   | 'tower-support-l2'
   | 'tower-support-l3'
+  | 'tower-support-l2-enhanced'
   | 'tower-sniper-l1'
   | 'tower-sniper-l2'
   | 'tower-sniper-l3'
@@ -34,6 +43,9 @@ type TextureKey =
   | 'tower-chain-l1'
   | 'tower-chain-l2'
   | 'tower-chain-l3'
+  | 'tower-range-indica'
+  | 'tower-range-sativa'
+  | 'tower-range-support'
   // Enemies
   | 'enemy-runner'
   | 'enemy-swift'
@@ -44,12 +56,18 @@ type TextureKey =
   | 'enemy-armored'
   | 'enemy-bulwark'
   | 'enemy-boss'
+  | 'enemy-beetle'
+  | 'enemy-alien-boss'
   // Badges & overlays
   | 'badge-fast'
   | 'badge-armored'
   | 'badge-boss'
   | 'badge-shielded'
   | 'badge-swarm'
+  | 'badge-elite'
+  | 'badge-stealth'
+  | 'badge-regeneration'
+  | 'badge-toxic'
   | 'effect-motion-trail'
   | 'effect-shield'
   | 'effect-boss-glow'
@@ -57,9 +75,29 @@ type TextureKey =
   | 'effect-splash-indicator'
   | 'effect-dot-burn'
   | 'effect-dot-burn-strong'
+  | 'effect-explosion-electric'
+  | 'effect-explosion-orange'
+  | 'effect-electric-impact'
+  | 'effect-freeze-impact'
+  | 'effect-poison-impact'
+  | 'napalm-puddle-effect'
+  | 'fire-trail'
+  | 'shrapnel-explosion'
+  | 'cryo-freeze-ring'
+  | 'toxin-cloud-effect'
+  | 'crit-icon'
+  | 'dot-icon'
   | 'projectile-impact'
   | 'projectile-volley'
   | 'projectile-support'
+  | 'projectile-chain'
+  | 'projectile-chain-arc'
+  | 'projectile-flame'
+  | 'projectile-shrapnel'
+  | 'projectile-pierce'
+  | 'projectile-heavy'
+  | 'projectile-ice'
+  | 'projectile-toxin'
   | 'tower-placeholder'
 
 const TOWER_TEXTURE_BY_TYPE: Record<TowerType, Record<1 | 2 | 3, TextureKey>> = {
@@ -69,6 +107,12 @@ const TOWER_TEXTURE_BY_TYPE: Record<TowerType, Record<1 | 2 | 3, TextureKey>> = 
   sniper: { 1: 'tower-sniper-l1', 2: 'tower-sniper-l2', 3: 'tower-sniper-l3' },
   flamethrower: { 1: 'tower-flamethrower-l1', 2: 'tower-flamethrower-l2', 3: 'tower-flamethrower-l3' },
   chain: { 1: 'tower-chain-l1', 2: 'tower-chain-l2', 3: 'tower-chain-l3' },
+}
+
+const RANGE_TEXTURE_BY_TYPE: Partial<Record<TowerType, TextureKey>> = {
+  indica: 'tower-range-indica',
+  sativa: 'tower-range-sativa',
+  support: 'tower-range-support',
 }
 
 const assetPath = (relativePath: string) => {
@@ -85,6 +129,8 @@ const ENEMY_TEXTURE_BY_TYPE: Partial<Record<EnemyType, TextureKey>> = {
   armored_pest: 'enemy-armored',
   bulwark: 'enemy-bulwark',
   carrier_boss: 'enemy-boss',
+  armored_beetle: 'enemy-beetle',
+  alien_boss: 'enemy-alien-boss',
 }
 
 const BADGE_BY_TAG: Partial<Record<EnemyTag, TextureKey>> = {
@@ -93,21 +139,35 @@ const BADGE_BY_TAG: Partial<Record<EnemyTag, TextureKey>> = {
   boss: 'badge-boss',
   shielded: 'badge-shielded',
   swarm: 'badge-swarm',
+  flying: 'badge-flying',
+  stealth: 'badge-stealth',
+  regenerator: 'badge-regeneration',
+  toxic: 'badge-toxic',
+  elite: 'badge-elite',
 }
 
 const TEXTURE_PATHS: Record<TextureKey, string> = {
   grassBase: assetPath('/textures/grass_base.png'),
   woodBase: assetPath('/textures/wood_base.png'),
   pathStraight: assetPath('/textures/path_straight.png'),
+  stonePath: assetPath('/textures/stone_path.png'),
+  grassTile: assetPath('/textures/grass_tile.png'),
+  swampTerrain: assetPath('/textures/swamp_terrain.png'),
+  textureGrassCannabis: assetPath('/textures/texture_grass_cannabis.png'),
+  'gold-well-tile': assetPath('/textures/gold_well_tile.png'),
+  'rune-tile': assetPath('/textures/rune_tile.png'),
   'tower-indica-l1': assetPath('/towers/tower_indica_build_level1.png'),
   'tower-indica-l2': assetPath('/towers/tower_indica_build_level2.png'),
   'tower-indica-l3': assetPath('/towers/tower_indica_build_level3.png'),
+  'tower-indica-l2-enhanced': assetPath('/towers/tower_indica_level2_enhanced.png'),
   'tower-sativa-l1': assetPath('/towers/tower_sativa_build_level1.png'),
   'tower-sativa-l2': assetPath('/towers/tower_sativa_build_level2.png'),
   'tower-sativa-l3': assetPath('/towers/tower_sativa_build_level3.png'),
+  'tower-sativa-l2-enhanced': assetPath('/towers/tower_sativa_level2_enhanced.png'),
   'tower-support-l1': assetPath('/towers/tower_support_build_level1.png'),
   'tower-support-l2': assetPath('/towers/tower_support_build_level2.png'),
   'tower-support-l3': assetPath('/towers/tower_support_build_level3.png'),
+  'tower-support-l2-enhanced': assetPath('/towers/tower_support_level2_enhanced.png'),
   'tower-sniper-l1': assetPath('/towers/tower_sniper_build_level1.png'),
   'tower-sniper-l2': assetPath('/towers/tower_sniper_build_level2.png'),
   'tower-sniper-l3': assetPath('/towers/tower_sniper_build_level3.png'),
@@ -117,6 +177,9 @@ const TEXTURE_PATHS: Record<TextureKey, string> = {
   'tower-chain-l1': assetPath('/towers/tower_chain_build_level1.png'),
   'tower-chain-l2': assetPath('/towers/tower_chain_build_level2.png'),
   'tower-chain-l3': assetPath('/towers/tower_chain_build_level3.png'),
+  'tower-range-indica': assetPath('/effects/tower_range_indicator_indica.png'),
+  'tower-range-sativa': assetPath('/effects/tower_range_indicator_sativa.png'),
+  'tower-range-support': assetPath('/effects/tower_range_indicator_support.png'),
   'tower-placeholder': 'data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"96\" height=\"96\" viewBox=\"0 0 96 96\"><rect width=\"96\" height=\"96\" rx=\"16\" fill=\"%23222\"/><text x=\"50%\" y=\"55%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-size=\"18\" fill=\"%23ccc\">WIP</text></svg>',
   'enemy-runner': assetPath('/enemies/enemy_runner.png'),
   'enemy-swift': assetPath('/enemies/enemy_swift_runner.png'),
@@ -127,11 +190,18 @@ const TEXTURE_PATHS: Record<TextureKey, string> = {
   'enemy-armored': assetPath('/enemies/enemy_armored_pest.png'),
   'enemy-bulwark': assetPath('/enemies/enemy_bulwark.png'),
   'enemy-boss': assetPath('/enemies/enemy_carrier_boss.png'),
+  'enemy-beetle': assetPath('/enemies/enemy_armored_beetle.png'),
+  'enemy-alien-boss': assetPath('/enemies/enemy_alien_boss.png'),
   'badge-fast': assetPath('/enemies/badges/badge_fast.svg.png'),
   'badge-armored': assetPath('/enemies/badges/badge_armored.svg.png'),
   'badge-boss': assetPath('/enemies/badges/badge_boss.svg.png'),
   'badge-shielded': assetPath('/enemies/badges/badge_shielded.svg.png'),
   'badge-swarm': assetPath('/enemies/badges/badge_swarm.svg.png'),
+  'badge-elite': assetPath('/enemies/badges/badge_elite.svg.png'),
+  'badge-flying': assetPath('/enemies/badges/badge_flying.svg.png'),
+  'badge-stealth': assetPath('/enemies/badges/badge_stealth.svg.png'),
+  'badge-regeneration': assetPath('/enemies/badges/badge_regeneration.svg.png'),
+  'badge-toxic': assetPath('/enemies/badges/badge_toxic.svg.png'),
   'effect-motion-trail': assetPath('/enemies/effect_motion_trail_fast.png'),
   'effect-shield': assetPath('/enemies/effect_shield_overlay.png'),
   'effect-boss-glow': assetPath('/enemies/effect_boss_glow.png'),
@@ -139,9 +209,29 @@ const TEXTURE_PATHS: Record<TextureKey, string> = {
   'effect-splash-indicator': assetPath('/effects/splash_indicator.png'),
   'effect-dot-burn': assetPath('/effects/dot_burn_overlay.png'),
   'effect-dot-burn-strong': assetPath('/effects/dot_burn_overlay2.png'),
+  'effect-explosion-electric': assetPath('/effects/effect_explosion_electric.png'),
+  'effect-explosion-orange': assetPath('/effects/effect_explosion_orange.png'),
+  'effect-electric-impact': assetPath('/effects/electric_impact.png'),
+  'effect-freeze-impact': assetPath('/effects/freeze_impact.png'),
+  'effect-poison-impact': assetPath('/effects/poison_impact.png'),
+  'napalm-puddle-effect': assetPath('/effects/napalm_puddle_effect.png'),
+  'fire-trail': assetPath('/effects/fire_trail.png'),
+  'shrapnel-explosion': assetPath('/projectiles/shrapnel_explosion.png'),
+  'cryo-freeze-ring': assetPath('/projectiles/cryo_freeze_ring.png'),
+  'toxin-cloud-effect': assetPath('/projectiles/toxin_cloud_effect.png'),
+  'crit-icon': assetPath('/ui/icons/perks/critical_hit_icon.png'),
+  'dot-icon': assetPath('/ui/icons/perks/dot_damage_icon.png'),
   'projectile-impact': assetPath('/projectiles/impact_projectile.png'),
   'projectile-volley': assetPath('/projectiles/volley_projectile.png'),
   'projectile-support': assetPath('/projectiles/support_bolt.png'),
+  'projectile-chain': assetPath('/projectiles/chain_lightning_projectile.png'),
+  'projectile-chain-arc': assetPath('/projectiles/chain_arc_projectile.png'),
+  'projectile-flame': assetPath('/projectiles/flamethrower_cone.png'),
+  'projectile-shrapnel': assetPath('/projectiles/shrapnel_effect.png'),
+  'projectile-pierce': assetPath('/projectiles/pierce_effect.png'),
+  'projectile-heavy': assetPath('/projectiles/indica_heavy_round.png'),
+  'projectile-ice': assetPath('/projectiles/ice_shard_spritesheet.png'),
+  'projectile-toxin': assetPath('/projectiles/support_slow_projectile.png'),
 }
 
 class TextureCache {
@@ -338,6 +428,22 @@ export class CanvasRenderer {
       ctx.arc(x, y, spriteSize / 2 + 4, 0, Math.PI * 2)
       ctx.fillStyle = branchColor
       ctx.fill()
+      // Small branch decal at top for readability
+      ctx.fillStyle = tower.upgradeState.branch === 'A' ? '#b5e9ff' : '#ffd8a0'
+      ctx.strokeStyle = 'rgba(0,0,0,0.45)'
+      ctx.lineWidth = 1.5
+      ctx.beginPath()
+      ctx.moveTo(x, y - spriteSize / 2 - 2)
+      ctx.lineTo(x - 8, y - spriteSize / 2 + 12)
+      ctx.lineTo(x + 8, y - spriteSize / 2 + 12)
+      ctx.closePath()
+      ctx.fill()
+      ctx.stroke()
+      ctx.fillStyle = '#0b0f0c'
+      ctx.font = 'bold 10px Arial'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(tower.upgradeState.branch, x, y - spriteSize / 2 + 8)
     }
 
     ctx.drawImage(sprite, x - spriteSize / 2, y - spriteSize / 2, spriteSize, spriteSize)
@@ -695,20 +801,43 @@ export class CanvasRenderer {
     ctx.fillText(`${Math.round(healthPercent * 100)}%`, x, healthY + healthHeight + 12)
   }
 
-  private drawRangeVisualization(ctx: CanvasRenderingContext2D, x: number, y: number, range: number, tileSize: number): void {
-    // Enhanced range visualization
-    ctx.fillStyle = 'rgba(100, 200, 100, 0.15)'
-    ctx.beginPath()
-    ctx.arc(x, y, range, 0, Math.PI * 2)
-    ctx.fill()
-    
-    ctx.strokeStyle = 'rgba(100, 200, 100, 0.4)'
-    ctx.lineWidth = 2
-    ctx.setLineDash([5, 5])
-    ctx.beginPath()
-    ctx.arc(x, y, range, 0, Math.PI * 2)
-    ctx.stroke()
-    ctx.setLineDash([])
+  private drawRangeVisualization(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    range: number,
+    tileSize: number,
+    textureKey?: TextureKey,
+    branch?: 'A' | 'B'
+  ): void {
+    // Enhanced range visualization with optional textured rings
+    const ringImage = textureKey ? this.textureCache.getImage(textureKey) : null
+    if (ringImage && ringImage.complete && ringImage.naturalWidth > 0) {
+      ctx.save()
+      ctx.globalAlpha = 0.32
+      if (branch) {
+        ctx.globalAlpha = branch === 'A' ? 0.34 : 0.3
+        ctx.filter = branch === 'A' ? 'hue-rotate(180deg)' : 'hue-rotate(-20deg)'
+      }
+      const size = range * 2
+      ctx.drawImage(ringImage, x - size, y - size, size * 2, size * 2)
+      ctx.restore()
+    } else {
+      const baseColor = branch === 'A' ? 'rgba(100, 220, 255, 0.15)' : branch === 'B' ? 'rgba(255, 200, 140, 0.15)' : 'rgba(100, 200, 100, 0.15)'
+      const strokeColor = branch === 'A' ? 'rgba(120, 230, 255, 0.4)' : branch === 'B' ? 'rgba(255, 210, 150, 0.4)' : 'rgba(100, 200, 100, 0.4)'
+      ctx.fillStyle = baseColor
+      ctx.beginPath()
+      ctx.arc(x, y, range, 0, Math.PI * 2)
+      ctx.fill()
+      
+      ctx.strokeStyle = strokeColor
+      ctx.lineWidth = 2
+      ctx.setLineDash([5, 5])
+      ctx.beginPath()
+      ctx.arc(x, y, range, 0, Math.PI * 2)
+      ctx.stroke()
+      ctx.setLineDash([])
+    }
   }
 
   private drawSelectionAura(
@@ -892,7 +1021,8 @@ export class CanvasRenderer {
     const bottomRight = worldToScreen(map.worldWidth, map.worldHeight)
 
     ctx.save()
-    const grassPattern = this.textureCache.getPattern(ctx, 'grassBase')
+    const grassTextureKey = (map.theme?.grassTextureKey as TextureKey) ?? 'swampTerrain'
+    const grassPattern = this.textureCache.getPattern(ctx, grassTextureKey)
     ctx.fillStyle = grassPattern ?? (map.theme?.grassColor ?? palette.grass)
     ctx.fillRect(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y)
     if (map.theme?.grassColor) {
@@ -904,6 +1034,7 @@ export class CanvasRenderer {
     ctx.restore()
 
     this.drawPathTiles(ctx, map, worldToScreen, tileSize)
+    this.drawSpecialTiles(ctx, map, worldToScreen, tileSize)
 
     ctx.save()
     ctx.strokeStyle = 'rgba(255,255,255,0.08)'
@@ -934,7 +1065,8 @@ export class CanvasRenderer {
     worldToScreen: Function,
     tileSize: number
   ): void {
-    const pathPattern = this.textureCache.getPattern(ctx, 'pathStraight')
+    const pathTextureKey = (map.theme?.pathTextureKey as TextureKey) ?? 'pathStraight'
+    const pathPattern = this.textureCache.getPattern(ctx, pathTextureKey)
     ctx.save()
     ctx.fillStyle = pathPattern ?? (map.theme?.pathColor ?? palette.path)
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)'
@@ -961,6 +1093,33 @@ export class CanvasRenderer {
       ctx.fillRect(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y)
       ctx.restore()
     }
+  }
+
+  private drawSpecialTiles(
+    ctx: CanvasRenderingContext2D,
+    map: MapData,
+    worldToScreen: Function,
+    tileSize: number
+  ): void {
+    if (!map.specialTiles || map.specialTiles.length === 0) return
+    map.specialTiles.forEach((special) => {
+      const tile = map.tileLookup.get(`${special.grid.x}:${special.grid.y}`)
+      if (!tile || tile.type === 'path') return
+      const origin = worldToScreen(tile.grid.x * map.cellSize, tile.grid.y * map.cellSize)
+      const textureKey = (special.type === 'gold_well' ? 'gold-well-tile' : 'rune-tile') as TextureKey
+      const sprite = this.textureCache.getImage(textureKey)
+      if (sprite && sprite.complete && sprite.naturalWidth > 0) {
+        ctx.save()
+        ctx.globalAlpha = 0.92
+        ctx.drawImage(sprite, origin.x, origin.y, tileSize, tileSize)
+        ctx.restore()
+      } else {
+        ctx.save()
+        ctx.fillStyle = special.type === 'gold_well' ? 'rgba(255, 215, 120, 0.4)' : 'rgba(120, 200, 255, 0.35)'
+        ctx.fillRect(origin.x, origin.y, tileSize, tileSize)
+        ctx.restore()
+      }
+    })
   }
 
   private drawPath(ctx: CanvasRenderingContext2D, path: any[], worldToScreen: Function, tileSize: number): void {
@@ -1027,7 +1186,8 @@ export class CanvasRenderer {
   private drawTowerRanges(ctx: CanvasRenderingContext2D, towers: any[], worldToScreen: Function, scale: number): void {
     towers.forEach((tower) => {
       const { x, y } = worldToScreen(tower.position.x, tower.position.y)
-      this.drawRangeVisualization(ctx, x, y, tower.range * scale, 32)
+      const ringKey = RANGE_TEXTURE_BY_TYPE[tower.type as TowerType]
+      this.drawRangeVisualization(ctx, x, y, tower.range * scale, 32, ringKey, tower.upgradeState?.branch)
     })
   }
 

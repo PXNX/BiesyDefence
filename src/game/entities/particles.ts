@@ -58,6 +58,39 @@ export const createImpactSparkSprite = (position: Vector2): Particle => ({
   freezeFrame: true,
 })
 
+export const createDamageImpactOverlay = (position: Vector2, damageType: string): Particle | null => {
+  const keyMap: Record<string, { key: any; size?: number; alpha?: number }> = {
+    chain: { key: 'effect-explosion-electric', size: 72, alpha: 0.65 },
+    electric: { key: 'effect-explosion-electric', size: 72, alpha: 0.65 },
+    burn: { key: 'effect-explosion-orange', size: 72, alpha: 0.55 },
+    impact: { key: 'effect-explosion-orange', size: 64, alpha: 0.5 },
+    pierce: { key: 'effect-explosion-orange', size: 64, alpha: 0.5 },
+    freeze: { key: 'effect-freeze-impact', size: 72, alpha: 0.6 },
+    dot: { key: 'effect-poison-impact', size: 64, alpha: 0.55 },
+    poison: { key: 'effect-poison-impact', size: 64, alpha: 0.55 },
+    control: { key: 'effect-freeze-impact', size: 64, alpha: 0.5 },
+  }
+  const mapped = keyMap[damageType]
+  if (!mapped) return null
+  return {
+    id: createEntityId('particle'),
+    position: { ...position },
+    velocity: { x: 0, y: 0 },
+    radius: 0,
+    life: 0.5,
+    maxLife: 0.5,
+    color: '#ffffff',
+    textureKey: mapped.key as any,
+    frameCount: 1,
+    cols: 1,
+    rows: 1,
+    size: mapped.size ?? 64,
+    additive: true,
+    baseAlpha: mapped.alpha ?? 0.6,
+    freezeFrame: true,
+  }
+}
+
 export const createSplashIndicatorParticle = (position: Vector2, radius: number): Particle => ({
   id: createEntityId('particle'),
   position: { ...position },
@@ -85,7 +118,7 @@ export const createMuzzleParticles = (
     y: targetPosition.y - towerPosition.y,
   })
 
-  return Array.from({ length: 4 }, (_, index) => {
+  return Array.from({ length: 4 }, () => {
     const jitter = normalize({
       x: direction.x + randomBetween(-0.25, 0.25),
       y: direction.y + randomBetween(-0.25, 0.25),
@@ -172,3 +205,162 @@ export const createWeakpointMarker = (position: Vector2): Particle[] => [
     baseAlpha: 0.9,
   },
 ]
+
+export const createCritMarker = (position: Vector2): Particle => ({
+  id: createEntityId('particle'),
+  position: { ...position },
+  velocity: { x: 0, y: -28 },
+  radius: 0,
+  life: 0.4,
+  maxLife: 0.4,
+  color: '#ffd166',
+  textureKey: 'crit-icon',
+  frameCount: 1,
+  size: 36,
+  additive: true,
+  baseAlpha: 0.95,
+})
+
+export const createDotMarker = (position: Vector2): Particle => ({
+  id: createEntityId('particle'),
+  position: { ...position },
+  velocity: { x: 0, y: -24 },
+  radius: 0,
+  life: 0.5,
+  maxLife: 0.5,
+  color: '#9acd32',
+  textureKey: 'dot-icon',
+  frameCount: 1,
+  size: 32,
+  additive: true,
+  baseAlpha: 0.9,
+})
+
+export const createChainArcImpact = (position: Vector2): Particle => ({
+  id: createEntityId('particle'),
+  position: { ...position },
+  velocity: { x: 0, y: 0 },
+  radius: 0,
+  life: 0.5,
+  maxLife: 0.5,
+  color: '#9cc8ff',
+  textureKey: 'projectile-chain-arc',
+  frameCount: 4,
+  cols: 2,
+  rows: 2,
+  fps: 8,
+  size: 72,
+  additive: true,
+  baseAlpha: 0.85,
+})
+
+export const createStormImpact = (position: Vector2): Particle => ({
+  id: createEntityId('particle'),
+  position: { ...position },
+  velocity: { x: 0, y: 0 },
+  radius: 0,
+  life: 0.45,
+  maxLife: 0.45,
+  color: '#bcdcff',
+  textureKey: 'storm-effect',
+  frameCount: 4,
+  cols: 2,
+  rows: 2,
+  fps: 10,
+  size: 80,
+  additive: true,
+  baseAlpha: 0.85,
+})
+
+export const createNapalmPuddle = (position: Vector2, radius = 48): Particle[] => [
+  createRingEffect(position, radius, 'rgba(255,132,79,0.35)', 1.4, 0.6),
+  {
+    id: createEntityId('particle'),
+    position: { ...position },
+    velocity: { x: 0, y: 0 },
+    radius,
+    life: 1.5,
+    maxLife: 1.5,
+    color: '#ff6b35',
+    textureKey: 'napalm-puddle-effect',
+    frameCount: 1,
+    sizeWorld: radius * 2,
+    additive: false,
+    baseAlpha: 0.28,
+  },
+]
+
+export const createFireTrail = (position: Vector2, radius = 32): Particle[] => [
+  createRingEffect(position, radius, 'rgba(255,180,120,0.4)', 0.8, 0.6),
+  {
+    id: createEntityId('particle'),
+    position: { ...position },
+    velocity: { x: 0, y: 0 },
+    radius,
+    life: 0.8,
+    maxLife: 0.8,
+    color: '#ff9f68',
+    textureKey: 'fire-trail',
+    frameCount: 1,
+    sizeWorld: radius * 2,
+    additive: true,
+    baseAlpha: 0.7,
+  },
+]
+
+export const createShrapnelImpact = (position: Vector2, radius = 42): Particle[] => [
+  createRingEffect(position, radius, 'rgba(255,248,180,0.55)', 0.6, 0.75),
+  {
+    id: createEntityId('particle'),
+    position: { ...position },
+    velocity: { x: 0, y: 0 },
+    radius,
+    life: 0.5,
+    maxLife: 0.5,
+    color: '#fff7b2',
+    textureKey: 'shrapnel-explosion',
+    frameCount: 4,
+    cols: 2,
+    rows: 2,
+    fps: 10,
+    sizeWorld: radius * 2,
+    additive: true,
+    baseAlpha: 0.85,
+  },
+]
+
+export const createCryoRing = (position: Vector2, radius = 40): Particle => ({
+  id: createEntityId('particle'),
+  position: { ...position },
+  velocity: { x: 0, y: 0 },
+  radius,
+  life: 0.6,
+  maxLife: 0.6,
+  color: '#9cd7ff',
+  textureKey: 'cryo-freeze-ring',
+  frameCount: 4,
+  cols: 2,
+  rows: 2,
+  fps: 8,
+  sizeWorld: radius * 2,
+  additive: true,
+  baseAlpha: 0.9,
+})
+
+export const createToxinCloud = (position: Vector2, radius = 42): Particle => ({
+  id: createEntityId('particle'),
+  position: { ...position },
+  velocity: { x: 0, y: 0 },
+  radius,
+  life: 0.7,
+  maxLife: 0.7,
+  color: '#98ffb0',
+  textureKey: 'toxin-cloud-effect',
+  frameCount: 4,
+  cols: 2,
+  rows: 2,
+  fps: 9,
+  sizeWorld: radius * 2,
+  additive: true,
+  baseAlpha: 0.75,
+})

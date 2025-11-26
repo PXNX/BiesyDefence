@@ -7,13 +7,14 @@ export type DamageType = 'impact' | 'volley' | 'control' | 'dot' | 'pierce' | 'c
 
 export type GameStatus = 'idle' | 'running' | 'paused' | 'won' | 'lost'
 
-export type TileType = 'path' | 'grass'
+export type TileType = 'path' | 'grass' | 'gold_well' | 'rune'
 
 export interface MapTile {
   grid: Vector2
   center: Vector2
   type: TileType
   key: string
+  specialType?: 'gold_well' | 'rune'
 }
 
 export interface MapData {
@@ -34,7 +35,11 @@ export interface MapData {
     backgroundColor: string
     pathColor: string
     grassColor: string
+    grassTextureKey?: string
+    pathTextureKey?: string
+    overlayTextureKey?: string
   }
+  specialTiles?: Array<{ type: 'gold_well' | 'rune'; grid: Vector2 }>
 }
 
 export type TowerType = 'indica' | 'sativa' | 'support' | 'sniper' | 'flamethrower' | 'chain'
@@ -49,6 +54,8 @@ export type EnemyType =
   | 'stealth'
   | 'regenerator'
   | 'splitter'
+  | 'armored_beetle'
+  | 'alien_boss'
 export type EnemyTag =
   | 'armored'
   | 'fast'
@@ -58,6 +65,9 @@ export type EnemyTag =
   | 'stealth'
   | 'regenerator'
   | 'splitter'
+  | 'flying'
+  | 'toxic'
+  | 'elite'
 
 // Chapter 2 Balance: Tower upgrade system preparation (levels 1-3)
 export interface TowerUpgrade {

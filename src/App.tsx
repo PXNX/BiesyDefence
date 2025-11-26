@@ -466,7 +466,7 @@ function App() {
       }
 
       switch (event.code) {
-        case 'Space':
+        case 'Space': {
           event.preventDefault()
           if (snapshot?.status === 'running') {
             handlePause()
@@ -474,105 +474,52 @@ function App() {
             handleStart()
           }
           break
-        case 'KeyR':
+        }
+        case 'KeyR': {
           event.preventDefault()
-          handleReset()
+          if (snapshot?.hoverTower) {
+            tryUpgradeHotkey('branchB')
+          } else {
+            handleReset()
+          }
           break
-        case 'KeyN':
+        }
+        case 'KeyN': {
           event.preventDefault()
           if (snapshot?.nextWaveAvailable) {
             handleNextWave()
           }
           break
-        case 'KeyT':
+        }
+        case 'KeyT': {
           event.preventDefault()
           handleToggleTelemetry()
           break
-        case 'Digit1':
-          event.preventDefault()
-          handleSpeedChange(1)
-          break
-        case 'Digit2':
-          event.preventDefault()
-          handleSpeedChange(2)
-          break
-        case 'Digit3':
-          event.preventDefault()
-          handleSpeedChange(4)
-          break
-        case 'Escape':
-          event.preventDefault()
-          if (showGameOverOverlay) {
-            handleRetry()
-          } else {
-            // Cancel tower selection (reset to first available tower)
-            controllerRef.current?.setPreviewTowerType(null)
-            controllerRef.current?.clearHover()
-            setSelectedTower(null)
-            setFeedback('Tower selection cancelled')
-          }
-          break
-      }
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // Ignore if typing in input fields
-      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
-        return
-      }
-
-      switch (event.code) {
-        case 'Space':
-          event.preventDefault()
-          if (snapshot?.status === 'running') {
-            handlePause()
-          } else {
-            handleStart()
-          }
-          break
-        case 'KeyR':
-          event.preventDefault()
-          handleReset()
-          break
-        case 'KeyN':
-          event.preventDefault()
-          if (snapshot?.nextWaveAvailable) {
-            handleNextWave()
-          }
-          break
-        case 'KeyT':
-          event.preventDefault()
-          handleToggleTelemetry()
-          break
-        case 'Digit1':
-        case 'Digit2':
-        case 'Digit3':
-          event.preventDefault()
-          tryUpgradeHotkey('core')
-          break
+        }
         case 'KeyQ':
-        case 'KeyW':
+        case 'KeyW': {
           event.preventDefault()
           tryUpgradeHotkey('branchA')
           break
-        case 'KeyE':
-        case 'KeyR':
+        }
+        case 'KeyE': {
           event.preventDefault()
           tryUpgradeHotkey('branchB')
           break
+        }
         case 'Digit1':
-          event.preventDefault()
-          handleSpeedChange(1)
-          break
         case 'Digit2':
+        case 'Digit3': {
           event.preventDefault()
-          handleSpeedChange(2)
+          if (snapshot?.hoverTower) {
+            tryUpgradeHotkey('core')
+          } else {
+            const speed = event.code === 'Digit1' ? 1 : event.code === 'Digit2' ? 2 : 4
+            handleSpeedChange(speed)
+          }
           break
-        case 'Digit3':
-          event.preventDefault()
-          handleSpeedChange(4)
-          break
-        case 'Escape':
+        }
+        case 'Escape': {
           event.preventDefault()
           if (showGameOverOverlay) {
             handleRetry()
@@ -583,6 +530,7 @@ function App() {
             setFeedback('Tower selection cancelled')
           }
           break
+        }
       }
     }
 

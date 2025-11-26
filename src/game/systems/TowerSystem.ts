@@ -4,9 +4,12 @@ import {
   createImpactParticles,
   createImpactSparkSprite,
   createMuzzleParticles,
-  createPuddleEffect,
   createRingEffect,
   createSparkBurst,
+  createNapalmPuddle,
+  createFireTrail,
+  createCryoRing,
+  createToxinCloud,
 } from '@/game/entities/particles'
 import { acquireProjectile } from '@/game/utils/enhancedPool'
 import { findOptimalTargets, findTargetsInRange } from '@/game/utils/spatialGrid'
@@ -76,12 +79,29 @@ const recordDamageEvent = (
   })
 }
 
-const getProjectileSprite = (towerType: Tower['type'], damageType: DamageType) => {
+const getProjectileSprite = (towerType: Tower['type'], damageType: DamageType, hasPerk: (s: string) => boolean) => {
   if (towerType === 'support') {
+    if (hasPerk('cryo')) return { key: 'projectile-ice', size: 30, trailColor: '#9cd7ff', trailWidth: 6 }
+    if (hasPerk('toxin')) return { key: 'projectile-toxin', size: 30, trailColor: '#9bffb0', trailWidth: 6 }
     return { key: 'projectile-support', size: 30, trailColor: '#6be8ff', trailWidth: 6 }
   }
   if (towerType === 'sativa' || damageType === 'volley') {
+    if (hasPerk('shrapnel')) return { key: 'projectile-shrapnel', size: 30, trailColor: '#fff7b2', trailWidth: 5 }
     return { key: 'projectile-volley', size: 26, trailColor: '#fdf1a2', trailWidth: 4 }
+  }
+  if (towerType === 'flamethrower') {
+    return { key: 'projectile-flame', size: 46, trailColor: '#ffbb7a', trailWidth: 10 }
+  }
+  if (towerType === 'chain') {
+    return hasPerk('arc') ? { key: 'projectile-chain-arc', size: 34, trailColor: '#bcdcff', trailWidth: 6 } : { key: 'projectile-chain', size: 32, trailColor: '#bcdcff', trailWidth: 6 }
+  }
+  if (towerType === 'sniper' || damageType === 'pierce') {
+    return hasPerk('pierce') || hasPerk('weak')
+      ? { key: 'projectile-pierce', size: 30, trailColor: '#ffdbb0', trailWidth: 4 }
+      : { key: 'projectile-heavy', size: 30, trailColor: '#e0e0e0', trailWidth: 4 }
+  }
+  if (towerType === 'indica') {
+    return hasPerk('pen') ? { key: 'projectile-pierce', size: 30, trailColor: '#f8e0c0', trailWidth: 4 } : { key: 'projectile-heavy', size: 30, trailColor: '#d6f5d6', trailWidth: 4 }
   }
   return { key: 'projectile-impact', size: 28, trailColor: undefined, trailWidth: 4 }
 }
@@ -135,7 +155,7 @@ export const updateTowers = (
           }
 
           if (hasPerk('cryo')) {
-            state.particles.push(createRingEffect(enemy.position, 36, 'rgba(140, 220, 255, 0.7)', 0.5, 0.7))
+            state.particles.push(createCryoRing(enemy.position, 36))
           }
           if (hasPerk('cryo-2') && Math.random() < (tower.stunChance ?? 0.1)) {
             applyStunToEnemy(enemy, tower.stunDuration ?? 0.6, tower.id)
@@ -151,6 +171,7 @@ export const updateTowers = (
           // Toxin virulent puff on kill
           if (enemy.health <= 0 && hasPerk('toxin-2')) {
             state.particles.push(...createSparkBurst(enemy.position, 'rgba(110, 255, 150, 0.8)', 12))
+            state.particles.push(createToxinCloud(enemy.position, 42))
             const spreadTargets = findTargetsInRange(
               { ...tower, range: Math.max(28, tower.range * 0.5) } as Tower,
               state.enemies
@@ -256,7 +277,10 @@ export const updateTowers = (
             applyDotToEnemy(enemy, tower.dot.dps, tower.dot.duration, 'burn', tower.id, tower.type)
           }
           if (hasPerk('napalm')) {
-            state.particles.push(...createPuddleEffect(enemy.position, 'rgba(255,132,79,0.55)', 44))
+            state.particles.push(...createNapalmPuddle(enemy.position, 44))
+          }
+          if (hasPerk('pressure')) {
+            state.particles.push(...createFireTrail(enemy.position, 28))
           }
         })
         tower.cooldown = tower.fireRate
@@ -278,7 +302,7 @@ export const updateTowers = (
     const projectileCount = tower.type === 'sativa' ? 2 : 1
     const baseDamage = tower.type === 'sativa' ? Math.floor(tower.damage * 0.6) : tower.damage
     telemetry?.recordShot(tower)
-    const spriteMeta = getProjectileSprite(tower.type, towerDamageType)
+    const spriteMeta = getProjectileSprite(tower.type, towerDamageType, hasPerk)
     for (let i = 0; i < projectileCount; i++) {
       const isCrit = tower.critChance ? Math.random() < tower.critChance : false
       const critMult = isCrit ? tower.critMultiplier ?? 1.5 : 1

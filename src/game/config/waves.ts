@@ -143,6 +143,22 @@ const waveTemplates: WaveScheduleEntry[][] = [
     { type: 'swarm', count: 20, firstDelay: 0.35, interval: 0.25 },
     { type: 'swift_runner', count: 10, firstDelay: 0.5, interval: 0.5 },
   ],
+  // Phase F - Elites & final boss
+  [
+    { type: 'armored_beetle', count: 6, firstDelay: 0.6, interval: 1.0 },
+    { type: 'regenerator', count: 3, firstDelay: 0.8, interval: 1.4 },
+    { type: 'stealth', count: 4, firstDelay: 0.7, interval: 1.2 },
+  ],
+  [
+    { type: 'armored_beetle', count: 8, firstDelay: 0.6, interval: 0.9 },
+    { type: 'splitter', count: 4, firstDelay: 0.9, interval: 1.1 },
+    { type: 'swift_runner', count: 10, firstDelay: 0.5, interval: 0.6 },
+  ],
+  [
+    { type: 'alien_boss', count: 1, firstDelay: 1.8, interval: 3.0 },
+    { type: 'armored_beetle', count: 6, firstDelay: 1.2, interval: 1.5 },
+    { type: 'swarm', count: 16, firstDelay: 0.45, interval: 0.3 },
+  ],
 ]
 
 export const buildWaveSchedules = (strengthMultiplier: number = 1): WaveSpawn[][] => {

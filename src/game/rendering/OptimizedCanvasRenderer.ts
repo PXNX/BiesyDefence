@@ -35,14 +35,31 @@ type TextureKey =
   | 'enemy-armored'
   | 'enemy-bulwark'
   | 'enemy-boss'
+  | 'enemy-beetle'
+  | 'enemy-alien-boss'
   | 'badge-fast'
   | 'badge-armored'
   | 'badge-boss'
   | 'badge-shielded'
   | 'badge-swarm'
+  | 'badge-elite'
+  | 'badge-stealth'
+  | 'badge-regeneration'
+  | 'badge-toxic'
   | 'effect-motion-trail'
   | 'effect-shield'
   | 'effect-boss-glow'
+  | 'projectile-impact'
+  | 'projectile-volley'
+  | 'projectile-support'
+  | 'projectile-chain'
+  | 'projectile-chain-arc'
+  | 'projectile-flame'
+  | 'projectile-shrapnel'
+  | 'projectile-pierce'
+  | 'projectile-heavy'
+  | 'projectile-ice'
+  | 'projectile-toxin'
 
 const TOWER_TEXTURE_BY_TYPE: Record<TowerType, TextureKey> = {
   indica: 'tower-indica',
@@ -61,6 +78,8 @@ const ENEMY_TEXTURE_BY_TYPE: Partial<Record<EnemyType, TextureKey>> = {
   armored_pest: 'enemy-armored',
   bulwark: 'enemy-bulwark',
   carrier_boss: 'enemy-boss',
+  armored_beetle: 'enemy-beetle',
+  alien_boss: 'enemy-alien-boss',
 }
 
 const BADGE_BY_TAG: Partial<Record<EnemyTag, TextureKey>> = {
@@ -69,6 +88,11 @@ const BADGE_BY_TAG: Partial<Record<EnemyTag, TextureKey>> = {
   boss: 'badge-boss',
   shielded: 'badge-shielded',
   swarm: 'badge-swarm',
+  flying: 'badge-flying',
+  stealth: 'badge-stealth',
+  regenerator: 'badge-regeneration',
+  toxic: 'badge-toxic',
+  elite: 'badge-elite',
 }
 
 const TEXTURE_PATHS: Record<TextureKey, string> = {
@@ -89,14 +113,32 @@ const TEXTURE_PATHS: Record<TextureKey, string> = {
   'enemy-armored': '/enemies/enemy_armored_pest.png',
   'enemy-bulwark': '/enemies/enemy_bulwark.png',
   'enemy-boss': '/enemies/enemy_carrier_boss.png',
+  'enemy-beetle': '/enemies/enemy_armored_beetle.png',
+  'enemy-alien-boss': '/enemies/enemy_alien_boss.png',
   'badge-fast': '/enemies/badges/badge_fast.svg.png',
   'badge-armored': '/enemies/badges/badge_armored.svg.png',
   'badge-boss': '/enemies/badges/badge_boss.svg.png',
   'badge-shielded': '/enemies/badges/badge_shielded.svg.png',
   'badge-swarm': '/enemies/badges/badge_swarm.svg.png',
+  'badge-elite': '/enemies/badges/badge_elite.svg.png',
+  'badge-flying': '/enemies/badges/badge_flying.svg.png',
+  'badge-stealth': '/enemies/badges/badge_stealth.svg.png',
+  'badge-regeneration': '/enemies/badges/badge_regeneration.svg.png',
+  'badge-toxic': '/enemies/badges/badge_toxic.svg.png',
   'effect-motion-trail': '/enemies/effect_motion_trail_fast.png',
   'effect-shield': '/enemies/effect_shield_overlay.png',
   'effect-boss-glow': '/enemies/effect_boss_glow.png',
+  'projectile-impact': '/projectiles/impact_projectile.png',
+  'projectile-volley': '/projectiles/volley_projectile.png',
+  'projectile-support': '/projectiles/support_bolt.png',
+  'projectile-chain': '/projectiles/chain_lightning_projectile.png',
+  'projectile-chain-arc': '/projectiles/chain_arc_projectile.png',
+  'projectile-flame': '/projectiles/flamethrower_cone.png',
+  'projectile-shrapnel': '/projectiles/shrapnel_effect.png',
+  'projectile-pierce': '/projectiles/pierce_effect.png',
+  'projectile-heavy': '/projectiles/indica_heavy_round.png',
+  'projectile-ice': '/projectiles/ice_shard_spritesheet.png',
+  'projectile-toxin': '/projectiles/support_slow_projectile.png',
 }
 
 // Caching system for expensive operations

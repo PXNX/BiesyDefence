@@ -86,9 +86,9 @@ export function TowerRadialMenu({ hoverTower, money, onUpgradeLevel, onBuyPerk }
         <div className="radial-label">{hoverTower.name}</div>
         <div className="radial-level">Lvl {level}</div>
         <div className="radial-stats">
-          <img src="/TestAssets/critical_hit_icon.png" alt="crit" title="Crit/Weakpoint" />
-          <img src="/TestAssets/dot_damage_icon.png" alt="dot" title="DoT/Status" />
-          <img src="/TestAssets/range_upgrade_icon.png" alt="range" title="Range/Control" />
+          <img src="/ui/icons/perks/critical_hit_icon.png" alt="crit" title="Crit/Weakpoint" />
+          <img src="/ui/icons/perks/dot_damage_icon.png" alt="dot" title="DoT/Status" />
+          <img src="/ui/icons/perks/range_upgrade_icon.png" alt="range" title="Range/Control" />
         </div>
       </div>
 
@@ -129,6 +129,7 @@ export function TowerRadialMenu({ hoverTower, money, onUpgradeLevel, onBuyPerk }
             <span className="node-chip">{item.key === 'core' ? 'C' : item.key === 'branch-a' ? 'A' : 'B'}</span>
             <span className="node-title">{item.label}</span>
             <span className="node-cost">{formatCost(item.cost)}</span>
+            {isBranchLocked && <span className="node-cost">Locked</span>}
           </button>
         )
       })}

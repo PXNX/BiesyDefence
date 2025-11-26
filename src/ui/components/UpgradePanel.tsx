@@ -1,5 +1,6 @@
 import { TOWER_UPGRADES, type BranchId } from '@/game/config/upgrades'
-import type { TowerType, GameSnapshot } from '@/game/core/types'
+import type { GameSnapshot } from '@/game/core/types'
+import './UpgradePanel.css'
 
 interface UpgradePanelProps {
   hoverTower: NonNullable<GameSnapshot['hoverTower']>
@@ -8,7 +9,25 @@ interface UpgradePanelProps {
   onBuyPerk: (towerId: string, perkId: string) => void
 }
 
-const formatCost = (value: number | null) => (value !== null && value !== undefined ? `$${value}` : '--')
+const formatCost = (value: number | null | undefined) =>
+  value !== null && value !== undefined ? `$${value}` : '--'
+
+const perkIcon = (perkId: string) => {
+  const id = perkId.toLowerCase()
+  if (id.includes('rupture')) return '/ui/icons/perks/ruptura.png'
+  if (id.includes('penetrator')) return '/ui/icons/perks/penetrator.png'
+  if (id.includes('shrapnel')) return '/ui/icons/perks/shrapnel.png'
+  if (id.includes('focus')) return '/ui/icons/perks/focus.png'
+  if (id.includes('cryo')) return '/ui/icons/perks/cryo.png'
+  if (id.includes('toxin')) return '/ui/icons/perks/toxin.png'
+  if (id.includes('pierce')) return '/ui/icons/perks/pierce.png'
+  if (id.includes('weak')) return '/ui/icons/perks/weakpoint.png'
+  if (id.includes('napalm')) return '/ui/icons/perks/napalm.png'
+  if (id.includes('pressure')) return '/ui/icons/perks/pressure.png'
+  if (id.includes('storm')) return '/ui/icons/perks/storm.png'
+  if (id.includes('arc')) return '/ui/icons/perks/arc.png'
+  return undefined
+}
 
 export function UpgradePanel({ hoverTower, money, onUpgradeLevel, onBuyPerk }: UpgradePanelProps) {
   const plan = TOWER_UPGRADES[hoverTower.type]
@@ -25,35 +44,45 @@ export function UpgradePanel({ hoverTower, money, onUpgradeLevel, onBuyPerk }: U
   const branchFilter = branch ? (p: any) => p.branch === branch : (p: any) => true
   const branchLocked = (perkBranch: BranchId) => branch && branch !== perkBranch
 
-  const getIcon = (perkId: string) => {
-    const id = perkId.toLowerCase()
-    if (id.includes('rupture')) return '/ui/icons/perks/ruptura.png'
-    if (id.includes('penetrator')) return '/ui/icons/perks/penetrator.png'
-    if (id.includes('shrapnel')) return '/ui/icons/perks/shrapnel.png'
-    if (id.includes('focus')) return '/ui/icons/perks/focus.png'
-    if (id.includes('cryo')) return '/ui/icons/perks/cryo.png'
-    if (id.includes('toxin')) return '/ui/icons/perks/toxin.png'
-    if (id.includes('pierce')) return '/ui/icons/perks/pierce.png'
-    if (id.includes('weak')) return '/ui/icons/perks/weakpoint.png'
-    if (id.includes('napalm')) return '/ui/icons/perks/napalm.png'
-    if (id.includes('pressure')) return '/ui/icons/perks/pressure.png'
-    if (id.includes('storm')) return '/ui/icons/perks/storm.png'
-    if (id.includes('arc')) return '/ui/icons/perks/arc.png'
-    return undefined
-  }
-
   return (
     <div className="upgrade-panel">
       <header className="upgrade-panel__header">
-        <div className="title">{hoverTower.name}</div>
-        <div className="subtitle">
-          Lvl {level} · Money: ${money}
+        <div className="title-row">
+          <div className="title">{hoverTower.name}</div>
+          {level >= 3 ? (
+            <img
+              src="/ui/icons/perks/level3_badge.png"
+              alt="Tier 3"
+              className="badge-tier"
+              title="Tier 3 reached"
+            />
+          ) : (
+            <div className="level-chip">Lvl {level}</div>
+          )}
+        </div>
+        <div className="subtitle">Money: ${money}</div>
+        <div className="stat-strip" aria-label="Tower stats">
+          <div className="stat-chip" title="Range">
+            <img src="/ui/icons/perks/range_upgrade_icon.png" alt="range" />
+            <span>{hoverTower.range ?? '--'}</span>
+          </div>
+          <div className="stat-chip" title="Scope / Focus">
+            <img src="/ui/icons/perks/sniper_scope_upgrade.png" alt="scope" />
+            <span>{hoverTower.type}</span>
+          </div>
+          <div className="stat-chip" title="Pressure / Power">
+            <img src="/ui/icons/perks/pressure_effect.png" alt="pressure" />
+            <span>Tier {level}</span>
+          </div>
         </div>
       </header>
 
       <section className="upgrade-panel__core">
         <div className="core-row">
-          <div>Core Upgrade</div>
+          <div className="core-label">
+            <img src="/ui/icons/perks/ui_upgrade_arrow.png" alt="" aria-hidden="true" />
+            <span>Core Upgrade</span>
+          </div>
           <div className="spacer" />
           <button
             className="primary"
@@ -72,16 +101,19 @@ export function UpgradePanel({ hoverTower, money, onUpgradeLevel, onBuyPerk }: U
             const owned = perksOwned.has(perk.id)
             const lockedBranch = branchLocked(perk.branch)
             const affordable = money >= perk.cost
-            const icon = getIcon(perk.id)
+            const icon = perkIcon(perk.id)
             return (
               <button
                 key={perk.id}
                 className={[
                   'perk-card',
+                  `branch-${perk.branch}`,
                   owned ? 'owned' : '',
                   lockedBranch ? 'locked' : '',
                   !owned && !lockedBranch && affordable ? 'affordable' : '',
-                ].join(' ')}
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
                 disabled={owned || lockedBranch || !affordable}
                 onClick={() => onBuyPerk(hoverTower.id, perk.id)}
                 title={perk.description}
@@ -89,11 +121,12 @@ export function UpgradePanel({ hoverTower, money, onUpgradeLevel, onBuyPerk }: U
                 <div className="perk-head">
                   {icon && <img src={icon} alt="" aria-hidden="true" />}
                   <div className="perk-name">{perk.name}</div>
+                  <span className={`branch-chip branch-${perk.branch}`}>Branch {perk.branch}</span>
                 </div>
                 <div className="perk-desc">{perk.description}</div>
                 <div className="perk-meta">
-                  <span>Branch {perk.branch}</span>
-                  <span>{formatCost(perk.cost)}</span>
+                  <span className="perk-cost">{formatCost(perk.cost)}</span>
+                  <span className="perk-status">{lockedBranch ? 'Locked' : owned ? 'Owned' : ''}</span>
                 </div>
               </button>
             )
