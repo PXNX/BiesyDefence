@@ -19,7 +19,7 @@ import {
   createCritMarker,
   createDotMarker,
 } from '@/game/entities/particles'
-import { applyDamageToEnemy, applyVulnerability, findSplashTargets } from '@/game/utils/combat'
+import { applyDamageToEnemy, applyTowerBonusesToDamage, applyVulnerability, findSplashTargets } from '@/game/utils/combat'
 import type { TelemetryCollector } from '@/game/systems/telemetry/TelemetryCollector'
 
 export const updateProjectiles = (
@@ -53,7 +53,11 @@ export const updateProjectiles = (
         Boolean(sourceTower?.upgradeState?.perks?.some((id) => id.includes(prefix)))
       const dmgType = projectile.damageType ?? 'impact'
       const before = target.health
-      const dealt = applyDamageToEnemy(target, projectile.damage, dmgType)
+      const dealt = applyDamageToEnemy(
+        target,
+        applyTowerBonusesToDamage(sourceTower, target, projectile.damage),
+        dmgType
+      )
       const actual = Math.max(0, before - target.health)
       const overkill = Math.max(0, dealt - actual)
       target.lastHitBy = {
@@ -76,7 +80,11 @@ export const updateProjectiles = (
         const splashFactor = projectile.splashFactor ?? 0.5
         splashTargets.forEach((enemy) => {
           const splashBefore = enemy.health
-          const splashDealt = applyDamageToEnemy(enemy, projectile.damage * splashFactor, dmgType)
+          const splashDealt = applyDamageToEnemy(
+            enemy,
+            applyTowerBonusesToDamage(sourceTower, enemy, projectile.damage * splashFactor),
+            dmgType
+          )
           const splashActual = Math.max(0, splashBefore - enemy.health)
           const splashOverkill = Math.max(0, splashDealt - splashActual)
           enemy.lastHitBy = {
@@ -119,7 +127,13 @@ export const updateProjectiles = (
         const shrapnelRadius = projectile.splashRadius ?? 28
         const shrapnelTargets = findSplashTargets(target.position, state.enemies, shrapnelRadius, target.id)
         const factor = Math.max(0.25, projectile.splashFactor ?? 0.4)
-        shrapnelTargets.forEach((e) => applyDamageToEnemy(e, projectile.damage * factor, dmgType))
+        shrapnelTargets.forEach((e) =>
+          applyDamageToEnemy(
+            e,
+            applyTowerBonusesToDamage(sourceTower, e, projectile.damage * factor),
+            dmgType
+          )
+        )
       }
 
       if (target.health === 0) {

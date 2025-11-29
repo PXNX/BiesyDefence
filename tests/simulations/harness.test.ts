@@ -1,3 +1,4 @@
+// Summary: Deterministic headless harness plus sanity checks for map specials, enemies, and telemetry across difficulties.
 import * as fs from 'fs'
 import * as path from 'path'
 jest.mock('@/game/rendering/CanvasRenderer', () => {
@@ -50,6 +51,7 @@ import { GameController } from '@/game/core/GameController'
 import { createInitialState } from '@/game/core/GameStateFactory'
 import type { GameSnapshot } from '@/game/core/types'
 import { MapManager } from '@/game/maps/MapManager'
+import { createEnemy } from '@/game/entities/enemies'
 import { createMulberry32 } from '../utils/seededRandom'
 import { resetIdSeed } from '@/game/utils/id'
 import { resetProjectilePool } from '@/game/utils/pool'
@@ -188,5 +190,43 @@ describe('Headless simulation harness', () => {
     } else {
       fs.writeFileSync(ARTIFACT_PATH, serialized, 'utf-8')
     }
+  })
+
+  it('keeps specials, enemy tags, and telemetry stable across difficulties', () => {
+    const difficulties: Array<'easy' | 'normal' | 'hard'> = ['easy', 'normal', 'hard']
+    const mapIds = MapManager.getInstance()
+      .getAvailableMaps()
+      .map((map) => map.id)
+    const seed = 2025
+
+    difficulties.forEach((difficulty) => {
+      mapIds.forEach((mapId) => {
+        const result = runHeadlessSimulation(mapId, difficulty, seed, 3)
+        expect(result.wavesRun).toBeGreaterThan(0)
+
+        const currentMap = MapManager.getInstance().getCurrentMap()
+        expect(currentMap?.specialTiles?.length ?? 0).toBeGreaterThan(0)
+
+        const beetle = createEnemy('armored_beetle', { x: 0, y: 0 }, 0)
+        expect(beetle.tags).toEqual(expect.arrayContaining(['armored', 'elite']))
+        const alienBoss = createEnemy('alien_boss', { x: 0, y: 0 }, 0)
+        expect(alienBoss.tags).toEqual(expect.arrayContaining(['boss', 'flying', 'toxic', 'elite']))
+
+        // Telemetry presence check
+        const perfSpy = jest.spyOn(performance, 'now')
+        perfSpy.mockReturnValue(0)
+        MapManager.resetForTests()
+        const controller = new GameController()
+        const state = createInitialState({ mapId, difficulty })
+        ;(controller as any).state = state
+        state.status = 'running'
+        controller.beginNextWave()
+        ;(controller as any).fixedUpdate(50)
+        const snapshot = (controller as any).createSnapshot() as GameSnapshot
+        expect(Array.isArray(snapshot.telemetry?.warnings)).toBe(true)
+        snapshot.telemetry?.warnings?.forEach((w) => expect(typeof w).toBe('string'))
+        perfSpy.mockRestore()
+      })
+    })
   })
 })

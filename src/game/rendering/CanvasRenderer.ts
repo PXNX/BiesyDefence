@@ -1110,13 +1110,22 @@ export class CanvasRenderer {
       const sprite = this.textureCache.getImage(textureKey)
       if (sprite && sprite.complete && sprite.naturalWidth > 0) {
         ctx.save()
-        ctx.globalAlpha = 0.92
+        ctx.globalAlpha = special.capturedBy ? 1 : 0.92
         ctx.drawImage(sprite, origin.x, origin.y, tileSize, tileSize)
         ctx.restore()
       } else {
         ctx.save()
         ctx.fillStyle = special.type === 'gold_well' ? 'rgba(255, 215, 120, 0.4)' : 'rgba(120, 200, 255, 0.35)'
         ctx.fillRect(origin.x, origin.y, tileSize, tileSize)
+        ctx.restore()
+      }
+      if (special.capturedBy) {
+        ctx.save()
+        ctx.strokeStyle = special.type === 'gold_well' ? 'rgba(255, 215, 120, 0.8)' : 'rgba(120, 200, 255, 0.8)'
+        ctx.lineWidth = Math.max(2, tileSize * 0.06)
+        ctx.beginPath()
+        ctx.arc(origin.x + tileSize / 2, origin.y + tileSize / 2, tileSize * 0.55, 0, Math.PI * 2)
+        ctx.stroke()
         ctx.restore()
       }
     })

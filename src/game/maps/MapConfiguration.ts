@@ -1,4 +1,11 @@
-import type { Vector2, TileType } from '@/game/core/types'
+import type {
+  MapEnvironmentalEffect,
+  MapHudBanner,
+  MapModifiers,
+  MapSpecialTile,
+  Vector2,
+  TileType,
+} from '@/game/core/types'
 
 /**
  * MapConfiguration - Interface for defining configurable map parameters
@@ -89,7 +96,10 @@ export interface MapConfiguration {
     pathTextureKey?: string
     overlayTextureKey?: string
   }
-  specialTiles?: Array<{ type: 'gold_well' | 'rune'; grid: Vector2 }>
+  specialTiles?: MapSpecialTile[]
+  modifiers?: MapModifiers
+  environmentalEffects?: MapEnvironmentalEffect[]
+  hudBanners?: MapHudBanner[]
   unlockRequirement?: {
     type: 'waves_cleared' | 'achievement'
     value: string

@@ -174,13 +174,20 @@ export const createEnemy = (
 ): Enemy => {
   const base = ENEMY_PROFILES[type] ?? ENEMY_PROFILES.pest
   const difficultyConfig = MapManager.getInstance().getCurrentDifficultyConfig()
+  const mapModifiers = MapManager.getInstance().getCurrentMap()?.modifiers ?? {}
   const { hpScale, speedScale, rewardScale } = getWaveScaling(waveIndex)
 
   const stats: EnemyStats = {
     ...base,
-    speed: Math.round(base.speed * speedScale * difficultyConfig.enemySpeedMultiplier),
-    health: Math.round(base.health * hpScale * difficultyConfig.enemyHealthMultiplier),
-    reward: Math.round(base.reward * rewardScale * difficultyConfig.enemyRewardMultiplier),
+    speed: Math.round(
+      base.speed * speedScale * difficultyConfig.enemySpeedMultiplier * (mapModifiers.enemySpeedMultiplier ?? 1)
+    ),
+    health: Math.round(
+      base.health * hpScale * difficultyConfig.enemyHealthMultiplier * (mapModifiers.enemyHealthMultiplier ?? 1)
+    ),
+    reward: Math.round(
+      base.reward * rewardScale * difficultyConfig.enemyRewardMultiplier * (mapModifiers.enemyRewardMultiplier ?? 1)
+    ),
     damageToLives: base.damageToLives,
   }
   if (options?.noReward) {

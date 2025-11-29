@@ -18,6 +18,7 @@ import {
   applyDamageToEnemy,
   applyDotToEnemy,
   applySlowToEnemy,
+  applyTowerBonusesToDamage,
   applyVulnerability,
   applyStunToEnemy,
 } from '@/game/utils/combat'
@@ -147,7 +148,14 @@ export const updateTowers = (
 
           if (tower.dot) {
             const dotType = tower.dot.damageType ?? 'dot'
-            applyDotToEnemy(enemy, tower.dot.dps, tower.dot.duration, dotType, tower.id, tower.type)
+            applyDotToEnemy(
+              enemy,
+              applyTowerBonusesToDamage(tower, enemy, tower.dot.dps),
+              tower.dot.duration,
+              dotType,
+              tower.id,
+              tower.type
+            )
           }
 
           if (tower.vulnerabilityDebuff) {
@@ -161,11 +169,15 @@ export const updateTowers = (
             applyStunToEnemy(enemy, tower.stunDuration ?? 0.6, tower.id)
           }
         })
-        
+
         // Support towers deal light damage to enemies in range
         enemiesInRange.forEach(enemy => {
           const before = enemy.health
-          const dealt = applyDamageToEnemy(enemy, tower.damage, towerDamageType)
+          const dealt = applyDamageToEnemy(
+            enemy,
+            applyTowerBonusesToDamage(tower, enemy, tower.damage),
+            towerDamageType
+          )
           recordDamageEvent(telemetry, tower, enemy, dealt, before, towerDamageType)
 
           // Toxin virulent puff on kill
@@ -215,7 +227,11 @@ export const updateTowers = (
             if (hitIds.has(target.id)) break
             hitIds.add(target.id)
             const before = target.health
-            const dealt = applyDamageToEnemy(target, damage, towerDamageType)
+            const dealt = applyDamageToEnemy(
+              target,
+              applyTowerBonusesToDamage(tower, target, damage),
+              towerDamageType
+            )
             recordDamageEvent(telemetry, tower, target, dealt, before, towerDamageType)
             state.particles.push(createImpactSparkSprite(target.position))
             if (hasPerk('storm')) {
@@ -234,7 +250,11 @@ export const updateTowers = (
               ).filter((e) => !hitIds.has(e.id) && !e.isDead && !e.reachedGoal)
               splashTargets.forEach((e) => {
                 const b = e.health
-                const d = applyDamageToEnemy(e, damage * splashFactor, towerDamageType)
+                const d = applyDamageToEnemy(
+                  e,
+                  applyTowerBonusesToDamage(tower, e, damage * splashFactor),
+                  towerDamageType
+                )
                 recordDamageEvent(telemetry, tower, e, d, b, towerDamageType)
               })
             }
@@ -270,11 +290,22 @@ export const updateTowers = (
         }
         targets.forEach((enemy) => {
           const before = enemy.health
-          const dealt = applyDamageToEnemy(enemy, tower.damage, 'burn')
+          const dealt = applyDamageToEnemy(
+            enemy,
+            applyTowerBonusesToDamage(tower, enemy, tower.damage),
+            'burn'
+          )
           recordDamageEvent(telemetry, tower, enemy, dealt, before, 'burn')
           state.particles.push(...createImpactParticles(enemy.position, '#fb923c'))
           if (tower.dot) {
-            applyDotToEnemy(enemy, tower.dot.dps, tower.dot.duration, 'burn', tower.id, tower.type)
+            applyDotToEnemy(
+              enemy,
+              applyTowerBonusesToDamage(tower, enemy, tower.dot.dps),
+              tower.dot.duration,
+              'burn',
+              tower.id,
+              tower.type
+            )
           }
           if (hasPerk('napalm')) {
             state.particles.push(...createNapalmPuddle(enemy.position, 44))

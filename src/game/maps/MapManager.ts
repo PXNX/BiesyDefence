@@ -1,5 +1,6 @@
 import type {
   MapData,
+  MapSpecialTile,
   MapTile,
 } from '@/game/core/types'
 import type {
@@ -83,6 +84,37 @@ export class MapManager {
         grassTextureKey: 'textureGrassCannabis',
         pathTextureKey: 'stonePath',
       },
+      modifiers: {
+        incomeMultiplier: 0.05,
+        towerRangeMultiplier: 1.02,
+        enemyRewardMultiplier: 1.05,
+      },
+      environmentalEffects: [
+        {
+          id: 'dawn-fog',
+          type: 'fog',
+          intensity: 0.15,
+          durationSeconds: 12,
+          frequencySeconds: 38,
+          rangeMultiplier: 0.95,
+        },
+      ],
+      hudBanners: [
+        {
+          id: 'high-value',
+          title: 'High-Value Groves',
+          description: 'Capture gold wells for +12% income; runes boost nearby tower range.',
+          severity: 'info',
+          icon: '💰',
+        },
+        {
+          id: 'fog',
+          title: 'Rolling Fog',
+          description: 'Low fog pockets occasionally trim range by 5%.',
+          severity: 'warning',
+          icon: '🌫️',
+        },
+      ],
       metadata: {
         version: '2.0.0',
         author: 'BiesyDefence Team',
@@ -123,6 +155,31 @@ export class MapManager {
         grassTextureKey: 'grassTile',
         pathTextureKey: 'stonePath',
       },
+      modifiers: {
+        enemySpeedMultiplier: 1.05,
+        towerDamageMultiplier: 1.04,
+        incomeMultiplier: 0.02,
+      },
+      environmentalEffects: [
+        {
+          id: 'cross-wind',
+          type: 'wind',
+          intensity: 0.2,
+          durationSeconds: 10,
+          frequencySeconds: 28,
+          rangeMultiplier: 0.97,
+          projectileSpread: 0.05,
+        },
+      ],
+      hudBanners: [
+        {
+          id: 'wind',
+          title: 'Canyon Gusts',
+          description: 'Crosswinds slightly reduce range and push enemies a bit faster.',
+          severity: 'warning',
+          icon: '🌬️',
+        },
+      ],
       metadata: {
         version: '2.0.0',
         author: 'BiesyDefence Team',
@@ -163,6 +220,30 @@ export class MapManager {
         grassTextureKey: 'grassTile',
         pathTextureKey: 'stonePath',
       },
+      modifiers: {
+        towerRangeMultiplier: 0.98,
+        towerFireRateMultiplier: 1.05,
+        incomeMultiplier: 0.03,
+      },
+      environmentalEffects: [
+        {
+          id: 'delta-fog',
+          type: 'fog',
+          intensity: 0.12,
+          durationSeconds: 14,
+          frequencySeconds: 32,
+          rangeMultiplier: 0.94,
+        },
+      ],
+      hudBanners: [
+        {
+          id: 'fog-delta',
+          title: 'Delta Mist',
+          description: 'Slight range dampening; attack speed improved by 5% to compensate.',
+          severity: 'info',
+          icon: '🌫️',
+        },
+      ],
       metadata: {
         version: '2.0.0',
         author: 'BiesyDefence Team',
@@ -203,6 +284,29 @@ export class MapManager {
         grassTextureKey: 'swampTerrain',
         pathTextureKey: 'stonePath',
       },
+      modifiers: {
+        enemyHealthMultiplier: 1.05,
+        towerDamageMultiplier: 1.06,
+      },
+      environmentalEffects: [
+        {
+          id: 'wetlands-haze',
+          type: 'fog',
+          intensity: 0.18,
+          durationSeconds: 10,
+          frequencySeconds: 24,
+          rangeMultiplier: 0.93,
+        },
+      ],
+      hudBanners: [
+        {
+          id: 'wet-haze',
+          title: 'Wetland Haze',
+          description: 'Heavier air trims range but boosts damage focus in corridors.',
+          severity: 'warning',
+          icon: '💧',
+        },
+      ],
       metadata: {
         version: '2.1.0',
         author: 'BiesyDefence Team',
@@ -243,6 +347,30 @@ export class MapManager {
         grassTextureKey: 'grassTile',
         pathTextureKey: 'stonePath',
       },
+      modifiers: {
+        towerRangeMultiplier: 1.04,
+        towerDamageMultiplier: 0.98,
+        incomeMultiplier: 0.02,
+      },
+      environmentalEffects: [
+        {
+          id: 'terrace-wind',
+          type: 'wind',
+          intensity: 0.18,
+          durationSeconds: 9,
+          frequencySeconds: 26,
+          rangeMultiplier: 0.97,
+        },
+      ],
+      hudBanners: [
+        {
+          id: 'terrace-wind',
+          title: 'Terrace Drift',
+          description: 'Gentle terrace winds: small range loss, but wider sightlines.',
+          severity: 'info',
+          icon: '🍃',
+        },
+      ],
       metadata: {
         version: '2.1.0',
         author: 'BiesyDefence Team',
@@ -285,6 +413,30 @@ export class MapManager {
         grassTextureKey: 'grassTile',
         pathTextureKey: 'stonePath',
       },
+      modifiers: {
+        enemySpeedMultiplier: 1.03,
+        towerRangeMultiplier: 1.01,
+        towerFireRateMultiplier: 1.03,
+      },
+      environmentalEffects: [
+        {
+          id: 'cross-wisp',
+          type: 'wind',
+          intensity: 0.12,
+          durationSeconds: 8,
+          frequencySeconds: 20,
+          rangeMultiplier: 0.98,
+        },
+      ],
+      hudBanners: [
+        {
+          id: 'cross-traffic',
+          title: 'Crosswinds',
+          description: 'Mild gusts; towers cycle slightly faster to compensate.',
+          severity: 'info',
+          icon: '🌀',
+        },
+      ],
       metadata: {
         version: '2.1.0',
         author: 'BiesyDefence Team',
@@ -412,6 +564,9 @@ export class MapManager {
       : basePaths.map((p) => p[p.length - 1]).filter(Boolean)) as MapPathNode[]
 
     return {
+      id: mapConfig.id,
+      name: mapConfig.name,
+      description: mapConfig.description,
       width,
       height,
       cellSize,
@@ -424,6 +579,7 @@ export class MapManager {
       paths: basePaths,
       spawnPoints,
       exitPoints,
+      metadata: mapConfig.metadata,
       theme: {
         name: mapConfig.theme,
         backgroundColor: mapConfig.backgroundColor,
@@ -433,6 +589,9 @@ export class MapManager {
         pathTextureKey: mapConfig.tileset?.pathTextureKey,
         overlayTextureKey: mapConfig.tileset?.overlayTextureKey,
       },
+      modifiers: mapConfig.modifiers,
+      environmentalEffects: mapConfig.environmentalEffects,
+      hudBanners: mapConfig.hudBanners,
       specialTiles: specialConfigs,
     }
   }
@@ -582,8 +741,8 @@ export class MapManager {
     pathGridKeys: Set<string>,
     width: number,
     height: number
-  ): Array<{ type: 'gold_well' | 'rune'; grid: MapPathNode }> {
-    const specials: Array<{ type: 'gold_well' | 'rune'; grid: MapPathNode }> = []
+  ): MapSpecialTile[] {
+    const specials: MapSpecialTile[] = []
     const isPath = (x: number, y: number) => pathGridKeys.has(`${x}:${y}`)
     const candidates: MapPathNode[] = []
     for (let y = 1; y < height - 1; y += 1) {
@@ -598,10 +757,22 @@ export class MapManager {
     }
 
     if (candidates.length > 0) {
-      specials.push({ type: 'gold_well', grid: candidates[0] })
+      specials.push({
+        type: 'gold_well',
+        grid: candidates[0],
+        auraRadius: 1.5,
+        bonus: { incomeMultiplier: 0.12 },
+        hudHint: '+12% income to rewards/interest while captured.',
+      })
     }
     if (candidates.length > 1) {
-      specials.push({ type: 'rune', grid: candidates[candidates.length - 1] })
+      specials.push({
+        type: 'rune',
+        grid: candidates[candidates.length - 1],
+        auraRadius: 1.5,
+        bonus: { towerRangeMult: 1.12, towerDamageMult: 1.06 },
+        hudHint: '+12% range / +6% damage to towers in aura.',
+      })
     }
 
     return specials

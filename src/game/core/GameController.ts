@@ -4,13 +4,20 @@ import type {
   GameSnapshot,
   GameState,
   GameStatus,
+  MapSpecialTile,
+  Tower,
   TowerType,
   ViewportTransform,
   Vector2,
 } from '@/game/core/types'
 import { TOWER_PROFILES } from '@/game/config/constants'
 import { updateEnemies } from '@/game/systems/EnemySystem'
-import { updateEconomy } from '@/game/systems/EconomySystem'
+import {
+  queueEconomyEvent,
+  updateEconomy,
+  type EconomyEvent,
+  type EconomyDelta,
+} from '@/game/systems/EconomySystem'
 import { updateParticles } from '@/game/systems/ParticleSystem'
 import { updateProjectiles } from '@/game/systems/ProjectileSystem'
 import { updateTowers } from '@/game/systems/TowerSystem'
@@ -20,6 +27,7 @@ import { createTowerUpgradeSystem } from '@/game/systems/TowerUpgradeSystem'
 import { MapManager } from '@/game/maps/MapManager'
 import { AchievementSystem } from '@/game/progression/AchievementSystem'
 import { SaveManager } from '@/game/progression/SaveManager'
+import { audioManager } from '@/game/audio/AudioManager'
 import { createEntityId } from '@/game/utils/id'
 import { releaseProjectile } from '@/game/utils/pool'
 import { clearEnemySpatialGrid, updateEnemySpatialGrid } from '@/game/utils/spatialGrid'
@@ -125,6 +133,7 @@ export class GameController {
   private peakIncomePerWave = 0
   private perfectWavesThisRun = 0
   private runStartLives = 0
+  private capturedSpecials = new Map<string, MapSpecialTile>()
 
   constructor() {
     this.state = createInitialState()
@@ -139,6 +148,9 @@ export class GameController {
       this.achievementSystem.initializeProgress([])
     }
     this.achievementSystem.trackTowerPlacements(this.towersPlaced)
+    this.achievementSystem.subscribe(() => {
+      audioManager.playSoundEffect('victory', 0.4)
+    })
     // Add window focus handling
     this.setupWindowFocusHandlers()
     this.boundMouseMove = this.handleMouseMove.bind(this)
@@ -147,7 +159,47 @@ export class GameController {
     this.boundCanvasMouseUp = this.handlePanEnd.bind(this)
     this.boundWheel = this.handleWheel.bind(this)
     this.boundContextMenu = this.handleContextMenu.bind(this)
+    this.bootstrapSpecialTileBonuses()
     this.resetCamera()
+  }
+
+  private queueEconomy(event: EconomyEvent): void {
+    queueEconomyEvent(this.state, event)
+  }
+
+  private applyEconomyQueue(): EconomyDelta {
+    const incomeMultiplier = this.getIncomeMultiplier()
+    if (incomeMultiplier !== 1 && this.state.economyEvents && this.state.economyEvents.length > 0) {
+      this.state.economyEvents = this.state.economyEvents.map((event) => {
+        if (event.type === 'reward' || event.type === 'wave_bonus' || event.type === 'interest' || event.type === 'refund') {
+          return {
+            ...event,
+            amount: Math.round(event.amount * incomeMultiplier),
+            score: event.score !== undefined ? Math.round((event.score ?? 0) * incomeMultiplier) : event.score,
+          }
+        }
+        return event
+      })
+    }
+
+    const delta = updateEconomy(this.state, {
+      onMoneyChange: (nextMoney) => {
+        this.peakMoney = Math.max(this.peakMoney, nextMoney)
+      },
+      onLivesChange: () => {
+        // Lives changes are handled after aggregation below
+      },
+    })
+
+    if (delta.livesDelta < 0 && this.state.resources.lives <= 0) {
+      this.handleGameOver()
+    }
+
+    if (delta.moneyDelta !== 0 || delta.scoreDelta !== 0 || delta.livesDelta !== 0) {
+      this.notify()
+    }
+
+    return delta
   }
 
   private setupWindowFocusHandlers() {
@@ -187,6 +239,113 @@ export class GameController {
       y: map.worldHeight / 2,
     }
     this.camera.zoom = 3.0
+  }
+
+  private bootstrapSpecialTileBonuses(): void {
+    // Capture any specials already under starting towers and apply map/env modifiers
+    this.state.towers.forEach((tower) => this.captureSpecialTilesNearTower(tower))
+    this.refreshTowerStatsWithBonuses()
+  }
+
+  private parseGridKey(gridKey: string): { x: number; y: number } {
+    const [x, y] = gridKey.split(':').map((v) => parseInt(v, 10))
+    return { x: Number.isFinite(x) ? x : 0, y: Number.isFinite(y) ? y : 0 }
+  }
+
+  private captureSpecialTilesNearTower(tower: Tower): void {
+    if (!this.state.map.specialTiles) return
+    const { x, y } = this.parseGridKey(tower.gridKey)
+    this.state.map.specialTiles.forEach((tile) => {
+      const captureRadius = (tile.auraRadius ?? 1.5) + 0.001
+      const distance = Math.max(Math.abs(tile.grid.x - x), Math.abs(tile.grid.y - y))
+      if (!tile.capturedBy && distance <= captureRadius) {
+        tile.capturedBy = tower.id
+        tile.capturedAtWave = this.state.currentWaveIndex + 1
+        this.capturedSpecials.set(`${tile.grid.x}:${tile.grid.y}`, tile)
+      }
+    })
+  }
+
+  private applyMapBonusesToTower(tower: Tower): void {
+    const modifiers = this.state.map.modifiers ?? {}
+    const baseRange = tower.range
+    const baseDamage = tower.damage
+    const baseFireRate = tower.fireRate
+    let rangeMult = modifiers.towerRangeMultiplier ?? 1
+    let damageMult = modifiers.towerDamageMultiplier ?? 1
+    let fireRateMult = modifiers.towerFireRateMultiplier ?? 1
+
+    const { x, y } = this.parseGridKey(tower.gridKey)
+    const specials = this.state.map.specialTiles ?? []
+    specials.forEach((tile) => {
+      if (!tile.capturedBy) return
+      const distance = Math.max(Math.abs(tile.grid.x - x), Math.abs(tile.grid.y - y))
+      const aura = tile.auraRadius ?? 1.5
+      if (distance <= aura) {
+        rangeMult *= tile.bonus?.towerRangeMult ?? 1
+        damageMult *= tile.bonus?.towerDamageMult ?? 1
+        fireRateMult *= tile.bonus?.towerFireRateMult ?? 1
+      }
+    })
+
+    tower.range = Math.max(40, Math.round(baseRange * rangeMult))
+    tower.damage = Math.round(baseDamage * damageMult)
+    tower.fireRate = Math.max(0.1, baseFireRate / Math.max(0.01, fireRateMult))
+    if (tower.dot) {
+      tower.dot = {
+        ...tower.dot,
+        dps: Math.max(0, tower.dot.dps * damageMult),
+      }
+    }
+    tower.mapBonuses = {
+      rangeMult,
+      damageMult,
+      fireRateMult,
+    }
+  }
+
+  private refreshTowerStatsWithBonuses(): void {
+    this.state.towers.forEach((tower) => {
+      recomputeTowerStats(tower)
+      this.applyMapBonusesToTower(tower)
+    })
+  }
+
+  private getIncomeMultiplier(): number {
+    const base = 1 + (this.state.map.modifiers?.incomeMultiplier ?? 0)
+    const specialBoost =
+      this.state.map.specialTiles
+        ?.filter((tile) => tile.capturedBy && tile.bonus?.incomeMultiplier)
+        .reduce((acc, tile) => acc + (tile.bonus?.incomeMultiplier ?? 0), 0) ?? 0
+    return Math.max(0, base + specialBoost)
+  }
+
+  private buildMapStatus(): GameSnapshot['mapStatus'] {
+    const specials = this.state.map.specialTiles ?? []
+    const captured = specials.filter((t) => t.capturedBy)
+    const incomeBonusPct = Math.round((this.getIncomeMultiplier() - 1) * 100)
+    const rangeBonus = this.state.towers.reduce(
+      (max, tower) => Math.max(max, tower.mapBonuses?.rangeMult ?? 1),
+      this.state.map.modifiers?.towerRangeMultiplier ?? 1
+    )
+    const damageBonus = this.state.towers.reduce(
+      (max, tower) => Math.max(max, tower.mapBonuses?.damageMult ?? 1),
+      this.state.map.modifiers?.towerDamageMultiplier ?? 1
+    )
+    return {
+      id: this.state.map.id,
+      name: this.state.map.name,
+      incomeBonusPct,
+      towerRangeBonusPct: Math.round((rangeBonus - 1) * 100),
+      towerDamageBonusPct: Math.round((damageBonus - 1) * 100),
+      capturedSpecials: captured.length,
+      totalSpecials: specials.length,
+      capturedDetails: {
+        gold: captured.filter((c) => c.type === 'gold_well').length,
+        rune: captured.filter((c) => c.type === 'rune').length,
+      },
+      banners: this.state.map.hudBanners,
+    }
   }
 
   private calculateBaseScale(): number {
@@ -652,13 +811,18 @@ export class GameController {
     const now = performance.now()
     if (this.lastWaveCompletedAt > 0 && now - this.lastWaveCompletedAt < 7000) {
       earlyStarterBonus = Math.max(5, Math.round(5 + (this.state.currentWaveIndex + 1) * 2))
-      this.state.resources.money += earlyStarterBonus
+      this.queueEconomy({
+        type: 'wave_bonus',
+        amount: earlyStarterBonus,
+        reason: 'tempo_bonus',
+      })
       this.waveRewardGained += earlyStarterBonus
-      this.peakMoney = Math.max(this.peakMoney, this.state.resources.money)
+      this.applyEconomyQueue()
     }
 
     this.state.wavePhase = 'active'
     this.telemetry.startWave(this.state.currentWaveIndex)
+    audioManager.playSoundEffect('wave-start', 0.6)
     this.notify()
     this.render()
     return true
@@ -672,8 +836,10 @@ export class GameController {
     if (this.state.resources.money < cost) return { success: false, message: `Need $${cost}.` }
     tower.upgradeState = tower.upgradeState ?? { level: 1, branch: undefined, perks: [] }
     tower.upgradeState.level = (tower.upgradeState.level ?? 1) + 1 as 1 | 2 | 3
-    this.state.resources.money -= cost
+    this.queueEconomy({ type: 'purchase', amount: cost, reason: 'tower_level_upgrade' })
+    this.applyEconomyQueue()
     recomputeTowerStats(tower)
+    this.applyMapBonusesToTower(tower)
     this.render()
     this.notify()
     return { success: true, message: `Upgraded to level ${tower.upgradeState.level}.` }
@@ -693,8 +859,10 @@ export class GameController {
       tower.upgradeState.branch = perk.branch
     }
     tower.upgradeState.perks = Array.from(new Set([...(tower.upgradeState.perks ?? []), perkId]))
-    this.state.resources.money -= cost
+    this.queueEconomy({ type: 'purchase', amount: cost, reason: 'tower_perk' })
+    this.applyEconomyQueue()
     recomputeTowerStats(tower)
+    this.applyMapBonusesToTower(tower)
     this.render()
     this.notify()
     return { success: true, message: `Perk purchased: ${perkId}.` }
@@ -782,7 +950,6 @@ export class GameController {
     updateTowers(this.state, deltaSeconds, this.telemetry)
     updateProjectiles(this.state, deltaSeconds, this.telemetry)
     updateParticles(this.state, deltaSeconds)
-    updateEconomy(this.state)
 
     if (this.lastHoverWorld) {
       this.recalculateHover(this.lastHoverWorld, false)
@@ -790,6 +957,9 @@ export class GameController {
 
     // Clean up dead enemies and expired projectiles
     this.cleanupEntities()
+
+    // Apply queued economy events (rewards, purchases, interest)
+    this.applyEconomyQueue()
 
     // Check for critical state changes and trigger immediate updates
     this.checkForStateChanges()
@@ -836,21 +1006,23 @@ export class GameController {
   private handleWaveCompleted(waveIndex: number): void {
     // Wave completed logic - can be extended for UI notifications
     console.log(`Wave ${waveIndex + 1} completed`)
+    audioManager.playSoundEffect('wave-complete', 0.7)
 
     // Wave bounty: bonus money if no leaks this wave
     if (this.currentWaveNoLeak && this.state.status === 'running') {
       const difficulty = this.state.map ? MapManager.getInstance().getCurrentDifficultyConfig() : { enemyRewardMultiplier: 1 }
       const bonus = Math.round((10 + (waveIndex + 1) * 5) * (difficulty.enemyRewardMultiplier ?? 1))
-      this.state.resources.money += bonus
+      this.queueEconomy({ type: 'wave_bonus', amount: bonus, reason: 'no_leak_bonus' })
       this.waveRewardGained += bonus
-      this.notify()
+      this.applyEconomyQueue()
     }
 
     // Light interest / economy tempo bonus
     const interest = Math.floor(this.state.resources.money * 0.05)
     if (interest > 0) {
-      this.state.resources.money += interest
+      this.queueEconomy({ type: 'interest', amount: interest, reason: 'wave_interest' })
       this.waveRewardGained += interest
+      this.applyEconomyQueue()
     }
     this.peakIncomePerWave = Math.max(this.peakIncomePerWave, this.waveRewardGained)
     this.peakMoney = Math.max(this.peakMoney, this.state.resources.money)
@@ -887,6 +1059,7 @@ export class GameController {
   private handleAllWavesCompleted(): void {
     // All waves completed - game state is already set in WaveSystem
     console.log('All waves completed')
+    audioManager.playSoundEffect('victory', 0.7)
   }
   /**
    * Handle game over when lives reach 0
@@ -898,6 +1071,7 @@ export class GameController {
       this.state.resources.lives = 0 // Ensure lives don't go negative
       console.log('Game Over! All lives lost.')
       this.finalizeRun(false)
+      audioManager.playSoundEffect('game-over', 0.75)
     }
   }
 
@@ -911,7 +1085,8 @@ export class GameController {
     }
     
     const previousLives = this.state.resources.lives
-    this.state.resources.lives = Math.max(0, this.state.resources.lives - damage)
+    this.queueEconomy({ type: 'life_loss', amount: damage, reason: 'enemy_leak' })
+    this.applyEconomyQueue()
     this.currentWaveNoLeak = false
     this.waveLeakCount += 1
     this.totalLeaksThisRun += 1
@@ -1082,17 +1257,21 @@ export class GameController {
             currencyGainedThisFrame += enemy.stats.reward
             const scoreGain = 10 + Math.floor(enemy.stats.reward * 0.5)
             scoreGainedThisFrame += scoreGain
-            this.state.resources.money += enemy.stats.reward
-            this.state.resources.score += scoreGain
+            this.queueEconomy({
+              type: 'reward',
+              amount: enemy.stats.reward,
+              score: scoreGain,
+              reason: `kill:${enemy.type}`,
+            })
             enemy.rewardClaimed = true
             this.waveKillCount += 1
             this.waveRewardGained += enemy.stats.reward
+            audioManager.playSoundEffect('enemy-death', 0.5)
             if (enemy.lastHitBy?.towerType) {
               const type = enemy.lastHitBy.towerType
               this.towerKillCounts[type] = (this.towerKillCounts[type] ?? 0) + 1
               this.achievementSystem.trackTowerKills(type, this.towerKillCounts[type])
             }
-            this.peakMoney = Math.max(this.peakMoney, this.state.resources.money)
 
             // Handle on-death spawns (e.g., carrier boss releasing swarm)
             if (enemy.stats.onDeathSpawn) {
@@ -1568,6 +1747,7 @@ export class GameController {
 
       const achievementNotifications = this.achievementSystem.drainNotifications()
       const achievements = this.achievementSystem.getProgress()
+      const mapStatus = this.buildMapStatus()
 
       // Create snapshot with validated data from GameState
       const snapshot: GameSnapshot = {
@@ -1618,6 +1798,7 @@ export class GameController {
         hoverTower: hoverTowerSummary,
         telemetry: telemetrySnapshot,
         balanceWarnings,
+        mapStatus,
         achievements,
         achievementNotifications,
       }
@@ -1768,7 +1949,9 @@ export class GameController {
       return { success: false, message: 'Paths are reserved for enemies.' }
     }
 
-    if (tile.type !== 'grass') {
+    const isSpecialTile = tile.type === 'gold_well' || tile.type === 'rune'
+
+    if (!isSpecialTile && tile.type !== 'grass') {
       return { success: false, message: 'This tile is reserved for map bonuses.' }
     }
 
@@ -1802,13 +1985,15 @@ export class GameController {
       chainFalloff: profile.chainFalloff,
     })
     const newTower = this.state.towers[this.state.towers.length - 1]
+    this.captureSpecialTilesNearTower(newTower)
+    this.refreshTowerStatsWithBonuses()
     this.telemetry.registerTower(newTower)
     this.towersPlaced += 1
     this.achievementSystem.trackTowerPlacements(this.towersPlaced)
 
-    this.state.resources.money -= profile.cost
-    this.peakMoney = Math.max(this.peakMoney, this.state.resources.money)
-    this.notify()
+    this.queueEconomy({ type: 'purchase', amount: profile.cost, reason: 'tower_purchase' })
+    this.applyEconomyQueue()
+    audioManager.playSoundEffect('tower-place', 0.6)
     if (this.lastHoverWorld) {
       this.recalculateHover(this.lastHoverWorld)
     }
@@ -1876,7 +2061,7 @@ export class GameController {
     const profile = TOWER_PROFILES[this.previewTowerType]
     const hasTower = this.state.towers.some((tower) => tower.gridKey === gridKey)
     const valid =
-      tile.type === 'grass' &&
+      (tile.type === 'grass' || tile.type === 'gold_well' || tile.type === 'rune') &&
       !hasTower &&
       Boolean(profile) &&
       this.state.resources.money >= (profile?.cost ?? 0)

@@ -9,6 +9,50 @@ export type GameStatus = 'idle' | 'running' | 'paused' | 'won' | 'lost'
 
 export type TileType = 'path' | 'grass' | 'gold_well' | 'rune'
 
+export interface MapHudBanner {
+  id: string
+  title: string
+  description: string
+  severity?: 'info' | 'warning' | 'danger'
+  icon?: string
+}
+
+export interface MapEnvironmentalEffect {
+  id: string
+  type: 'wind' | 'fog' | 'rain' | 'night'
+  intensity?: number
+  durationSeconds?: number
+  frequencySeconds?: number
+  rangeMultiplier?: number
+  projectileSpread?: number
+  enemySpeedMultiplier?: number
+}
+
+export interface MapModifiers {
+  incomeMultiplier?: number
+  towerRangeMultiplier?: number
+  towerDamageMultiplier?: number
+  towerFireRateMultiplier?: number
+  enemyHealthMultiplier?: number
+  enemySpeedMultiplier?: number
+  enemyRewardMultiplier?: number
+}
+
+export interface MapSpecialTile {
+  type: 'gold_well' | 'rune'
+  grid: Vector2
+  auraRadius?: number
+  bonus?: {
+    incomeMultiplier?: number
+    towerRangeMult?: number
+    towerDamageMult?: number
+    towerFireRateMult?: number
+  }
+  hudHint?: string
+  capturedBy?: string
+  capturedAtWave?: number
+}
+
 export interface MapTile {
   grid: Vector2
   center: Vector2
@@ -30,6 +74,9 @@ export interface MapData {
   paths?: Vector2[][]
   spawnPoints?: Vector2[]
   exitPoints?: Vector2[]
+  id?: string
+  name?: string
+  description?: string
   theme?: {
     name: string
     backgroundColor: string
@@ -39,7 +86,11 @@ export interface MapData {
     pathTextureKey?: string
     overlayTextureKey?: string
   }
-  specialTiles?: Array<{ type: 'gold_well' | 'rune'; grid: Vector2 }>
+  metadata?: Record<string, unknown>
+  modifiers?: MapModifiers
+  environmentalEffects?: MapEnvironmentalEffect[]
+  hudBanners?: MapHudBanner[]
+  specialTiles?: MapSpecialTile[]
 }
 
 export type TowerType = 'indica' | 'sativa' | 'support' | 'sniper' | 'flamethrower' | 'chain'
@@ -193,6 +244,12 @@ export interface Tower {
     branch?: 'A' | 'B'
     perks?: string[]
   }
+  mapBonuses?: {
+    rangeMult?: number
+    damageMult?: number
+    fireRateMult?: number
+  }
+  tagBonuses?: Partial<Record<EnemyTag, number>>
   critChance?: number
   critMultiplier?: number
   stunChance?: number
@@ -266,6 +323,21 @@ export interface Wave {
 
 export type WavePhase = 'idle' | 'active' | 'completed' | 'finalized'
 
+export type EconomyEventType =
+  | 'reward'
+  | 'wave_bonus'
+  | 'interest'
+  | 'purchase'
+  | 'refund'
+  | 'life_loss'
+
+export interface EconomyEvent {
+  type: EconomyEventType
+  amount: number
+  score?: number
+  reason?: string
+}
+
 export interface GameState {
   map: MapData
   path: Vector2[]
@@ -275,6 +347,7 @@ export interface GameState {
   projectiles: Projectile[]
   particles: Particle[]
   resources: Resources
+  economyEvents?: EconomyEvent[]
   waves: Wave[]
   currentWaveIndex: number
   status: GameStatus
@@ -306,6 +379,17 @@ export interface GameSnapshot {
   showRanges: boolean
   showHitboxes: boolean
   gameSpeed: number
+  mapStatus?: {
+    id?: string
+    name?: string
+    incomeBonusPct: number
+    towerRangeBonusPct: number
+    towerDamageBonusPct: number
+    capturedSpecials: number
+    totalSpecials: number
+    banners?: MapHudBanner[]
+    capturedDetails?: { gold: number; rune: number }
+  }
   hoverTower?: {
     id: string
     type: TowerType

@@ -239,6 +239,7 @@ export const createInitialState = (options?: {
       lives: initialResources.initialLives,
       score: INITIAL_SCORE,
     },
+    economyEvents: [],
     waves: buildWaves(difficultyConfig.waveStrengthMultiplier ?? 1),
     currentWaveIndex: 0,
     status: 'idle',

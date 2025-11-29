@@ -1,6 +1,6 @@
 import { TOWER_PROFILES } from '@/game/config/constants'
 import { TOWER_UPGRADES, type UpgradePerk, type BranchId, getBaseUpgradeCosts } from '@/game/config/upgrades'
-import type { Tower, TowerType } from '@/game/core/types'
+import type { EnemyTag, Tower, TowerType } from '@/game/core/types'
 
 interface AggregatedEffects {
   damageMult: number
@@ -20,6 +20,7 @@ interface AggregatedEffects {
   stunChance: number
   stunDuration: number
   markDuration: number
+  tagDamageBonus: Partial<Record<EnemyTag, number>>
 }
 
 const emptyEffects = (): AggregatedEffects => ({
@@ -40,6 +41,7 @@ const emptyEffects = (): AggregatedEffects => ({
   stunChance: 0,
   stunDuration: 0,
   markDuration: 0,
+  tagDamageBonus: {},
 })
 
 const applyPerk = (agg: AggregatedEffects, perk: UpgradePerk) => {
@@ -61,6 +63,12 @@ const applyPerk = (agg: AggregatedEffects, perk: UpgradePerk) => {
   agg.stunChance += eff.stunChance ?? 0
   agg.stunDuration = Math.max(agg.stunDuration, eff.stunDuration ?? agg.stunDuration)
   agg.markDuration = Math.max(agg.markDuration, eff.markDuration ?? agg.markDuration)
+  if (eff.tagDamageBonus) {
+    Object.entries(eff.tagDamageBonus).forEach(([tag, bonus]) => {
+      const existing = agg.tagDamageBonus[tag as EnemyTag] ?? 0
+      agg.tagDamageBonus[tag as EnemyTag] = existing + (bonus ?? 0)
+    })
+  }
 }
 
 export const recomputeTowerStats = (tower: Tower): Tower => {
@@ -113,6 +121,7 @@ export const recomputeTowerStats = (tower: Tower): Tower => {
   tower.stunChance = agg.stunChance
   tower.stunDuration = agg.stunDuration
   tower.markDuration = agg.markDuration
+  tower.tagBonuses = agg.tagDamageBonus
   tower.cooldown = Math.min(tower.cooldown, tower.fireRate)
 
   return tower

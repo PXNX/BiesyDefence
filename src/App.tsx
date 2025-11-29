@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 import { GameController } from '@/game/core/GameController'
 import type { GameSnapshot, GameStatus, TowerType, EnemyType, AchievementView } from '@/game/core/types'
@@ -18,6 +18,7 @@ import { TelemetryPanel } from '@/ui/components/TelemetryPanel'
 import { TowerRadialMenu } from '@/ui/components/TowerRadialMenu'
 import './ui/components/TowerRadialMenu.css'
 import { TOWER_UPGRADES } from '@/game/config/upgrades'
+import { TranslationService, LanguageDetector, type Language } from '@/localization'
 
 const initialTower: TowerType = 'indica'
 
@@ -28,6 +29,8 @@ function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const startOverlayRef = useRef<HTMLDivElement | null>(null)
   const gameOverOverlayRef = useRef<HTMLDivElement | null>(null)
+  const translationService = useMemo(() => TranslationService.getInstance(), [])
+  const languageDetector = useMemo(() => LanguageDetector.getInstance(), [])
   const [snapshot, setSnapshot] = useState<GameSnapshot | null>(null)
   const [selectedTower, setSelectedTower] = useState<TowerType | null>(initialTower)
   const [feedback, setFeedback] = useState<string | null>(null)
@@ -50,6 +53,21 @@ function App() {
   const [showTelemetryPanel, setShowTelemetryPanel] = useState(true)
   const [showAchievementPanel, setShowAchievementPanel] = useState(false)
   const [achievementToasts, setAchievementToasts] = useState<AchievementView[]>([])
+  const [language, setLanguage] = useState<Language>(translationService.getCurrentLanguage())
+  const languageOptions = translationService.getSupportedLanguages()
+
+  const t = useCallback(
+    (key: string, fallback: string) => translationService.t(key, { fallback }),
+    [translationService, language]
+  )
+
+  useEffect(() => {
+    const detected = languageDetector.detectUserPreferences()
+    translationService.setLanguage(detected.language)
+    setLanguage(detected.language)
+    const unsubscribe = translationService.subscribe((lang) => setLanguage(lang))
+    return () => unsubscribe()
+  }, [languageDetector, translationService])
 
   useEffect(() => {
     const initializeAudio = async () => {
@@ -422,6 +440,11 @@ function App() {
     setAudioConfig(audioManager.getConfig())
   }
 
+  const handleLanguageChange = (lang: Language) => {
+    translationService.setLanguage(lang)
+    setLanguage(lang)
+  }
+
   const handleRetry = useCallback(async () => {
     await unlockAudioContext()
     const controller = controllerRef.current
@@ -449,11 +472,11 @@ function App() {
     nextWaveTypes.length > 0 ||
     Boolean(snapshot?.lastWaveSummary)
   const canvasStatusMessage = !isAudioReady
-    ? 'Loading audio...'
+    ? t('app.loading_audio', 'Loading audio...')
     : appPhase === 'resetting'
-    ? 'Resetting the prototype...'
+    ? t('app.resetting', 'Resetting the prototype...')
     : !snapshot
-    ? 'Preparing the battle map...'
+    ? t('app.preparing_map', 'Preparing the battle map...')
     : undefined
   const isCanvasBusy = Boolean(canvasStatusMessage)
 
@@ -645,6 +668,7 @@ function App() {
                     audioConfig={audioConfig}
                     onToggleMute={handleToggleMute}
                     onMasterVolumeChange={handleMasterVolumeChange}
+                    t={t}
                     hoverTower={snapshot.hoverTower}
                   />
                   <TowerIconBar
@@ -668,7 +692,7 @@ function App() {
                   {hasIntel && (
                     <div className="meta-pill intel-trigger">
                       <button type="button" aria-haspopup="true" aria-expanded="false">
-                        Wave Intel
+                        {t('app.wave_intel', 'Wave Intel')}
                       </button>
                       <div className="intel-popover">
                         {snapshot?.wavePreview && snapshot.wavePreview.length > 0 && (
@@ -680,15 +704,15 @@ function App() {
                     </div>
                   )}
                   <div className="meta-pill">
-                    <span>Money</span>
+                    <span>{t('app.money', 'Money')}</span>
                     <strong>${snapshot?.money ?? 0}</strong>
                   </div>
                   <div className="meta-pill">
-                    <span>Lives</span>
+                    <span>{t('app.lives', 'Lives')}</span>
                     <strong>{snapshot?.lives ?? 0}</strong>
                   </div>
                   <div className="meta-pill">
-                    <span>Wave</span>
+                    <span>{t('app.wave', 'Wave')}</span>
                     <strong>{waveLabel}</strong>
                   </div>
                   <div className="meta-pill">
@@ -697,8 +721,24 @@ function App() {
                       className="ghost"
                       onClick={() => setShowAchievementPanel((prev) => !prev)}
                     >
-                      Achievements
+                      {t('app.achievements', 'Achievements')}
                     </button>
+                  </div>
+                  <div className="meta-pill">
+                    <label className="language-label" htmlFor="language-select">
+                      {t('app.language', 'Language')}
+                    </label>
+                    <select
+                      id="language-select"
+                      value={language}
+                      onChange={(e) => handleLanguageChange(e.target.value as Language)}
+                    >
+                      {languageOptions.map((lang) => (
+                        <option key={lang.code} value={lang.code}>
+                          {lang.nativeName || lang.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </div>
@@ -718,45 +758,47 @@ function App() {
           aria-describedby="start-overlay-desc"
           tabIndex={-1}
         >
-          <p className="eyebrow">Seed the Defense</p>
-          <h2 id="start-overlay-title">Play the prototype loop</h2>
-          <p id="start-overlay-desc" className="overlay-subtext">
-            Place towers, control the tempo, and push waves back. Deploy towers tactically before
-            releasing each wave.
-          </p>
-          <div className="overlay-actions">
-            <button className="primary" onClick={handleStart}>
-              Play
-            </button>
-            <button className="ghost" onClick={handleToggleHowToPlay}>
-              {showHowToPlay ? 'Hide tips' : 'How to play'}
-            </button>
-          </div>
-          {showHowToPlay && (
-            <div className="how-to-panel">
-              <h4>🎮 How to Play</h4>
-              <div className="how-to-section">
-                <h5>🏗️ Tower Strategy</h5>
-                <p>• <strong>Indica:</strong> Heavy damage, slow fire rate - best for tough enemies</p>
-                <p>• <strong>Sativa:</strong> Fast fire rate, lower damage - keeps enemies at bay</p>
-                <p>• <strong>Support:</strong> Slows enemies down, no direct damage - pairs with shooters</p>
-              </div>
-              <div className="how-to-section">
-                <h5>💰 Economy & Survival</h5>
-                <p>• Earn money by defeating enemies</p>
-                <p>• Lose lives when enemies reach the end</p>
-                <p>• Build strategically before starting waves</p>
-              </div>
-              <div className="how-to-section">
-                <h5>⌨️ Keyboard Shortcuts</h5>
-                <p>• <strong>Space:</strong> Start/Pause game</p>
-                <p>• <strong>1, 2, 3:</strong> Change game speed (1x, 2x, 4x)</p>
-                <p>• <strong>N:</strong> Start next wave</p>
-                <p>• <strong>R:</strong> Reset game</p>
-                <p>• <strong>Esc:</strong> Cancel tower selection</p>
-              </div>
-            </div>
+        <p className="eyebrow">{t('app.start_eyebrow', 'Seed the Defense')}</p>
+        <h2 id="start-overlay-title">{t('app.start_title', 'Play the prototype loop')}</h2>
+        <p id="start-overlay-desc" className="overlay-subtext">
+          {t(
+            'app.start_desc',
+            'Place towers, control the tempo, and push waves back. Deploy towers tactically before releasing each wave.'
           )}
+        </p>
+        <div className="overlay-actions">
+          <button className="primary" onClick={handleStart}>
+            {t('app.play', 'Play')}
+          </button>
+          <button className="ghost" onClick={handleToggleHowToPlay}>
+            {showHowToPlay ? t('app.hide_tips', 'Hide tips') : t('app.how_to_play', 'How to play')}
+          </button>
+        </div>
+        {showHowToPlay && (
+          <div className="how-to-panel">
+            <h4>{t('app.how_to_play', 'How to play')}</h4>
+            <div className="how-to-section">
+              <h5>{t('app.how_to_play_towers', 'Tower Strategy')}</h5>
+              <p>- <strong>Indica:</strong> {t('app.how_to_play_indica', 'Heavy damage, slow fire rate - best for tough enemies')}</p>
+              <p>- <strong>Sativa:</strong> {t('app.how_to_play_sativa', 'Fast fire rate, lower damage - keeps enemies at bay')}</p>
+              <p>- <strong>Support:</strong> {t('app.how_to_play_support', 'Slows enemies down, no direct damage - pairs with shooters')}</p>
+            </div>
+            <div className="how-to-section">
+              <h5>{t('app.how_to_play_economy', 'Economy & Survival')}</h5>
+              <p>- {t('app.how_to_play_money', 'Earn money by defeating enemies')}</p>
+              <p>- {t('app.how_to_play_lives', 'Lose lives when enemies reach the end')}</p>
+              <p>- {t('app.how_to_play_build', 'Build strategically before starting waves')}</p>
+            </div>
+            <div className="how-to-section">
+              <h5>{t('app.how_to_play_keys', 'Keyboard Shortcuts')}</h5>
+              <p>- <strong>Space:</strong> {t('app.shortcut_space', 'Start/Pause game')}</p>
+              <p>- <strong>1, 2, 3:</strong> {t('app.shortcut_speed', 'Change game speed (1x, 2x, 4x)')}</p>
+              <p>- <strong>N:</strong> {t('app.shortcut_next_wave', 'Start next wave')}</p>
+              <p>- <strong>R:</strong> {t('app.shortcut_reset', 'Reset game')}</p>
+              <p>- <strong>Esc:</strong> {t('app.shortcut_cancel', 'Cancel tower selection')}</p>
+            </div>
+          </div>
+        )}
         </div>
       </div>
 
@@ -773,17 +815,17 @@ function App() {
           aria-describedby="gameover-overlay-desc"
           tabIndex={-1}
         >
-          <p className="eyebrow">{snapshot?.status === 'won' ? 'Trophy' : 'Warning'}</p>
+          <p className="eyebrow">{snapshot?.status === 'won' ? t('app.trophy', 'Trophy') : t('app.warning', 'Warning')}</p>
           <h2 id="gameover-overlay-title">
-            {snapshot?.status === 'won' ? 'Garden Secured' : 'Garden Lost'}
+            {snapshot?.status === 'won' ? t('app.garden_secured', 'Garden Secured') : t('app.garden_lost', 'Garden Lost')}
           </h2>
           <p id="gameover-overlay-desc" className="overlay-subtext">
             {snapshot?.status === 'won'
-              ? 'You stood strong through the planned waves. Restart to test balance.'
-              : 'The path was breached. Reset the prototype when you are ready to retry.'}
+              ? t('app.gameover_win_desc', 'You stood strong through the planned waves. Restart to test balance.')
+              : t('app.gameover_loss_desc', 'The path was breached. Reset the prototype when you are ready to retry.')}
           </p>
           <button className="primary" onClick={handleRetry}>
-            Retry
+            {t('app.retry', 'Retry')}
           </button>
         </div>
       </div>

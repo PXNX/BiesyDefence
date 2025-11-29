@@ -1,6 +1,7 @@
 import React from 'react'
 import { SpeedChips } from './SpeedChips'
 import { PauseButton } from './PauseButton'
+import { AudioMini } from './AudioMini'
 import type { AudioConfig } from '@/game/audio/AudioManager'
 
 interface GameControlPanelProps {
@@ -11,6 +12,7 @@ interface GameControlPanelProps {
   audioConfig: AudioConfig
   onToggleMute: () => void
   onMasterVolumeChange: (volume: number) => void
+  t: (key: string, fallback: string) => string
   hoverTower?: {
     id: string
     type: string
@@ -27,6 +29,8 @@ const GameControlPanel = ({
   onPauseToggle,
   audioConfig,
   onToggleMute,
+  onMasterVolumeChange,
+  t,
   hoverTower
 }: GameControlPanelProps) => {
   return (
@@ -43,10 +47,16 @@ const GameControlPanel = ({
             type="button"
             className={`audio-toggle-only ${audioConfig.muted ? 'muted' : ''}`}
             onClick={onToggleMute}
-            aria-label={audioConfig.muted ? 'Unmute audio' : 'Mute audio'}
+            aria-label={audioConfig.muted ? t('controls.unmute', 'Unmute audio') : t('controls.mute', 'Mute audio')}
           >
-            {audioConfig.muted ? 'Mute' : 'Sound'}
+            {audioConfig.muted ? t('controls.mute', 'Mute') : t('controls.sound', 'Sound')}
           </button>
+          <AudioMini
+            muted={audioConfig.muted}
+            volume={audioConfig.masterVolume}
+            onToggleMute={onToggleMute}
+            onVolumeChange={onMasterVolumeChange}
+          />
         </div>
       </div>
 

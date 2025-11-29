@@ -25,6 +25,23 @@ export const applyDamageToEnemy = (
   return damage
 }
 
+export const applyTowerBonusesToDamage = (
+  tower: Tower | undefined,
+  enemy: Enemy,
+  baseDamage: number
+): number => {
+  if (!tower || !enemy.tags || enemy.tags.length === 0) return baseDamage
+  if (!tower.tagBonuses) return baseDamage
+  let multiplier = 1
+  enemy.tags.forEach((tag) => {
+    const bonus = tower.tagBonuses?.[tag]
+    if (typeof bonus === 'number') {
+      multiplier *= 1 + bonus
+    }
+  })
+  return Math.max(0, baseDamage * multiplier)
+}
+
 export const applySlowToEnemy = (
   enemy: Enemy,
   baseMultiplier: number,
