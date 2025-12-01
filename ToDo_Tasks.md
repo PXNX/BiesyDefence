@@ -1,36 +1,36 @@
-# ToDo Tasks
+## UI To-Do / offene Baustellen
 
-## 1. Economy & Balancing (critical)
-- [x] Expand the stub at `src/game/systems/EconomySystem.ts` into the canonical money manager the roadmap demands. `GameController` now queues economy events (kills, purchases, wave bonuses, interest, life loss) and applies them centrally, updating peaks/notifications from one place.
-  - Follow-up: add modifiers for map specials (gold wells/runes) and telemetry hooks for the new event reasons when those systems ship.
+- Theme konsolidieren: Farben/Abstufungen aus `src/assets/theme.ts` + CSS-Variablen konsequent nutzen, Hardcodes (z. B. `#90EE90`, diverse `rgba(...)`) in Komponenten und Inline-Styles ersetzen, damit Look zentral anpassbar bleibt.
+- Responsiveness verbessern: Fixbreiten/Fixed-Positionen abbauen (`TOWER_DETAILS_PANEL_WIDTH`, TowerRadialMenu 220x220, CornerStatCards fixed, `side-dock-panel`/`info-bar` absolut), Breakpoints für kleinere Screens ergänzen, Canvas/HUD skalierbar halten.
+- Shop/Tower-UX fertigstellen: Platzhalter-Assets (PLACEHOLDER_SHOP) durch finale Art ersetzen, BASE_URL-sichere Pfade verwenden, Tower-Auswahl klar von Bauen trennen, saubere Disabled-/“Out of Money”-States und Fokus-/Hover-Feedback einbauen.
+- Asset-/Texture-Probleme beheben: Sprites/Overlays/Badges neu exportieren (korrekte Alpha, keine Backplates), Dateigrößen reduzieren oder WebP/Atlas nutzen, konsistente Mappings (CanvasRenderer/OptimizedCanvasRenderer) und Fallbacks einführen, um “Quadrate”/leere Rechtecke zu vermeiden.
+- Encoding-/Copy-Bugs fixen: Ersetze fehlerhafte Zeichen (`�`, ``) in Toasts/Wave-Intel/Tower-Stats mit korrekten Separatoren/Symbolen; sicherstellen, dass Dateien UTF-8 und Zeichenfolgen sauber sind.
+- Icon-/Placeholder-Bereiche schließen: `??`/`?` in CornerStatCards/Achievements ersetzen, einheitliches Icon-Set (SVG bevorzugt) für HUD/Achievements/Stats nutzen statt Raster-Hintergründe.
+- Lokalisierung durchziehen: Strings außerhalb von `App.tsx` (GameControlPanel, TowerIconBar, UpgradePanel, TowerRadialMenu, Achievement*) an `TranslationService` anbinden oder klare Primärsprache definieren, um gemischte EN/DE-Texte zu vermeiden.
+- Layout/Overlays zugänglicher machen: Fokus-Falle und `aria-hidden` für Hintergrund bei Start/GameOver-Overlays konsistent setzen; Radialmenü und andere Controls tastaturbedienbar machen.
+- Styling vereinheitlichen: Globale Styles vs. component `<style>`-Blöcke/TowerRadialMenu.css/UpgradePanel.css harmonisieren, Shadow/Glassmorphism/Borders zentral definieren; PNG-Button-Backplates (`/ui/buttons/...`) durch CSS-Varianten ersetzen.
+- Debug/Telemetry drosseln: TelemetryPanel/EnhancedDebugPanel standardmäßig ausblenden oder in Dev-Only-Modus verschieben, um Spieler-HUD zu entschlacken.
+- Feedback/States ausbauen: Klarere Hover/Active/Disabled-Visuals für Audio-Regler, Speed-Chips, Shop-/Upgrade-Buttons; lebendige Micro-Interaktionen hinzufügen, ohne Lesbarkeit zu verlieren.
 
-## 2. UI consolidation & cleanup
-- [x] Remove the deprecated backups that the roadmap calls out (`src/ui/components/GameControls.tsx.bak:6`, `src/ui/components/GameHUD.tsx.bak:3`, `src/ui/components/TopHUD.tsx.deprecated:7`, `src/ui/components/TowerPicker.tsx.deprecated:21`) and lock the visible controls (`GameControlPanel` at `src/ui/components/GameControlPanel.tsx:33`, `App.tsx:640`, `TowerIconBar` at `src/App.tsx:650`) behind a single, documented surface. `development_roadmap.md:23` highlights this clean-up as priority.
-  - Replace any lingering imports that target `.bak`/`.deprecated` files and ensure the currently used components cover the same behaviors (pause, speed chips, tower selection, audio toggle).
-  - Reintroduce `AudioMini` (`src/ui/components/AudioMini.tsx:1`) only through the active HUD, because it is currently referenced solely in `TopHUD.tsx.deprecated:43`.
+## QA / Perf / Tests
+- Headless/Autoplay pro Difficulty ausweiten (lange Läufe), perf-Snapshots und 404/Asset-Checks automatisieren; E2E für Wave-Transitions + Economy-Regressions ergänzen.
+- Resist/Slow-Cap/Streak Unit-Checks ergänzen; fehlende Preload/404-Sweeps für neue Icons/Badges/Projectiles/Effekte nachziehen.
 
-## 3. Localization rollout
-- [x] Wire `TranslationService.ts:354` into the main UI instead of leaving it unused outside the demo (`src/demo/Chapter6IntegrationDemo.ts:8`). Static strings such as the start overlay titles/buttons in `App.tsx:721`, `:732`, `:737` and control labels in `GameControlPanel.tsx:33`, `:46` must flow through `t()` so we can ship multiple languages as planned.
-  - Add a language selector tied to `LanguageDetector` and the strings bundle to satisfy `development_roadmap.md:39` and bring the roadmap’s localization section online.
-  - Sweep every visible component for hard-coded English (`App`, HUDs, tooltips) and centralize them in `strings.ts` so the same translations can reach React and telemetry messages.
+## Maps & Content
+- Neue Map-Layouts bauen (Misty/Terraced/Circular o. Ä.) mit Graph-basiertem Pfad (Splits/Joins/Loops) und Doppel-Spawn-Variante gemäß `docs/maps_plan.md`.
+- Tileset-Switch/Biome verankern (Wald/Steppe/Sumpf zunächst), inkl. 3× Gras/Pfad/Overlay-Texturen pro Biome; `TEXTURE_PATHS` erweitern.
+- Spezial-Tiles (Rune +Range, Gold-Well +Income) weiter pflegen und UI-Hints im HUD sicherstellen; Map-Mods-Feld (HP/Speed/Reward/TowerCost Multiplikatoren) nutzen.
+- Renderer/Placement: Multi-Pfad-Rendering + Validierung (kein Blocken), Deko-Layer, Range-Preview intakt halten.
+- Optional (Iteration 2+): leichte Map-Events (Wind/Nebel/Regen) und interaktive Elemente (Fässer/Fallen) vorbereiten.
 
-## 4. Audio & feedback integration
-- [x] Deepen the `AudioManager` hooks (`src/game/audio/AudioManager.ts:260`) beyond the existing tower-upgrade triggers in `App.tsx:120`, `:352`, `:365`, `:381`, `:395`. Roadmap `development_roadmap.md:39` calls for integrating sound across waves, hits, and UI.
-  - Emit sounds for wave start/complete, enemy deaths, tower placements, and achievements from the controller instead of only on UI button callbacks.
-  - Surface audio settings from `AudioMini` (`src/ui/components/AudioMini.tsx:1`) through whichever panel replaces the deprecated `TopHUD.tsx.deprecated:43` so players can mute/unmute without stumbling over unused code.
+## Balance & Telemetrie
+- Difficulty-Tuning per Telemetrie weiterführen; Heatmaps/zusätzliche Metrics bei Bedarf ergänzen.
+- HP/Reward per Difficulty feinschleifen nach neuen Maps/Events.
 
-## 5. Map special tiles & events
-- [x] Give `specialTiles` real gameplay effects: Gold wells add income, runes boost tower range/damage; renderer shows capture rings; Map metadata carries HUD banners/environmental mods.
-  - Captures apply income buffs and tower stat boosts; bonuses surface in HUD (`StatsCornerLayout`) and map metadata (`src/game/core/types.ts`).
-  - Map system now supports environmental modifiers, event banners, and feeds renderer/economy.
+## Audio / UX Polish
+- Musik-Loops/Ducking/Mix-Pass liefern; Audio-Hooks überprüfen.
+- Accessibility/Tooltips/Localization-Pflege nach neuen Strings/Assets.
 
-## 6. Upgrade/perk tuning & enemy interplay
-- [x] Revisited `TOWER_UPGRADES` with tuned costs/effects and tag-specific bonuses (Stun/Splash/Slow/Crit/DoT) aligned to enemy tags (`armored_beetle`, `alien_boss`).
-  - Perks validated against resistances/behaviors; tag bonuses documented in `docs/perk_tag_synergies.md`.
-
-## 7. Testing & QA expansion
-- [x] Added focused tests beyond the determinism check: EconomySystem + upgrade/affordability unit tests, harness assertions for specials/enemy tags/telemetry across difficulties.
-  - Headless harness extended; new unit tests cover core economy and perk locking.
-
-## 8. Documentation sync
-- [x] Roadmap/docs refreshed to reflect current implementation (MapManager/Audio/Upgrades live) and list remaining gaps (QA/perf runs, new maps, optional audio polish).
+## Upgrades & Assets (Feinschliff)
+- Branch-Cosmetics (Scope/Emitter/Coils/Nozzle/Focus/Armor-Decal) optional hinzufügen, um Perk/Branch-Lesbarkeit im Renderer zu verbessern.
+- Map-Events/Branch-Overlays (tint/overlay pro Branch) optional ergänzen.
