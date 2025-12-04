@@ -80,7 +80,7 @@ export const ENEMY_PROFILES: Record<EnemyType, EnemyStats> = {
     damageToLives: 3,
     color: '#ff9e7f',
     radius: 14,
-    resistances: { volley: 0.35, control: 0.25 },
+    resistances: { volley: 0.25, control: 0.2 },
     slowCap: 0.7,
     tags: ['boss'] as EnemyTag[],
     onDeathSpawn: {
@@ -141,7 +141,7 @@ export const ENEMY_PROFILES: Record<EnemyType, EnemyStats> = {
     damageToLives: 4,
     color: '#9ef2ff',
     radius: 15,
-    resistances: { volley: 0.35, control: 0.25, chain: 0.15 },
+    resistances: { volley: 0.25, control: 0.2, chain: 0.15 },
     slowCap: 0.7,
     tags: ['boss', 'flying', 'toxic', 'elite'] as EnemyTag[],
     onDeathSpawn: {
@@ -154,11 +154,27 @@ export const ENEMY_PROFILES: Record<EnemyType, EnemyStats> = {
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 
 const getWaveScaling = (waveIndex: number) => {
-  const hpScale = clamp(1 + 0.07 * waveIndex, 1, 2.2)
-  const speedScale = clamp(1 + 0.02 * waveIndex, 1, 1.4)
-  const rewardScale = 1 + 0.03 * waveIndex
+  // Difficulty curve (Phase-based): smoother early game, controlled mid, assertive late
+  const phase = waveIndex + 1
+  const hpBase =
+    phase <= 5
+      ? 1 + 0.05 * phase // gentler start
+      : phase <= 10
+        ? 1.25 + 0.06 * (phase - 5)
+        : phase <= 15
+          ? 1.55 + 0.07 * (phase - 10)
+          : 1.9 + 0.08 * (phase - 15)
+
+  const hpScale = clamp(hpBase, 1, 2.5)
+  const speedScale = clamp(1 + 0.02 * phase, 1, 1.45)
+
+  // Rewards now synced to HP scaling (same progression) to avoid economic starvation
+  const rewardScale = hpScale
+
+  // Elite boosts stay multiplicative on top
   const isEliteBoost =
-    waveIndex === 9 || waveIndex === 14 ? 1.2 : waveIndex === 19 ? 1.25 : 1
+    phase === 9 || phase === 14 ? 1.2 : phase === 19 ? 1.25 : 1
+
   return {
     hpScale: hpScale * isEliteBoost,
     speedScale: speedScale * isEliteBoost,

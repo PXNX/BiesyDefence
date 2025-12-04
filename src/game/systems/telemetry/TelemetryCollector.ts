@@ -40,6 +40,7 @@ type SpawnStats = {
 }
 
 export class TelemetryCollector {
+  private readonly enabled: boolean
   private readonly ringBufferSize = 256
   private events: DamageEvent[] = []
   private towerStats = new Map<string, TowerTelemetry>()
@@ -59,7 +60,12 @@ export class TelemetryCollector {
     lastSpawnAt: null,
   }
 
+  constructor(enabled = true) {
+    this.enabled = enabled
+  }
+
   public reset(): void {
+    if (!this.enabled) return
     this.events = []
     this.towerStats.clear()
     this.totalDamage = 0
@@ -74,10 +80,12 @@ export class TelemetryCollector {
   }
 
   public registerTowers(towers: Tower[]): void {
+    if (!this.enabled) return
     towers.forEach((tower) => this.registerTower(tower))
   }
 
   public registerTower(tower: Tower): void {
+    if (!this.enabled) return
     if (this.towerStats.has(tower.id)) {
       return
     }
@@ -94,6 +102,7 @@ export class TelemetryCollector {
   }
 
   public startWave(index: number): void {
+    if (!this.enabled) return
     this.currentWaveIndex = index
     this.waveStart = performance.now()
     this.totalDamage = 0
@@ -115,6 +124,7 @@ export class TelemetryCollector {
   }
 
   public recordShot(tower: Tower): void {
+    if (!this.enabled) return
     this.registerTower(tower)
     this.shots += 1
     const stats = this.towerStats.get(tower.id)
@@ -133,6 +143,7 @@ export class TelemetryCollector {
     overkill: number
     isDot?: boolean
   }): void {
+    if (!this.enabled) return
     if (params.tower) {
       this.registerTower(params.tower)
     }
@@ -171,6 +182,9 @@ export class TelemetryCollector {
   }
 
   public recordEnemySpawn(enemy: Enemy, waveIndex: number, elapsedWaveTime: number): void {
+    if (!this.enabled) {
+      return
+    }
     if (waveIndex !== this.currentWaveIndex) {
       return
     }
@@ -184,6 +198,7 @@ export class TelemetryCollector {
   }
 
   public trackStatus(enemies: Enemy[], deltaSeconds: number): void {
+    if (!this.enabled) return
     if (enemies.length === 0) {
       return
     }
@@ -203,6 +218,7 @@ export class TelemetryCollector {
   }
 
   public getWaveDurationSeconds(): number {
+    if (!this.enabled) return 0
     if (!this.waveStart) {
       return 0
     }
@@ -210,6 +226,18 @@ export class TelemetryCollector {
   }
 
   public buildSnapshot(): TelemetrySnapshot {
+    if (!this.enabled) {
+      return {
+        dps: 0,
+        dpsPerDollar: 0,
+        overkillPercent: 0,
+        hitsPerShot: 0,
+        slowUptime: 0,
+        dotUptime: 0,
+        topDpsPerCost: [],
+        warnings: [],
+      }
+    }
     const durationSeconds = Math.max(this.getWaveDurationSeconds(), 0.001)
     const dps = this.totalDamage / durationSeconds
     const dpsPerDollar =
@@ -269,6 +297,7 @@ export class TelemetryCollector {
   }
 
   public getBalanceWarnings(): string[] {
+    if (!this.enabled) return []
     const warnings: string[] = []
     const snapshot = this.buildSnapshot()
     const durationSeconds = this.getWaveDurationSeconds()
@@ -303,6 +332,7 @@ export class TelemetryCollector {
   }
 
   public debugLog(): void {
+    if (!this.enabled) return
     const snapshot = this.buildSnapshot()
     logger.debug('Telemetry snapshot', snapshot, 'telemetry')
   }
@@ -311,6 +341,7 @@ export class TelemetryCollector {
    * Attach telemetry to a GameState snapshot to keep UI decoupled.
    */
   public applyToSnapshot(snapshot: TelemetrySnapshot): TelemetrySnapshot {
+    if (!this.enabled) return snapshot
     return snapshot
   }
 }

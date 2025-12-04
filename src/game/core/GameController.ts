@@ -35,6 +35,8 @@ import { TelemetryCollector } from '@/game/systems/telemetry/TelemetryCollector'
 import { logger } from '@/game/utils/logger'
 import { canBuyPerk, getLevelUpgradeCost, getPerkCost, recomputeTowerStats } from '@/game/utils/upgradeLogic'
 import { TOWER_UPGRADES } from '@/game/config/upgrades'
+import { GAME_CONFIG, validateGameConfig } from '@/game/config/gameConfig'
+import { EventBus } from '@/game/core/EventBus'
 
 const clampValue = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max)
@@ -42,6 +44,10 @@ const clampValue = (value: number, min: number, max: number) =>
 interface PlacementResult {
   success: boolean
   message: string
+}
+
+type GameEvents = {
+  snapshot: GameSnapshot
 }
 
 export class GameController {
@@ -55,7 +61,7 @@ export class GameController {
   private context?: CanvasRenderingContext2D
   private viewportSize = { width: 0, height: 0 }
   private viewportTransform?: ViewportTransform
-  private subscribers = new Set<(snapshot: GameSnapshot) => void>()
+  private eventBus = new EventBus<GameEvents>()
   private hoverState: CanvasHighlight | null = null
   private selectedTowerId: string | null = null
   private lastHoverWorld: Vector2 | null = null
@@ -73,10 +79,10 @@ export class GameController {
   private isWindowFocused = true
   // Notification debouncing
   private lastNotificationTime = 0
-  private readonly notificationThrottleMs = 33 // ~30 FPS for UI updates
+  private readonly notificationThrottleMs = GAME_CONFIG.performance.notificationThrottleMs
   // Delta clamping for spiral of death prevention
-  private readonly maxDeltaMs = 250 // Maximum delta time to prevent spiral
-  private readonly fixedStep = 1000 / 60
+  private readonly maxDeltaMs = GAME_CONFIG.performance.maxDeltaMs
+  private readonly fixedStep = GAME_CONFIG.performance.fixedStepMs
   
   // State tracking for critical UI updates
   private lastKnownLives = -1
@@ -97,23 +103,23 @@ export class GameController {
   private panButton: number | null = null
   private hasPannedSinceMouseDown = false
   private cancelPlacementClick = false
-  private readonly panStartThreshold = 4
-  private readonly cameraOverscrollPx = 220
-  private readonly cameraOverscrollFactor = 0.12
+  private readonly panStartThreshold = GAME_CONFIG.ui.panStartThreshold
+  private readonly cameraOverscrollPx = GAME_CONFIG.ui.cameraOverscrollPx
+  private readonly cameraOverscrollFactor = GAME_CONFIG.ui.cameraOverscrollFactor
   private camera = {
     center: { x: 0, y: 0 },
-    zoom: 0.1,
-    minZoom: 0.7,
-    maxZoom: 6,
+    zoom: GAME_CONFIG.ui.zoom.initial,
+    minZoom: GAME_CONFIG.ui.zoom.min,
+    maxZoom: GAME_CONFIG.ui.zoom.max,
   }
   private currentWaveNoLeak = true
-  private autoWaveEnabled = true
+  private autoWaveEnabled = GAME_CONFIG.gameplay.autoWaveDefault
   private waveKillCount = 0
   private waveRewardGained = 0
   private waveLeakCount = 0
   private lastWaveSummary: GameSnapshot['lastWaveSummary'] = null
   private lastWaveCompletedAt = 0
-  private telemetry = new TelemetryCollector()
+  private telemetry = new TelemetryCollector(GAME_CONFIG.debug.enableTelemetry)
   private lastLoggedBalanceWarnings: string[] = []
   private achievementSystem = AchievementSystem.getInstance()
   private saveManager = SaveManager.getInstance()
@@ -136,6 +142,7 @@ export class GameController {
   private capturedSpecials = new Map<string, MapSpecialTile>()
 
   constructor() {
+    validateGameConfig(GAME_CONFIG)
     this.state = createInitialState()
     this.telemetry.registerTowers(this.state.towers)
     this.towersPlaced = this.state.towers.length
@@ -238,7 +245,7 @@ export class GameController {
       x: map.worldWidth / 2,
       y: map.worldHeight / 2,
     }
-    this.camera.zoom = 3.0
+    this.camera.zoom = GAME_CONFIG.ui.zoom.initial
   }
 
   private bootstrapSpecialTileBonuses(): void {
@@ -313,11 +320,14 @@ export class GameController {
 
   private getIncomeMultiplier(): number {
     const base = 1 + (this.state.map.modifiers?.incomeMultiplier ?? 0)
-    const specialBoost =
-      this.state.map.specialTiles
-        ?.filter((tile) => tile.capturedBy && tile.bonus?.incomeMultiplier)
-        .reduce((acc, tile) => acc + (tile.bonus?.incomeMultiplier ?? 0), 0) ?? 0
-    return Math.max(0, base + specialBoost)
+    const specialTiles =
+      this.state.map.specialTiles?.filter((tile) => tile.capturedBy && tile.bonus?.incomeMultiplier) ?? []
+    // Multiplikatives Stacking für Einkommen
+    const specialMult = specialTiles.reduce(
+      (acc, tile) => acc * (1 + (tile.bonus?.incomeMultiplier ?? 0)),
+      1
+    )
+    return Math.max(0, base * specialMult)
   }
 
   private buildMapStatus(): GameSnapshot['mapStatus'] {
@@ -504,11 +514,9 @@ export class GameController {
   }
 
   public subscribe(callback: (snapshot: GameSnapshot) => void) {
-    this.subscribers.add(callback)
+    const unsubscribe = this.eventBus.on('snapshot', callback)
     callback(this.createSnapshot())
-    return () => {
-      this.subscribers.delete(callback)
-    }
+    return unsubscribe
   }
 
   public setCanvas(canvas: HTMLCanvasElement) {
@@ -581,7 +589,7 @@ export class GameController {
     this.lastTimestamp = performance.now()
     this.accumulator = 0
     this.notify()
-    if (this.state.wavePhase === 'idle') {
+    if (this.state.wavePhase === 'idle' && this.autoWaveEnabled) {
       this.beginNextWave()
     }
     this.rafId = requestAnimationFrame(this.loop)
@@ -995,7 +1003,10 @@ export class GameController {
       (this.state.paths && request.routeIndex !== undefined
         ? this.state.paths[request.routeIndex]
         : this.state.paths?.[0]) ?? this.state.path
-    const enemy = createEnemy(request.type, request.spawnPosition, request.waveIndex, { route })
+    const enemy = createEnemy(request.type, request.spawnPosition, request.waveIndex, {
+      route,
+      pathIndex: request.routeIndex ?? 0,
+    })
     this.state.enemies.push(enemy)
     this.telemetry.recordEnemySpawn(enemy, request.waveIndex, request.elapsedTime)
   }
@@ -1169,7 +1180,7 @@ export class GameController {
     this.waveRewardGained = 0
     this.waveLeakCount = 0
     this.lastWaveSummary = null
-    this.autoWaveEnabled = true
+    this.autoWaveEnabled = GAME_CONFIG.gameplay.autoWaveDefault
     this.lastWaveCompletedAt = 0
     this.lastLoggedBalanceWarnings = []
     this.totalLeaksThisRun = 0
@@ -1288,7 +1299,12 @@ export class GameController {
                     y: enemy.position.y + jitter.y,
                   },
                   this.state.currentWaveIndex,
-                  { noReward: true, noLifeDamage: true }
+                  {
+                    noReward: true,
+                    noLifeDamage: true,
+                    route: enemy.route ?? this.state.path,
+                    pathIndex: enemy.pathIndex ?? 0,
+                  }
                 )
                 this.state.enemies.push(spawned)
                 const waveTimer = this.state.waves[this.state.currentWaveIndex]?.timer ?? 0
@@ -1347,24 +1363,12 @@ export class GameController {
       
       // Create and broadcast snapshot to all subscribers
       const snapshot = this.createSnapshot()
-      this.subscribers.forEach((callback) => {
-        try {
-          callback(snapshot)
-        } catch (error) {
-          console.error('Error in HUD subscriber callback:', error)
-        }
-      })
+      this.eventBus.emit('snapshot', snapshot)
     } catch (error) {
       console.error('Error updating HUD:', error)
       // Fallback: create a safe snapshot with default values
       const safeSnapshot = this.createSafeSnapshot()
-      this.subscribers.forEach((callback) => {
-        try {
-          callback(safeSnapshot)
-        } catch (callbackError) {
-          console.error('Error in safe HUD subscriber callback:', callbackError)
-        }
-      })
+      this.eventBus.emit('snapshot', safeSnapshot)
     }
   }
 
@@ -1496,7 +1500,7 @@ export class GameController {
       nextSpawnDelay: null,
       wavePreview: [],
       lastWaveSummary: null,
-      autoWaveEnabled: false,
+      autoWaveEnabled: this.autoWaveEnabled,
       showDamageNumbers: true,
       fps: 0,
       showRanges: false,

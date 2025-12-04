@@ -8,10 +8,9 @@ export const GRID_WIDTH = 45
 export const GRID_HEIGHT = 30
 export const CELL_SIZE = 48
 
-// Chapter 2 Balance: ECONOMY REBALANCING
-// Reduced starting money from 200 to 150 to create economic pressure
-// This forces players to make strategic early-game decisions about tower placement
-export const INITIAL_MONEY = 150
+// Chapter 3 Balance: Early economy relief
+// Increase starting money to enable build diversity and reduce death spiral risk
+export const INITIAL_MONEY = 200
 export const INITIAL_LIVES = 20
 export const INITIAL_SCORE = 0
 
@@ -85,7 +84,7 @@ export const TOWER_PROFILES: Record<TowerType, TowerProfile> = {
     name: 'Sativa Tower',
     description: 'Fast-Shot: Rapid fire with double-shot capability.',
     range: 138,
-    fireRate: 0.8,
+    fireRate: 1.0,
     damage: 12,
     projectileSpeed: 380,
     cost: 70,
@@ -97,9 +96,9 @@ export const TOWER_PROFILES: Record<TowerType, TowerProfile> = {
   support: {
     name: 'Support Tower',
     description: 'Slow-Support: Slows enemies 30% for 2 seconds, light damage.',
-    range: 150,
+    range: 130, // -13% range
     fireRate: 1.05,
-    damage: 10,
+    damage: 6, // ~-40% damage
     projectileSpeed: 240,
     cost: 65,
     color: '#6fe2ff',
