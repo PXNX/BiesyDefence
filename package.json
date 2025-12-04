@@ -78,5 +78,22 @@
       "path": "dist/assets/index-*.css",
       "maxSize": "50 kB"
     }
-  ]
+  ],
+  "description": "![BiesyDefence Logo](public/logo.png)",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bies93/BiesyDefence.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bies93/BiesyDefence/issues"
+  },
+  "homepage": "https://github.com/Bies93/BiesyDefence#readme"
 }

@@ -6,83 +6,330 @@ Ziel: Vollständige Abarbeitung aller offenen Punkte, sodass das Spiel auf AAA-N
 
 ## 1) Fundament & Architektur
 **Ziel:** Entfernen des God-Objects, klare Verantwortlichkeiten, konfigurierbare Systeme, saubere Trennung UI/Logik.
-- GameController-Refactor
-  - Aufsplitten in GameManager, SystemManager, RenderManager, InputManager, EventBus, GameLoop.
+
+### Aufgaben
+- [ ] **GameController-Refactor** ❌ KRITISCH
+  - [ ] Aufsplitten in GameManager, SystemManager, RenderManager, InputManager, EventBus, GameLoop.
+  - [x] EventBus implementiert (`src/game/core/EventBus.ts`)
+  - [ ] GameController auf <500 LOC reduzieren (aktuell: **2102 LOC**)
   - DoD: GameController <500 LOC, keine Spiellogik/Rendering/Input direkt darin.
-  - **Status:** EventBus eingebaut, zentrale Config eingeführt. Vollständige Aufteilung und Shrink <500 LOC offen.
-- State-Management & Events
-  - Zentraler Store (z.B. Zustand) als Single Source of Truth; EventBus (mitt/tiny-emitter) für System-Kommunikation.
-  - UI liest ausschließlich aus Store/Selectors; keine direkten Systemaufrufe aus Komponenten.
+  - **Status:** ❌ EventBus eingebaut, zentrale Config eingeführt. **ABER: GameController ist 4x zu groß (2102 LOC statt <500)**. Vollständige Aufteilung fehlt komplett.
+
+- [ ] **State-Management & Events** ⚠️ TEILWEISE
+  - [x] EventBus implementiert (typsicher, mit on/off/emit)
+  - [ ] Zentraler Store (z.B. Zustand) als Single Source of Truth
+  - [ ] UI liest ausschließlich aus Store/Selectors
+  - [ ] Keine direkten Systemaufrufe aus Komponenten
   - DoD: Keine doppelten State-Quellen UI/Game; Events dokumentiert.
-  - **Status:** EventBus für HUD-Dispatch aktiv. Store-Anbindung/UI-Selectors offen.
-- Konfigurationsdrehscheibe
-  - `GAME_CONFIG`/`GAME_CONSTANTS` für Performance (step, delta max), Balance (Tower/Enemy/Economy), UI (Layout-Tokens), Debug.
-  - Magic Numbers entfernen; Runtime-Validierung der Config.
+  - **Status:** ⚠️ EventBus für HUD-Dispatch aktiv. **Store-Anbindung/UI-Selectors fehlen komplett.**
+
+- [x] **Konfigurationsdrehscheibe** ✅ IMPLEMENTIERT
+  - [x] `GAME_CONFIG` mit Performance/Gameplay/UI/Debug-Sections (`src/game/config/gameConfig.ts`)
+  - [x] Runtime-Validierung mit `validateGameConfig()`
+  - [x] Loop/Zoom/Pan/Throttle/Auto-Wave an Config gebunden
+  - [ ] Magic Numbers vollständig entfernen (noch teilweise vorhanden)
   - DoD: 0 Magic Numbers in Kernsystemen; Config-Validator grün.
-  - **Status:** GAME_CONFIG + Validator implementiert; Loop/Zoom/Pan/Throttle/Auto-Wave daran gebunden. Weitere Magic Numbers bereinigen.
-- Modifier/Status-System
-  - Einheitliches Modifier-Pattern (ID, Quelle, Ziel, Typ flat/percentage, Dauer, Caps, Stacking-Regeln).
-  - Konsumiert von Enemy-/Tower-/Trait-System; UI kann aktive Modifier anzeigen.
+  - **Status:** ✅ GAME_CONFIG + Validator implementiert; Loop/Zoom/Pan/Throttle/Auto-Wave daran gebunden. ⚠️ Weitere Magic Numbers bereinigen.
+
+- [ ] **Modifier/Status-System** ❌ NICHT IMPLEMENTIERT
+  - [ ] Einheitliches Modifier-Pattern (ID, Quelle, Ziel, Typ flat/percentage, Dauer, Caps, Stacking-Regeln)
+  - [ ] Konsumiert von Enemy-/Tower-/Trait-System
+  - [ ] UI kann aktive Modifier anzeigen
   - DoD: Slow/Burn/Armor/Mark-Effekte laufen über Modifier-System; Caps und Stacking dokumentiert.
-  - **Status:** Offen.
-- Prod/Dev-Trennung
-  - Debug-/Telemetry-Panels nur in DEV; Logging/`performance.now()` Sampling nur Debug.
+  - **Status:** ❌ **Komplett offen. Keine Implementierung vorhanden.**
+
+- [ ] **Prod/Dev-Trennung** ⚠️ TEILWEISE
+  - [x] Debug-Flags in Config (`enableDebugPanels`, `enableTelemetry`, `enablePerformanceLogs`)
+  - [x] Flags nutzen `import.meta.env.DEV`
+  - [ ] UI/Panel-Gating (Debug-Panels nur in DEV anzeigen)
+  - [ ] Log-Drosselung implementieren
   - DoD: PROD-Build ohne Debug-Panels/Spam-Logs; ENV-Flags getestet.
-  - **Status:** Telemetry per Config abschaltbar; Debug-Flags in Config. UI/Panel-Gating und Log-Drosselung offen.
+  - **Status:** ⚠️ Telemetry per Config abschaltbar; Debug-Flags in Config. **UI/Panel-Gating und Log-Drosselung fehlen.**
+
+---
+
+### 📋 OFFENE ARBEITEN KAPITEL 1 (Fundament & Architektur)
+
+#### 🔴 KRITISCH - Sofort angehen
+1. **GameController-Refaktorierung** (2102 LOC → <500 LOC)
+   - Extrahieren: `SystemManager` (koordiniert alle Game-Systeme)
+   - Extrahieren: `RenderManager` (Canvas/Renderer-Verwaltung)
+   - Extrahieren: `InputManager` (Mouse/Keyboard/Touch-Events)
+   - Extrahieren: `GameLoop` (Update-Schleife, Timing, Accumulator)
+   - GameController wird zu schlankem Koordinator
+
+2. **State-Management einführen**
+   - Zustand oder ähnlichen Store installieren
+   - Store-Schema definieren (Resources, Towers, Enemies, Wave, UI-State)
+   - Selectors für UI-Komponenten erstellen
+   - UI-Komponenten auf Store umstellen (keine direkten GameController-Calls)
+   - Events dokumentieren
+
+3. **Modifier/Status-System implementieren**
+   - Interface `Modifier` definieren (id, source, target, type, value, duration, caps, stacking)
+   - `ModifierManager` erstellen (add, remove, update, query)
+   - Integration in `EnemySystem` (Slow, Burn, Armor-Debuffs)
+   - Integration in `TowerSystem` (Range-Buffs, Damage-Buffs)
+   - UI-Komponente für aktive Modifier
+   - Stacking-Regeln dokumentieren (additive vs. multiplicative)
+
+#### 🟡 WICHTIG - Bald erledigen
+4. **Magic Numbers eliminieren**
+   - Durchsuchen: `src/game/systems/` nach Hardcoded-Werten
+   - Durchsuchen: `src/game/entities/` nach Hardcoded-Werten
+   - Alle Werte in `GAME_CONFIG` oder `constants.ts` verschieben
+   - Validator erweitern für neue Config-Werte
+
+5. **UI/Panel-Gating für Debug**
+   - Debug-Panels mit `{GAME_CONFIG.debug.enableDebugPanels && <DebugPanel />}` wrappen
+   - Telemetry-UI nur in DEV anzeigen
+   - Performance-Overlays nur in DEV
+
+6. **Log-Drosselung**
+   - Logger-Wrapper erstellen mit Rate-Limiting
+   - `performance.now()` Sampling nur in Debug-Mode
+   - Console-Logs in PROD minimieren
 
 ---
 
 ## 2) Game Logic & Systeme
 **Ziel:** Korrekte, transparente Spielmechaniken, robuste Flows.
-- Wave/Economy-Sync
-  - Rewards an HP-Scaling koppeln; Economic Death Spiral entfernen.
+
+### Aufgaben
+- [ ] **Wave/Economy-Sync** ❌ NICHT IMPLEMENTIERT
+  - [ ] Rewards an HP-Scaling koppeln
+  - [ ] Economic Death Spiral entfernen
   - DoD: HP- und Reward-Skalierung aus gleicher Quelle; Tests decken das ab.
-  - **Status:** Offen (keine gekoppelte Reward/HP-Skalierung, keine Tests).
-- Auto-Wave Opt-in
-  - Grace-Phase vor Start; Auto-Wave standardmäßig aus; UI-Option sichtbar.
+  - **Status:** ❌ **Offen (keine gekoppelte Reward/HP-Skalierung, keine Tests).**
+
+- [ ] **Auto-Wave Opt-in** ⚠️ TEILWEISE
+  - [x] Auto-Wave standardmäßig aus (`autoWaveDefault: false` in `GAME_CONFIG`)
+  - [x] Config-Wert wird von GameController genutzt
+  - [ ] Grace-Phase vor Start implementieren
+  - [ ] UI-Option sichtbar und toggelbar
+  - [ ] E2E-Test vorhanden
   - DoD: Spieler hat Bau-Puffer; Auto-Wave toggelbar; E2E-Test vorhanden.
-  - **Status:** Default auf AUS via GAME_CONFIG; Grace/UX/Test offen.
-- Route-Inheritance
-  - On-death Spawns behalten Route/Index.
+  - **Status:** ⚠️ Default auf AUS via GAME_CONFIG; **Grace/UX/Test fehlen.**
+
+- [ ] **Route-Inheritance** ⚠️ CODE VORHANDEN, TESTS FEHLEN
+  - [x] On-death Spawns behalten Route/Index (Code in `WaveSystem.ts` + `GameController.ts`)
+  - [x] `routeIndex` wird beim Spawn übergeben und verarbeitet
+  - [ ] Tests für Multi-Path-Maps
+  - [ ] Tests für Splitter/Spawner
   - DoD: Multi-Path-Maps korrekt; Test für Splitter/Spawner.
-  - **Status:** Route/Index-Vererbung für Wave-Spawn + On-Death-Spawns implementiert; Tests fehlen.
-- Map-Modifier aktivieren
-  - EnemySpeed/Reward/TowerCost/Range/Fog/Wind anwenden; HUD-Banner spiegeln Werte.
+  - **Status:** ⚠️ Route/Index-Vererbung für Wave-Spawn + On-Death-Spawns implementiert; **Tests fehlen komplett.**
+
+- [ ] **Map-Modifier aktivieren** ❌ NICHT IMPLEMENTIERT
+  - [ ] EnemySpeed-Modifier anwenden
+  - [ ] Reward-Modifier anwenden
+  - [ ] TowerCost-Modifier anwenden
+  - [ ] Range-Modifier anwenden
+  - [ ] Fog/Wind-Effekte implementieren
+  - [ ] HUD-Banner spiegeln Modifier-Werte
   - DoD: Modifier wirken in Systems und UI; Tests pro Modifier.
-  - **Status:** Offen.
-- Enemy Traits
-  - Healer/Spawning/Teleport/Aggro als Traits; Ausführung im EnemySystem.
+  - **Status:** ❌ **Komplett offen.**
+
+- [ ] **Enemy Traits** ❌ NICHT IMPLEMENTIERT
+  - [ ] Healer-Trait implementieren
+  - [ ] Spawning-Trait implementieren
+  - [ ] Teleport-Trait implementieren
+  - [ ] Aggro-Trait implementieren
+  - [ ] Trait-Ausführung im EnemySystem
   - DoD: Mindestens 2 Traits aktiv getestet; keine Regressionen.
-  - **Status:** Offen.
-- Tower Synergien
-  - Mark/Exploit (Öl+Feuer, Säure+Plasma), Support-Procs; UI zeigt aktive Synergien/Markierungen.
+  - **Status:** ❌ **Komplett offen.**
+
+- [ ] **Tower Synergien** ❌ NICHT IMPLEMENTIERT
+  - [ ] Mark/Exploit-Mechanik (Öl+Feuer, Säure+Plasma)
+  - [ ] Support-Procs implementieren
+  - [ ] UI zeigt aktive Synergien/Markierungen
   - DoD: Synergie-Effekte sichtbar, stacken gemäß Regeln; Tests vorhanden.
-  - **Status:** Offen.
-- Director/Dynamische Waves (später)
-  - Budget-basierte Mini-Events, variable Routen, Elite-Mods (optional Phase 3+).
+  - **Status:** ❌ **Komplett offen.**
+
+- [ ] **Director/Dynamische Waves** (später)
+  - [ ] Budget-basierte Mini-Events
+  - [ ] Variable Routen
+  - [ ] Elite-Mods
   - **Status:** Offen (Phase 3+).
+
+---
+
+### 📋 OFFENE ARBEITEN KAPITEL 2 (Game Logic & Systeme)
+
+#### 🔴 KRITISCH - Sofort angehen
+1. **Wave/Economy-Sync implementieren**
+   - HP-Skalierung und Reward-Skalierung aus gemeinsamer Formel ableiten
+   - `getWaveScaling(waveIndex)` Funktion erstellen (returns { hpMultiplier, rewardMultiplier })
+   - In `waves.ts` integrieren
+   - Economic Death Spiral verhindern (Mindest-Rewards garantieren)
+   - Unit-Tests für Skalierung schreiben
+
+2. **Route-Inheritance Tests schreiben**
+   - Unit-Test: Multi-Path-Map mit 2+ Routen
+   - Unit-Test: Splitter spawnt Kinder auf gleicher Route
+   - Unit-Test: On-Death-Spawn behält routeIndex
+   - Integration-Test: Komplette Wave mit Multi-Path
+
+3. **Auto-Wave Grace-Phase & UX**
+   - Grace-Timer in GameController implementieren (nutzt `GAME_CONFIG.gameplay.graceSeconds`)
+   - UI-Countdown während Grace-Phase anzeigen
+   - Auto-Wave-Toggle in Settings/HUD hinzufügen
+   - E2E-Test: Auto-Wave aktivieren/deaktivieren
+   - E2E-Test: Grace-Phase gibt Zeit zum Bauen
+
+#### 🟡 WICHTIG - Bald erledigen
+4. **Map-Modifier System**
+   - `MapModifier` Interface definieren (type, value, target)
+   - Modifier in `MapConfiguration` integrieren
+   - `applyMapModifiers()` in relevanten Systemen:
+     - `EnemySystem`: Speed-Modifier
+     - `EconomySystem`: Reward-Modifier
+     - `TowerSystem`: Cost/Range-Modifier
+   - HUD-Banner-Komponente für aktive Modifier
+   - Tests pro Modifier-Typ
+
+5. **Enemy Traits System**
+   - `EnemyTrait` Interface definieren (type, parameters, onUpdate callback)
+   - Traits in Enemy-Definitions integrieren
+   - Trait-Execution in `EnemySystem.updateEnemies()`:
+     - Healer: Heilt nahe Enemies
+     - Spawning: Spawnt Minions periodisch
+     - Teleport: Springt vorwärts auf Path
+     - Aggro: Zieht Tower-Feuer auf sich
+   - UI-Indikatoren für aktive Traits
+   - Tests für mindestens 2 Traits
+
+6. **Tower Synergien**
+   - Marking-System implementieren (Tower markiert Enemy)
+   - Exploit-System implementieren (anderer Tower macht Bonus-Schaden)
+   - Synergie-Kombinationen definieren:
+     - Öl-Tower + Feuer-Tower = Burn-Explosion
+     - Säure-Tower + Plasma-Tower = Armor-Shred
+   - Support-Procs (z.B. Slow verstärkt Damage)
+   - UI zeigt aktive Markierungen/Synergien
+   - Tests für Synergie-Interaktionen
 
 ---
 
 ## 3) Balancing & Economy
 **Ziel:** Faire, datenbasierte Balance, klare Formeln, dokumentierte Regeln.
-- Emergency-Balance
-  - Support Nerf (~-40% DMG, -13% Range), Sativa Fire Rate 1.0, Startgeld 200, Wave 1-2 Rewards +25%, Boss-Resistenzen <25%.
+
+### Aufgaben
+- [ ] **Emergency-Balance** ⚠️ TEILWEISE
+  - [x] Support Nerf (~-40% DMG: 6 Damage, -13% Range: 130) in `constants.ts`
+  - [x] Sativa Fire Rate 1.0 in `constants.ts`
+  - [x] Startgeld 200 (`INITIAL_MONEY` in `constants.ts`)
+  - [ ] Wave 1-2 Rewards +25% (nicht erkennbar)
+  - [ ] Boss-Resistenzen <25% (nicht dokumentiert)
+  - [ ] Smoke-/E2E-Test Early Game
   - DoD: Werte im Config; Smoke-/E2E-Test Early Game grün.
-- Balance-Bibel
-  - Formeln für Schaden/Armor/Slow-Caps/Stacking/Upgrade-Kosten dokumentieren; zentrale Balance-Datei ohne Magic Numbers.
+  - **Status:** ⚠️ **Werte teilweise in Config; Tests fehlen komplett.**
+
+- [ ] **Balance-Bibel** ❌ NICHT VORHANDEN
+  - [ ] Formeln für Schaden dokumentieren
+  - [ ] Formeln für Armor dokumentieren
+  - [ ] Slow-Caps dokumentieren
+  - [ ] Stacking-Regeln dokumentieren
+  - [ ] Upgrade-Kosten-Formeln dokumentieren
+  - [ ] Zentrale Balance-Datei ohne Magic Numbers
   - DoD: Dokument + Tests, die Formeln validieren.
-- Income-Stacking
-  - Multiplikativ statt additiv; Rewards pro Enemy-Typ angleichen; Upgrade-Kosten für dominante Türme erhöhen.
+  - **Status:** ❌ **Komplett offen. Keine Dokumentation vorhanden.**
+
+- [ ] **Income-Stacking** ⚠️ UNKLAR
+  - [ ] Multiplikativ statt additiv (`getIncomeMultiplier()` prüfen)
+  - [ ] Rewards pro Enemy-Typ angleichen
+  - [ ] Upgrade-Kosten für dominante Türme erhöhen
+  - [ ] Tests für multiplikative Stacking
+  - [ ] Tests für mehrere Gold-Wells
   - DoD: getIncomeMultiplier multiplicative; Test deckt mehrere Gold-Wells ab.
-- Difficulty Curve
-  - Wellen 1-5 leichter, 6-10 moderat, 11-15 anziehend, 16-20 fordernd; datengetriebene Templates.
+  - **Status:** ⚠️ **`getIncomeMultiplier()` vorhanden, aber Implementierung unklar. Tests fehlen.**
+
+- [ ] **Difficulty Curve** ⚠️ TEMPLATES VORHANDEN, NICHT DATENGETRIEBEN
+  - [x] Wave-Templates in `waves.ts` vorhanden (Phasen A-F)
+  - [ ] Wellen 1-5 leichter machen (datenbasiert)
+  - [ ] Wellen 6-10 moderat (datenbasiert)
+  - [ ] Wellen 11-15 anziehend (datenbasiert)
+  - [ ] Wellen 16-20 fordernd (datenbasiert)
+  - [ ] Wave-Config versionieren
+  - [ ] Tests für HP/Speed/Reward-Skalierung
   - DoD: Wave-Config versioniert; Tests für HP/Speed/Reward-Skalierung.
-- Telemetrie für Balance
-  - Events: `tower_built`, `tower_upgraded`, `tower_sold`, `enemy_destroyed`, `player_defeated`; Heatmaps (Placement/Deaths).
+  - **Status:** ⚠️ **Templates vorhanden, aber nicht datengetrieben. Tests fehlen.**
+
+- [ ] **Telemetrie für Balance** ⚠️ BASIS VORHANDEN
+  - [x] `TelemetryCollector` implementiert
+  - [x] Integration in GameController, TowerSystem, EnemySystem, ProjectileSystem
+  - [ ] Event: `tower_built` senden
+  - [ ] Event: `tower_upgraded` senden
+  - [ ] Event: `tower_sold` senden
+  - [ ] Event: `enemy_destroyed` senden
+  - [ ] Event: `player_defeated` senden
+  - [ ] Heatmaps (Placement/Deaths) implementieren
+  - [ ] Dashboard/Export möglich
+  - [ ] KPI berechenbar
   - DoD: Events gesendet, Dashboard/Export möglich; KPI berechenbar.
-- KPI-Ziele
-  - Tower-Diversität >3, Avg Waves ~16, Overkill 10-25%, Retention >60%.
+  - **Status:** ⚠️ **TelemetryCollector vorhanden, aber Events/Dashboard/Export fehlen.**
+
+- [ ] **KPI-Ziele** ❌ NICHT MESSBAR
+  - [ ] Tower-Diversität >3 messen
+  - [ ] Avg Waves ~16 tracken
+  - [ ] Overkill 10-25% berechnen
+  - [ ] Retention >60% messen
+  - **Status:** ❌ **Keine Messung implementiert.**
+
+---
+
+### 📋 OFFENE ARBEITEN KAPITEL 3 (Balancing & Economy)
+
+#### 🔴 KRITISCH - Sofort angehen
+1. **Emergency-Balance vervollständigen**
+   - Wave 1-2 Rewards in `waves.ts` um 25% erhöhen
+   - Boss-Resistenzen in Enemy-Definitions auf <25% setzen und dokumentieren
+   - Smoke-Test für Early Game schreiben (Waves 1-3 spielbar)
+   - E2E-Test für Early Economy (kein sofortiger Tod)
+
+2. **Balance-Bibel erstellen**
+   - Dokument `docs/balance-formulas.md` erstellen
+   - Schaden-Formel dokumentieren: `baseDamage * (1 + upgrades * 0.15) * vulnerabilityMultiplier`
+   - Armor-Formel dokumentieren: `effectiveDamage = damage * (1 - armor)`
+   - Slow-Caps dokumentieren: `maxSlow = 0.7` (30% Mindestgeschwindigkeit)
+   - Stacking-Regeln: Additive vs. Multiplicative pro Modifier-Typ
+   - Upgrade-Kosten-Formel: `baseCost * (1.5 ^ level)`
+   - Unit-Tests für jede Formel schreiben
+
+3. **Income-Stacking validieren**
+   - `getIncomeMultiplier()` in GameController prüfen (multiplikativ?)
+   - Falls additiv: auf multiplikativ umstellen
+   - Rewards pro Enemy-Typ in `enemies.ts` angleichen
+   - Upgrade-Kosten für dominante Türme (Indica, Sativa) erhöhen
+   - Unit-Test: Mehrere Gold-Wells stacken multiplikativ
+
+#### 🟡 WICHTIG - Bald erledigen
+4. **Difficulty Curve datengetrieben machen**
+   - `DifficultyConfig` Interface definieren (waveRange, hpMultiplier, speedMultiplier, rewardMultiplier)
+   - Difficulty-Phasen in Config definieren:
+     - Phase 1 (Waves 1-5): HP 0.6x, Speed 0.8x, Reward 1.25x
+     - Phase 2 (Waves 6-10): HP 1.0x, Speed 1.0x, Reward 1.0x
+     - Phase 3 (Waves 11-15): HP 1.5x, Speed 1.2x, Reward 1.1x
+     - Phase 4 (Waves 16-20): HP 2.5x, Speed 1.4x, Reward 1.2x
+   - `applyDifficultyCurve()` Funktion in `waves.ts`
+   - Wave-Config versionieren (v1.0.0)
+   - Tests für HP/Speed/Reward-Skalierung
+
+5. **Telemetrie-Events implementieren**
+   - Event `tower_built` in TowerSystem senden (type, position, cost)
+   - Event `tower_upgraded` in TowerUpgradeSystem senden (id, level, cost)
+   - Event `tower_sold` in GameController senden (type, level, refund)
+   - Event `enemy_destroyed` in EnemySystem senden (type, wave, position, overkill)
+   - Event `player_defeated` in GameController senden (wave, reason, stats)
+   - Heatmap-Daten sammeln (tower placement grid, enemy death positions)
+   - Export-Funktion für Telemetrie-Daten (JSON)
+
+6. **KPI-Dashboard aufbauen**
+   - Tower-Diversität berechnen: `uniqueTowerTypes / totalTowers`
+   - Avg Waves berechnen: `sum(wavesReached) / gamesPlayed`
+   - Overkill berechnen: `(totalDamage - totalEnemyHP) / totalEnemyHP`
+   - Retention berechnen: `playersReturning / totalPlayers`
+   - Dashboard-UI für KPIs (nur DEV)
+   - Zielwerte validieren (Tower-Diversität >3, Avg Waves ~16, Overkill 10-25%)
 
 ---
 
