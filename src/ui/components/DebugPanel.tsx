@@ -1,30 +1,33 @@
 import type { ChangeEvent } from 'react'
+import {
+  selectShowRanges,
+  selectShowHitboxes,
+  selectFPS,
+  selectWave,
+  selectTelemetry
+} from '@/game/store/selectors'
 
 interface DebugPanelProps {
-  showRanges: boolean
-  showHitboxes: boolean
-  fps: number
-  currentWave: number
-  totalWaves: number
   quickWaveIndex: number
-  onToggleRanges: () => void
-  onToggleHitboxes: () => void
   onSetQuickWave: (_index: number) => void
   onQuickStartWave: () => void
+  onToggleRanges: () => void
+  onToggleHitboxes: () => void
 }
 
 export function DebugPanel({
-  showRanges,
-  showHitboxes,
-  fps,
-  currentWave,
-  totalWaves,
   quickWaveIndex,
-  onToggleRanges,
-  onToggleHitboxes,
   onSetQuickWave,
   onQuickStartWave,
+  onToggleRanges,
+  onToggleHitboxes,
 }: DebugPanelProps) {
+  const showRanges = selectShowRanges()
+  const showHitboxes = selectShowHitboxes()
+  const fps = selectFPS()
+  const wave = selectWave()
+  const telemetry = selectTelemetry()
+
   const handleRangeChange = (event: ChangeEvent<HTMLInputElement>) => {
     onSetQuickWave(Number(event.target.value) - 1)
   }
@@ -48,7 +51,7 @@ export function DebugPanel({
       <div className="debug-row">
         <span>Wave</span>
         <strong>
-          {currentWave} / {totalWaves}
+          {wave.current} / {wave.total}
         </strong>
       </div>
       <div className="debug-row toggle-row">
@@ -59,12 +62,16 @@ export function DebugPanel({
           Hitboxes
         </button>
       </div>
+      <div className="debug-row">
+        <span>DPS</span>
+        <strong>{telemetry?.dps?.toFixed(1) ?? '0.0'}</strong>
+      </div>
       <label className="quick-wave-label">
         Quick wave jump
         <input
           type="range"
           min={1}
-          max={Math.max(totalWaves, 1)}
+          max={Math.max(wave.total, 1)}
           value={quickWaveIndex + 1}
           onChange={handleRangeChange}
         />

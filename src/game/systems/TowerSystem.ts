@@ -28,11 +28,11 @@ import type { TelemetryCollector } from '@/game/systems/telemetry/TelemetryColle
 // Prioritizes enemies closer to the goal (higher pathIndex) using efficient spatial queries
 const selectTarget = (tower: Tower, enemies: Enemy[]): Enemy | null => {
   const startTime = performance.now()
-  
+
   // Use spatial grid for O(n log n) targeting instead of O(n×m)
   const targets = findOptimalTargets(tower, enemies)
   let target = targets.length > 0 ? targets[0] : null
-  
+
   // Fallback: direct scan if grid misses candidates (safety net)
   if (!target) {
     const inRange = enemies
@@ -45,7 +45,7 @@ const selectTarget = (tower: Tower, enemies: Enemy[]): Enemy | null => {
       })
     target = inRange[0] ?? null
   }
-  
+
   const targetingTime = performance.now() - startTime
   if (targetingTime > 0.5) { // Log slow targeting operations
     logger.warn('Slow targeting detected', {
@@ -54,7 +54,7 @@ const selectTarget = (tower: Tower, enemies: Enemy[]): Enemy | null => {
       targetingTime: targetingTime.toFixed(2)
     }, 'performance')
   }
-  
+
   return target
 }
 
@@ -111,16 +111,21 @@ const getProjectileSprite = (towerType: Tower['type'], damageType: DamageType, h
 // - Support: Applies timed slow effects (30% reduction, 2 seconds) + light damage
 // - Sativa: Shoots double projectiles with 60% damage per shot (maintains DPS balance)
 // - Indica: Single powerful shots for focused elimination
+import type { ModifierManager } from '@/game/systems/ModifierSystem'
+
+// ...
+
 export const updateTowers = (
   state: GameState,
   deltaSeconds: number,
+  modifierManager: ModifierManager,
   telemetry?: TelemetryCollector
 ): void => {
   state.towers.forEach((tower) => {
     const hasPerk = (needle: string) => Boolean(tower.upgradeState?.perks?.some((id) => id.includes(needle)))
     const towerDamageType = tower.damageType ?? 'impact'
     tower.cooldown = Math.max(tower.cooldown - deltaSeconds, 0)
-    
+
     // CHAPTER 2: Support towers apply slow effects instead of shooting projectiles
     if (tower.type === 'support') {
       if (tower.cooldown <= 0) {
@@ -132,34 +137,51 @@ export const updateTowers = (
             .filter((enemy) => !enemy.isDead && !enemy.reachedGoal && distanceBetween(tower.position, enemy.position) <= tower.range)
             .sort((a, b) => b.pathIndex - a.pathIndex)
         }
-        
+
         // Apply slow + DoT + vulnerability
         enemiesInRange.forEach(enemy => {
           const slowCfg = tower.slow ?? { multiplier: 0.7, duration: 2.0 }
           // Cryo-Perk verstärkt Slow
           const extraSlow = hasPerk('cryo-1') ? 0.1 : 0
           const extraDuration = hasPerk('cryo-1') ? 0.5 : 0
-          applySlowToEnemy(
-            enemy,
-            Math.max(0.3, slowCfg.multiplier - extraSlow),
-            slowCfg.duration + extraDuration,
-            tower.id
-          )
+
+          // Apply Slow Modifier
+          const slowMultiplier = Math.max(0.1, slowCfg.multiplier - extraSlow)
+          const slowValue = Math.max(0, 1 - slowMultiplier)
+          modifierManager.addModifier(enemy.id, tower.id, {
+            type: 'slow',
+            value: slowValue,
+            duration: slowCfg.duration + extraDuration,
+            stacking: 'max'
+          })
 
           if (tower.dot) {
             const dotType = tower.dot.damageType ?? 'dot'
-            applyDotToEnemy(
-              enemy,
-              applyTowerBonusesToDamage(tower, enemy, tower.dot.dps),
-              tower.dot.duration,
-              dotType,
-              tower.id,
-              tower.type
-            )
+            // Apply DoT Modifier
+            modifierManager.addModifier(enemy.id, tower.id, {
+              type: dotType === 'burn' ? 'burn' : 'dot',
+              value: applyTowerBonusesToDamage(tower, enemy, tower.dot.dps), // DPS
+              duration: tower.dot.duration,
+              stacking: 'replace', // Or additive? Usually DoTs from same source refresh.
+              tickInterval: 0.5 // Standard tick interval
+            })
           }
 
           if (tower.vulnerabilityDebuff) {
-            applyVulnerability(enemy, tower.vulnerabilityDebuff.amount, tower.vulnerabilityDebuff.duration)
+            // Apply Vulnerability Modifier
+            const vulnValue = tower.vulnerabilityDebuff.amount
+            modifierManager.addModifier(enemy.id, tower.id, {
+              type: 'vulnerability',
+              value: vulnValue,
+              duration: tower.vulnerabilityDebuff.duration,
+              stacking: 'max' // Usually max vulnerability applies? Or additive? Let's say max for now.
+            })
+            modifierManager.addModifier(enemy.id, tower.id, {
+              type: 'armor_reduction',
+              value: vulnValue,
+              duration: tower.vulnerabilityDebuff.duration,
+              stacking: 'max'
+            })
           }
 
           if (hasPerk('cryo')) {
@@ -189,7 +211,13 @@ export const updateTowers = (
               state.enemies
             ).filter((e) => e.id !== enemy.id && !e.isDead && !e.reachedGoal)
             spreadTargets.forEach((e) =>
-              applyDotToEnemy(e, tower.dot ? tower.dot.dps * 0.6 : 4, tower.dot ? tower.dot.duration * 0.6 : 2, 'dot', tower.id, tower.type)
+              modifierManager.addModifier(e.id, tower.id, {
+                type: 'dot',
+                value: tower.dot ? tower.dot.dps * 0.6 : 4,
+                duration: tower.dot ? tower.dot.duration * 0.6 : 2,
+                stacking: 'replace',
+                tickInterval: 0.5
+              })
             )
           }
         })
@@ -198,7 +226,7 @@ export const updateTowers = (
         if (enemiesInRange[0]) {
           state.particles.push(...createMuzzleParticles(tower.position, enemiesInRange[0].position, tower.color))
         }
-        
+
         tower.cooldown = tower.fireRate
       }
       return
@@ -298,14 +326,14 @@ export const updateTowers = (
           recordDamageEvent(telemetry, tower, enemy, dealt, before, 'burn')
           state.particles.push(...createImpactParticles(enemy.position, '#fb923c'))
           if (tower.dot) {
-            applyDotToEnemy(
-              enemy,
-              applyTowerBonusesToDamage(tower, enemy, tower.dot.dps),
-              tower.dot.duration,
-              'burn',
-              tower.id,
-              tower.type
-            )
+            // Apply Burn Modifier
+            modifierManager.addModifier(enemy.id, tower.id, {
+              type: 'burn',
+              value: applyTowerBonusesToDamage(tower, enemy, tower.dot.dps),
+              duration: tower.dot.duration,
+              stacking: 'replace',
+              tickInterval: 0.5
+            })
           }
           if (hasPerk('napalm')) {
             state.particles.push(...createNapalmPuddle(enemy.position, 44))

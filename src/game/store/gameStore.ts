@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { GameSnapshot, GameStatus, WavePhase, TowerType } from '@/game/core/types'
+import type { Modifier } from '@/game/systems/ModifierSystem'
 
 /**
  * Game Store - Central state management using Zustand
@@ -22,6 +23,10 @@ interface GameStore {
     }
     wavePhase: WavePhase
     nextWaveAvailable: boolean
+    nextSpawnCountdown: number | null
+    nextSpawnDelay: number | null
+    wavePreview?: GameSnapshot['wavePreview']
+    lastWaveSummary?: GameSnapshot['lastWaveSummary']
     autoWaveEnabled: boolean
     fps: number
     gameSpeed: number
@@ -32,6 +37,7 @@ interface GameStore {
     showDamageNumbers: boolean
     selectedTowerId: string | null
     previewTowerType: TowerType | null
+    feedback: string | null
 
     // Telemetry
     telemetry: GameSnapshot['telemetry']
@@ -43,8 +49,12 @@ interface GameStore {
     // Map status
     mapStatus?: GameSnapshot['mapStatus']
 
+    // Hover tower
+    hoverTower?: GameSnapshot['hoverTower']
+
     // Balance warnings
     balanceWarnings: string[]
+    activeModifiers: Record<string, Modifier[]>
 
     // Actions
     updateSnapshot: (snapshot: GameSnapshot) => void
@@ -53,6 +63,7 @@ interface GameStore {
     toggleShowRanges: () => void
     toggleShowHitboxes: () => void
     toggleDamageNumbers: () => void
+    setFeedback: (message: string | null) => void
 }
 
 export const useGameStore = create<GameStore>((set) => ({
@@ -71,6 +82,8 @@ export const useGameStore = create<GameStore>((set) => ({
     },
     wavePhase: 'idle',
     nextWaveAvailable: false,
+    nextSpawnCountdown: null,
+    nextSpawnDelay: null,
     autoWaveEnabled: false,
     fps: 0,
     gameSpeed: 1,
@@ -81,6 +94,7 @@ export const useGameStore = create<GameStore>((set) => ({
     showDamageNumbers: true,
     selectedTowerId: null,
     previewTowerType: null,
+    feedback: null,
 
     // Telemetry
     telemetry: {
@@ -100,6 +114,7 @@ export const useGameStore = create<GameStore>((set) => ({
 
     // Balance warnings
     balanceWarnings: [],
+    activeModifiers: {},
 
     // Actions
     updateSnapshot: (snapshot) => set({
@@ -113,6 +128,10 @@ export const useGameStore = create<GameStore>((set) => ({
         wave: snapshot.wave,
         wavePhase: snapshot.wavePhase,
         nextWaveAvailable: snapshot.nextWaveAvailable,
+        nextSpawnCountdown: snapshot.nextSpawnCountdown,
+        nextSpawnDelay: snapshot.nextSpawnDelay,
+        wavePreview: snapshot.wavePreview,
+        lastWaveSummary: snapshot.lastWaveSummary,
         autoWaveEnabled: snapshot.autoWaveEnabled ?? false,
         fps: snapshot.fps,
         gameSpeed: snapshot.gameSpeed,
@@ -123,7 +142,9 @@ export const useGameStore = create<GameStore>((set) => ({
         achievements: snapshot.achievements ?? [],
         achievementNotifications: snapshot.achievementNotifications ?? [],
         mapStatus: snapshot.mapStatus,
+        hoverTower: snapshot.hoverTower,
         balanceWarnings: snapshot.balanceWarnings ?? [],
+        activeModifiers: snapshot.activeModifiers ?? {},
     }),
 
     setSelectedTower: (id) => set({ selectedTowerId: id }),
@@ -135,4 +156,6 @@ export const useGameStore = create<GameStore>((set) => ({
     toggleShowHitboxes: () => set((state) => ({ showHitboxes: !state.showHitboxes })),
 
     toggleDamageNumbers: () => set((state) => ({ showDamageNumbers: !state.showDamageNumbers })),
+
+    setFeedback: (message) => set({ feedback: message }),
 }))

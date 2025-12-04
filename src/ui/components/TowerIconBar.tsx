@@ -3,9 +3,8 @@ import { TOWER_PROFILES } from '@/game/config/constants'
 import type { TowerProfile } from '@/game/config/constants'
 import type { TowerType } from '@/game/core/types'
 import { TowerDetailsPanel, TOWER_DETAILS_PANEL_WIDTH } from './TowerDetailsPanel'
-
-const PLACEHOLDER_SHOP =
-  'data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"96\" height=\"96\" viewBox=\"0 0 96 96\"><rect width=\"96\" height=\"96\" rx=\"18\" fill=\"%23181818\"/><text x=\"50%\" y=\"55%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-size=\"18\" fill=\"%23cccccc\">WIP</text></svg>'
+import { useGameStore } from '@/game/store/gameStore'
+import { selectMoney, selectSelectedTowerId, selectFeedback } from '@/game/store/selectors'
 
 const TOWER_ART_PATHS: Record<TowerType, string> = {
   indica: '/towers/tower_indica_shop.png',
@@ -19,29 +18,27 @@ const TOWER_ART_PATHS: Record<TowerType, string> = {
 const TOWER_ENTRIES = Object.entries(TOWER_PROFILES) as [TowerType, TowerProfile][]
 
 interface TowerIconBarProps {
-  selectedTower: string | null
-  onSelectTower: (towerType: string) => void
-  money: number
   className?: string
-  feedback?: string | null
   orientation?: 'horizontal' | 'vertical'
 }
 
 export function TowerIconBar({
-  selectedTower,
-  onSelectTower,
-  money,
   className,
-  feedback,
   orientation = 'horizontal',
 }: TowerIconBarProps) {
   const [hoveredTower, setHoveredTower] = useState<TowerType | null>(null)
   const [panelPosition, setPanelPosition] = useState<{ x: number; y: number } | null>(null)
   const iconRefs = useRef<Record<TowerType, HTMLButtonElement | null>>({} as Record<TowerType, HTMLButtonElement | null>)
 
+  const money = selectMoney()
+  const selectedTower = selectSelectedTowerId()
+  const feedback = selectFeedback()
+  const setSelectedTower = useGameStore((state) => state.setSelectedTower)
+  const setFeedback = useGameStore((state) => state.setFeedback)
+
   const handleIconHover = (towerType: TowerType, event?: React.MouseEvent | React.FocusEvent) => {
     setHoveredTower(towerType)
-    
+
     // Calculate panel position left of the hovered icon so it stays outside the toolbar
     const iconElement = iconRefs.current[towerType]
     if (iconElement) {
@@ -59,7 +56,8 @@ export function TowerIconBar({
   }
 
   const handleIconClick = (towerType: TowerType) => {
-    onSelectTower(towerType)
+    setSelectedTower(towerType)
+    setFeedback(null)
   }
 
   const handleKeyDown = (event: React.KeyboardEvent, towerType: TowerType) => {
@@ -71,7 +69,7 @@ export function TowerIconBar({
 
   const handleKeyNavigation = (event: React.KeyboardEvent) => {
     const currentIndex = hoveredTower ? TOWER_ENTRIES.findIndex(([type]) => type === hoveredTower) : -1
-    
+
     if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
       event.preventDefault()
       const direction = event.key === 'ArrowRight' ? 1 : -1
@@ -89,7 +87,7 @@ export function TowerIconBar({
 
   return (
     <div className={wrapperClassName.filter(Boolean).join(' ')}>
-      <div 
+      <div
         className="tower-icon-bar-content"
         role="toolbar"
         aria-label="Tower Selection"
@@ -133,7 +131,7 @@ export function TowerIconBar({
                   {!isAffordable && (
                     <div className="lock-indicator" aria-hidden="true">
                       <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                        <path d="M12 1a5 5 0 00-5 5v3H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm-3 8V6a3 3 0 116 0v3H9z"/>
+                        <path d="M12 1a5 5 0 00-5 5v3H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm-3 8V6a3 3 0 116 0v3H9z" />
                       </svg>
                     </div>
                   )}

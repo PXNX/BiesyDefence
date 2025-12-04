@@ -204,6 +204,8 @@ export interface Enemy {
   }
   resistances?: DamageResistances
   vulnerability?: number
+  armorReduction?: number
+  damageTakenMult?: number
   tags?: EnemyTag[]
 }
 
@@ -408,6 +410,7 @@ export interface GameSnapshot {
   balanceWarnings?: string[]
   achievements?: AchievementView[]
   achievementNotifications?: AchievementView[]
+  activeModifiers?: Record<string, import('@/game/systems/ModifierSystem').Modifier[]>
 }
 
 export interface WavePreviewEntry {

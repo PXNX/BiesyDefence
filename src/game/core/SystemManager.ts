@@ -8,6 +8,7 @@ import { updateWaves, type WaveSystemCallbacks } from '@/game/systems/WaveSystem
 import { TelemetryCollector } from '@/game/systems/telemetry/TelemetryCollector'
 import { GAME_CONFIG } from '@/game/config/gameConfig'
 import { updateEnemySpatialGrid } from '@/game/utils/spatialGrid'
+import type { ModifierManager, ModifierEvent } from '@/game/systems/ModifierSystem'
 
 /**
  * SystemManager - Coordinates all game systems
@@ -26,6 +27,8 @@ export class SystemManager {
     updateSystems(
         state: GameState,
         deltaSeconds: number,
+        modifierManager: ModifierManager,
+        modifierEvents: ModifierEvent[],
         callbacks: {
             wave?: WaveSystemCallbacks
             economy?: EconomyHooks
@@ -40,6 +43,7 @@ export class SystemManager {
         updateTowers(
             state,
             deltaSeconds,
+            modifierManager,
             this.telemetry
         )
 
@@ -47,6 +51,7 @@ export class SystemManager {
         updateProjectiles(
             state,
             deltaSeconds,
+            modifierManager,
             this.telemetry
         )
 
@@ -54,6 +59,8 @@ export class SystemManager {
         updateEnemies(
             state,
             deltaSeconds,
+            modifierManager,
+            modifierEvents,
             this.telemetry
         )
 

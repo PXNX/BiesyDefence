@@ -5,10 +5,12 @@ const clamp = (value: number, min: number, max: number) => Math.max(min, Math.mi
 
 export const getDamageMultiplier = (damageType: DamageType, enemy: Enemy): number => {
   const resist = enemy.resistances?.[damageType] ?? 0
+  const armorReduction = enemy.armorReduction ?? 0
   const vulnerability = enemy.vulnerability ?? 0
+  const damageTakenMult = enemy.damageTakenMult ?? 1
   // resist is reduction (0.25 => 25% less), negative resist = bonus
-  const base = 1 - resist
-  return clamp(base, 0, 2.5) * (1 + vulnerability)
+  const base = 1 - Math.max(-0.9, resist - armorReduction)
+  return clamp(base, 0, 2.5) * (1 + vulnerability) * damageTakenMult
 }
 
 export const applyDamageToEnemy = (

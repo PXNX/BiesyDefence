@@ -44,6 +44,7 @@ export const selectShowHitboxes = () => useGameStore((state) => state.showHitbox
 export const selectShowDamageNumbers = () => useGameStore((state) => state.showDamageNumbers)
 export const selectSelectedTowerId = () => useGameStore((state) => state.selectedTowerId)
 export const selectPreviewTowerType = () => useGameStore((state) => state.previewTowerType)
+export const selectFeedback = () => useGameStore((state) => state.feedback)
 
 // Telemetry
 export const selectTelemetry = () => useGameStore((state) => state.telemetry)
@@ -55,8 +56,14 @@ export const selectAchievementNotifications = () => useGameStore((state) => stat
 // Map status
 export const selectMapStatus = () => useGameStore((state) => state.mapStatus)
 
+// Hover tower
+export const selectHoverTower = () => useGameStore((state) => state.hoverTower)
+
 // Balance warnings
 export const selectBalanceWarnings = () => useGameStore((state) => state.balanceWarnings)
+
+// Active modifiers
+export const selectActiveModifiers = () => useGameStore((state) => state.activeModifiers)
 
 // Composite selectors
 export const selectCanAffordTower = (cost: number) =>
@@ -69,3 +76,8 @@ export const selectWaveProgress = () => useGameStore((state) => ({
     nextAvailable: state.nextWaveAvailable,
     autoEnabled: state.autoWaveEnabled,
 }))
+
+export const selectNextSpawnCountdown = () => useGameStore((state) => state.nextSpawnCountdown)
+export const selectNextSpawnDelay = () => useGameStore((state) => state.nextSpawnDelay)
+export const selectWavePreview = () => useGameStore((state) => state.wavePreview)
+export const selectLastWaveSummary = () => useGameStore((state) => state.lastWaveSummary)

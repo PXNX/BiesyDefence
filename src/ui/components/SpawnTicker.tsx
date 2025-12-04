@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { selectNextSpawnCountdown, selectNextSpawnDelay } from '@/game/store/selectors';
 
-interface SpawnTickerProps {
-  countdown: number | null;
-  delay: number | null;
-}
-
-const SpawnTicker = ({ countdown, delay }: SpawnTickerProps) => {
+const SpawnTicker = () => {
+  const countdown = selectNextSpawnCountdown();
+  const delay = selectNextSpawnDelay();
   const [isVisible, setIsVisible] = useState(false);
 
   // Show/hide animation
@@ -18,7 +16,7 @@ const SpawnTicker = ({ countdown, delay }: SpawnTickerProps) => {
   }, [countdown, delay]);
 
   if (countdown === null || delay === null) return null;
-  
+
   const progress = 1 - Math.max(countdown / (delay ?? 1), 0);
   const waveInfo = `Wave ${Math.floor(progress * 5) + 1}`;
 
@@ -45,7 +43,7 @@ const SpawnTicker = ({ countdown, delay }: SpawnTickerProps) => {
           </div>
         </div>
       </div>
-      
+
       <style>{`
         .spawn-ticker-banner {
           position: fixed;

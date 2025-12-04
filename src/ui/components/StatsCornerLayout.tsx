@@ -1,39 +1,24 @@
 import { CornerStatCard } from './CornerStatCard';
-import type { GameSnapshot } from '@/game/core/types';
+import {
+  selectResources,
+  selectWave,
+  selectMapStatus,
+  selectScore
+} from '@/game/store/selectors';
 
-interface StatsCornerLayoutProps {
-  snapshot: GameSnapshot | null;
-}
+const StatsCornerLayout = () => {
+  const { money, lives } = selectResources();
+  const score = selectScore();
+  const wave = selectWave();
+  const mapStatus = selectMapStatus();
 
-const StatsCornerLayout = ({ snapshot }: StatsCornerLayoutProps) => {
-  if (!snapshot) {
-    return (
-      <>
-        <CornerStatCard
-          icon="??"
-          value="--"
-          label="Wave"
-          position="bottom-left"
-          critical={false}
-        />
-        <CornerStatCard
-          icon="?"
-          value="---"
-          label="Score"
-          position="bottom-right"
-          critical={false}
-        />
-      </>
-    );
-  }
-
-  const scoreTrend = snapshot.score > 0 ? 'up' : 'neutral';
-  const incomeBonus = snapshot.mapStatus?.incomeBonusPct ?? 0;
-  const towerRangeBonus = snapshot.mapStatus?.towerRangeBonusPct ?? 0;
-  const towerDamageBonus = snapshot.mapStatus?.towerDamageBonusPct ?? 0;
-  const capturedSpecials = snapshot.mapStatus?.capturedSpecials ?? 0;
-  const totalSpecials = snapshot.mapStatus?.totalSpecials ?? 0;
-  const envBanner = snapshot.mapStatus?.banners?.[0];
+  const scoreTrend = score > 0 ? 'up' : 'neutral';
+  const incomeBonus = mapStatus?.incomeBonusPct ?? 0;
+  const towerRangeBonus = mapStatus?.towerRangeBonusPct ?? 0;
+  const towerDamageBonus = mapStatus?.towerDamageBonusPct ?? 0;
+  const capturedSpecials = mapStatus?.capturedSpecials ?? 0;
+  const totalSpecials = mapStatus?.totalSpecials ?? 0;
+  const envBanner = mapStatus?.banners?.[0];
 
   return (
     <>
@@ -53,14 +38,14 @@ const StatsCornerLayout = ({ snapshot }: StatsCornerLayoutProps) => {
       />
       <CornerStatCard
         icon="??"
-        value={`${snapshot.wave.current}/${snapshot.wave.total}`}
+        value={`${wave.current}/${wave.total}`}
         label="Wave"
         position="bottom-left"
         critical={false}
       />
       <CornerStatCard
         icon="?"
-        value={snapshot.score.toLocaleString()}
+        value={score.toLocaleString()}
         label="Score"
         position="bottom-right"
         critical={false}

@@ -19,12 +19,14 @@ import {
   createCritMarker,
   createDotMarker,
 } from '@/game/entities/particles'
-import { applyDamageToEnemy, applyTowerBonusesToDamage, applyVulnerability, findSplashTargets } from '@/game/utils/combat'
+import { applyDamageToEnemy, applyTowerBonusesToDamage, findSplashTargets } from '@/game/utils/combat'
 import type { TelemetryCollector } from '@/game/systems/telemetry/TelemetryCollector'
+import type { ModifierManager } from '@/game/systems/ModifierSystem'
 
 export const updateProjectiles = (
   state: GameState,
   deltaSeconds: number,
+  modifierManager: ModifierManager,
   telemetry?: TelemetryCollector
 ): void => {
   state.projectiles.forEach((projectile) => {
@@ -120,8 +122,28 @@ export const updateProjectiles = (
         state.particles.push(createCritMarker(target.position))
       }
       if (sourceTower?.markDuration && sourceTower.markDuration > 0) {
-        applyVulnerability(target, 0.15, sourceTower.markDuration)
+        modifierManager.addModifier(target.id, sourceTower.id, {
+          type: 'vulnerability',
+          value: 0.15,
+          duration: sourceTower.markDuration,
+          stacking: 'max',
+        })
         state.particles.push(createDotMarker(target.position))
+      }
+      if (sourceTower?.vulnerabilityDebuff) {
+        const value = sourceTower.vulnerabilityDebuff.amount
+        modifierManager.addModifier(target.id, sourceTower.id, {
+          type: 'vulnerability',
+          value,
+          duration: sourceTower.vulnerabilityDebuff.duration,
+          stacking: 'max',
+        })
+        modifierManager.addModifier(target.id, sourceTower.id, {
+          type: 'armor_reduction',
+          value,
+          duration: sourceTower.vulnerabilityDebuff.duration,
+          stacking: 'max',
+        })
       }
       if (sourceTower?.type === 'sativa' && hasPerk('shrapnel')) {
         const shrapnelRadius = projectile.splashRadius ?? 28

@@ -40,12 +40,17 @@ type GameEvents = {
  * Delegates to specialized managers: GameLoop, SystemManager
  * Target: <500 LOC (down from 2103 LOC)
  */
+import { ModifierManager } from '@/game/systems/ModifierSystem'
+
+// ...
+
 export class GameController {
     private state: GameState
     private gameLoop: GameLoop
     private systemManager: SystemManager
     private inputManager: InputManager
     private renderManager: RenderManager
+    private modifierManager: ModifierManager
 
     // UI State
     private selectedTowerId: string | null = null
@@ -71,85 +76,25 @@ export class GameController {
         this.systemManager = new SystemManager()
         this.inputManager = new InputManager()
         this.renderManager = new RenderManager()
+        this.modifierManager = new ModifierManager()
 
         this.systemManager.registerTowers(this.state.towers)
         this.initializeAchievements()
         this.setupWindowFocusHandlers()
     }
 
-    // ============================================================================
-    // CORE GAME CONTROL
-    // ============================================================================
-
-    start(): void {
-        if (this.gameLoop.isRunning()) {
-            return
-        }
-
-        if (this.state.status === 'won' || this.state.status === 'lost') {
-            this.resetGame()
-        }
-
-        this.state.status = 'running'
-        this.updateStore()
-
-        if (this.state.wavePhase === 'idle' && this.autoWaveEnabled) {
-            this.beginNextWave()
-        }
-
-        this.gameLoop.start(
-            (deltaSeconds) => this.update(deltaSeconds),
-            () => this.render()
-        )
-    }
-
-    pause(): void {
-        if (!this.gameLoop.isRunning()) {
-            return
-        }
-
-        this.gameLoop.pause()
-        this.state.status = 'paused'
-        this.updateStore()
-    }
-
-    destroy(): void {
-        this.gameLoop.stop()
-        this.inputManager.detach()
-        this.renderManager.cleanup()
-    }
-
-    togglePlay(): void {
-        if (this.state.status === 'running') {
-            this.pause()
-        } else {
-            this.start()
-        }
-    }
-
-    resetGame(): void {
-        this.gameLoop.stop()
-        clearEnemySpatialGrid()
-
-        this.state = createInitialState()
-        this.systemManager.registerTowers(this.state.towers)
-        this.selectedTowerId = null
-
-        this.updateStore()
-        console.log('Game reset to initial state')
-    }
-
-    // ============================================================================
-    // GAME UPDATE LOOP
-    // ============================================================================
+    // ...
 
     private update(deltaSeconds: number): void {
         if (this.state.status !== 'running') {
             return
         }
 
+        // Update modifiers
+        const modifierEvents = this.modifierManager.update(deltaSeconds)
+
         // Update all game systems via SystemManager
-        this.systemManager.updateSystems(this.state, deltaSeconds, {
+        this.systemManager.updateSystems(this.state, deltaSeconds, this.modifierManager, modifierEvents, {
             wave: {
                 onEnemySpawn: (request) => this.handleEnemySpawn(request),
                 onWaveCompleted: (waveIndex) => this.handleWaveCompleted(waveIndex),
@@ -579,6 +524,7 @@ export class GameController {
                 warnings: [],
             },
             balanceWarnings: [],
+            activeModifiers: this.modifierManager.getSnapshot(),
         })
     }
 

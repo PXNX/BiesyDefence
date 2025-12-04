@@ -5,12 +5,16 @@ import type { GameSnapshot, GameStatus, TowerType, EnemyType, AchievementView } 
 import { StatsCornerLayout } from '@/ui/components/StatsCornerLayout'
 import { GameControlPanel } from '@/ui/components/GameControlPanel'
 import { SpawnTicker } from '@/ui/components/SpawnTicker'
-import { TowerIconBar } from '@/ui/components/TowerIconBar'
 import { WavePreviewPanel } from '@/ui/components/WavePreviewPanel'
 import { WaveSummaryCard } from '@/ui/components/WaveSummaryCard'
 import { EnemyIntelPanel } from '@/ui/components/EnemyIntelPanel'
 import { AchievementToast } from '@/ui/components/AchievementToast'
 import { AchievementPanel } from '@/ui/components/AchievementPanel'
+import { HUD } from '@/ui/components/HUD'
+import { WaveControl } from '@/ui/components/WaveControl'
+import { TowerShop } from '@/ui/components/TowerShop'
+import { ModifierDisplay } from '@/ui/components/ModifierDisplay'
+import { DebugPanel } from '@/ui/components/DebugPanel'
 import { audioManager } from '@/game/audio/AudioManager'
 import type { AudioConfig } from '@/game/audio/AudioManager'
 import { ErrorBoundary } from '@/ui/components/ErrorBoundary'
@@ -19,6 +23,8 @@ import { TowerRadialMenu } from '@/ui/components/TowerRadialMenu'
 import './ui/components/TowerRadialMenu.css'
 import { TOWER_UPGRADES } from '@/game/config/upgrades'
 import { TranslationService, LanguageDetector, type Language } from '@/localization'
+import { useGameStore } from '@/game/store/gameStore'
+import { selectSelectedTowerId, selectFeedback } from '@/game/store/selectors'
 
 const initialTower: TowerType = 'indica'
 
@@ -31,9 +37,15 @@ function App() {
   const gameOverOverlayRef = useRef<HTMLDivElement | null>(null)
   const translationService = useMemo(() => TranslationService.getInstance(), [])
   const languageDetector = useMemo(() => LanguageDetector.getInstance(), [])
-  const [snapshot, setSnapshot] = useState<GameSnapshot | null>(null)
-  const [selectedTower, setSelectedTower] = useState<TowerType | null>(initialTower)
-  const [feedback, setFeedback] = useState<string | null>(null)
+
+  // Use store instead of local state
+  const snapshot = useGameStore((state) => state)
+  const selectedTower = selectSelectedTowerId() as TowerType | null
+  const feedback = selectFeedback()
+  const setFeedback = useGameStore((state) => state.setFeedback)
+  const setSelectedTower = useGameStore((state) => state.setSelectedTower)
+  const updateSnapshot = useGameStore((state) => state.updateSnapshot)
+
   const [showHowToPlay, setShowHowToPlay] = useState(false)
   const [quickWaveIndex, setQuickWaveIndex] = useState(0)
   const [audioConfig, setAudioConfig] = useState<AudioConfig>({
@@ -79,17 +91,16 @@ function App() {
 
     const controller = new GameController()
     controllerRef.current = controller
-    const unsubscribe = controller.subscribe(setSnapshot)
+
     if (canvasRef.current) {
       controller.setCanvas(canvasRef.current)
     }
 
     return () => {
-      unsubscribe()
       controller.destroy()
       audioManager.destroy()
     }
-  }, [])
+  }, [updateSnapshot])
 
   const unlockAudioContext = useCallback(async () => {
     if (audioContextUnlocked) {
@@ -360,6 +371,20 @@ function App() {
     setShowTelemetryPanel((prev) => !prev)
   }, [])
 
+  const handleToggleAutoWave = useCallback((enabled: boolean) => {
+    const controller = controllerRef.current
+    if (!controller) return
+    controller.setAutoWave(enabled)
+  }, [])
+
+  const handleToggleRanges = useCallback(() => {
+    controllerRef.current?.toggleShowRanges()
+  }, [])
+
+  const handleToggleHitboxes = useCallback(() => {
+    controllerRef.current?.toggleShowHitboxes()
+  }, [])
+
   const handleUpgradeLevel = useCallback(
     (towerId: string) => {
       const controller = controllerRef.current
@@ -474,10 +499,10 @@ function App() {
   const canvasStatusMessage = !isAudioReady
     ? t('app.loading_audio', 'Loading audio...')
     : appPhase === 'resetting'
-    ? t('app.resetting', 'Resetting the prototype...')
-    : !snapshot
-    ? t('app.preparing_map', 'Preparing the battle map...')
-    : undefined
+      ? t('app.resetting', 'Resetting the prototype...')
+      : !snapshot
+        ? t('app.preparing_map', 'Preparing the battle map...')
+        : undefined
   const isCanvasBusy = Boolean(canvasStatusMessage)
 
   // Keyboard shortcuts and accessibility
@@ -576,8 +601,8 @@ function App() {
     const activeOverlay = showStartOverlay
       ? startOverlayRef.current
       : showGameOverOverlay
-      ? gameOverOverlayRef.current
-      : null
+        ? gameOverOverlayRef.current
+        : null
 
     if (!activeOverlay) {
       return
@@ -642,12 +667,10 @@ function App() {
                 />
               </section>
               <div className="hud-overlay">
-                <StatsCornerLayout snapshot={snapshot} />
+                <HUD />
+                <StatsCornerLayout />
                 {snapshot && snapshot.nextSpawnCountdown !== null && snapshot.nextSpawnDelay !== null && (
-                  <SpawnTicker
-                    countdown={snapshot.nextSpawnCountdown}
-                    delay={snapshot.nextSpawnDelay}
-                  />
+                  <SpawnTicker />
                 )}
               </div>
               {snapshot?.hoverTower && snapshot.hoverTower.screenPosition && (
@@ -661,30 +684,36 @@ function App() {
               {snapshot && (
                 <aside className="side-dock-panel" aria-label="Controls and towers">
                   <GameControlPanel
-                    speed={snapshot.gameSpeed ?? 1}
                     onSpeedChange={handleSpeedChange}
-                    isPaused={snapshot.status === 'paused'}
                     onPauseToggle={handlePause}
                     audioConfig={audioConfig}
                     onToggleMute={handleToggleMute}
                     onMasterVolumeChange={handleMasterVolumeChange}
                     t={t}
-                    hoverTower={snapshot.hoverTower}
                   />
-                  <TowerIconBar
-                    className="tower-dock-bar"
-                    orientation="vertical"
-                    selectedTower={selectedTower}
-                    onSelectTower={(towerType: string) => handleSelectTower(towerType as TowerType)}
-                    feedback={feedback}
-                    money={snapshot?.money ?? 0}
+                  <WaveControl
+                    onStart={handleStart}
+                    onPause={handlePause}
+                    onNext={handleNextWave}
+                    onToggleAutoWave={handleToggleAutoWave}
                   />
+                  <TowerShop onSelect={handleSelectTower} />
                   <TelemetryPanel
                     telemetry={snapshot.telemetry}
                     warnings={snapshot.balanceWarnings ?? []}
                     visible={showTelemetryPanel}
                     onToggle={handleToggleTelemetry}
                   />
+                  <ModifierDisplay />
+                  {import.meta.env.DEV && (
+                    <DebugPanel
+                      quickWaveIndex={quickWaveIndex}
+                      onSetQuickWave={handleSetQuickWave}
+                      onQuickStartWave={handleQuickStartWave}
+                      onToggleRanges={handleToggleRanges}
+                      onToggleHitboxes={handleToggleHitboxes}
+                    />
+                  )}
                 </aside>
               )}
               <div className="info-bar-shell">
@@ -745,103 +774,101 @@ function App() {
             </section>
           </section>
         </main>
-      <div
-        className={`overlay-panel start-overlay ${showStartOverlay ? 'visible' : ''}`}
-        aria-hidden={!showStartOverlay}
-      >
         <div
-          ref={startOverlayRef}
-          className="overlay-card"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="start-overlay-title"
-          aria-describedby="start-overlay-desc"
-          tabIndex={-1}
+          className={`overlay-panel start-overlay ${showStartOverlay ? 'visible' : ''}`}
+          aria-hidden={!showStartOverlay}
         >
-        <p className="eyebrow">{t('app.start_eyebrow', 'Seed the Defense')}</p>
-        <h2 id="start-overlay-title">{t('app.start_title', 'Play the prototype loop')}</h2>
-        <p id="start-overlay-desc" className="overlay-subtext">
-          {t(
-            'app.start_desc',
-            'Place towers, control the tempo, and push waves back. Deploy towers tactically before releasing each wave.'
-          )}
-        </p>
-        <div className="overlay-actions">
-          <button className="primary" onClick={handleStart}>
-            {t('app.play', 'Play')}
-          </button>
-          <button className="ghost" onClick={handleToggleHowToPlay}>
-            {showHowToPlay ? t('app.hide_tips', 'Hide tips') : t('app.how_to_play', 'How to play')}
-          </button>
-        </div>
-        {showHowToPlay && (
-          <div className="how-to-panel">
-            <h4>{t('app.how_to_play', 'How to play')}</h4>
-            <div className="how-to-section">
-              <h5>{t('app.how_to_play_towers', 'Tower Strategy')}</h5>
-              <p>- <strong>Indica:</strong> {t('app.how_to_play_indica', 'Heavy damage, slow fire rate - best for tough enemies')}</p>
-              <p>- <strong>Sativa:</strong> {t('app.how_to_play_sativa', 'Fast fire rate, lower damage - keeps enemies at bay')}</p>
-              <p>- <strong>Support:</strong> {t('app.how_to_play_support', 'Slows enemies down, no direct damage - pairs with shooters')}</p>
+          <div
+            ref={startOverlayRef}
+            className="overlay-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="start-overlay-title"
+            aria-describedby="start-overlay-desc"
+            tabIndex={-1}
+          >
+            <p className="eyebrow">{t('app.start_eyebrow', 'Seed the Defense')}</p>
+            <h2 id="start-overlay-title">{t('app.start_title', 'Play the prototype loop')}</h2>
+            <p id="start-overlay-desc" className="overlay-subtext">
+              {t(
+                'app.start_desc',
+                'Place towers, control the tempo, and push waves back. Deploy towers tactically before releasing each wave.'
+              )}
+            </p>
+            <div className="overlay-actions">
+              <button className="primary" onClick={handleStart}>
+                {t('app.play', 'Play')}
+              </button>
+              <button className="ghost" onClick={handleToggleHowToPlay}>
+                {showHowToPlay ? t('app.hide_tips', 'Hide tips') : t('app.how_to_play', 'How to play')}
+              </button>
             </div>
-            <div className="how-to-section">
-              <h5>{t('app.how_to_play_economy', 'Economy & Survival')}</h5>
-              <p>- {t('app.how_to_play_money', 'Earn money by defeating enemies')}</p>
-              <p>- {t('app.how_to_play_lives', 'Lose lives when enemies reach the end')}</p>
-              <p>- {t('app.how_to_play_build', 'Build strategically before starting waves')}</p>
-            </div>
-            <div className="how-to-section">
-              <h5>{t('app.how_to_play_keys', 'Keyboard Shortcuts')}</h5>
-              <p>- <strong>Space:</strong> {t('app.shortcut_space', 'Start/Pause game')}</p>
-              <p>- <strong>1, 2, 3:</strong> {t('app.shortcut_speed', 'Change game speed (1x, 2x, 4x)')}</p>
-              <p>- <strong>N:</strong> {t('app.shortcut_next_wave', 'Start next wave')}</p>
-              <p>- <strong>R:</strong> {t('app.shortcut_reset', 'Reset game')}</p>
-              <p>- <strong>Esc:</strong> {t('app.shortcut_cancel', 'Cancel tower selection')}</p>
-            </div>
+            {showHowToPlay && (
+              <div className="how-to-panel">
+                <h4>{t('app.how_to_play', 'How to play')}</h4>
+                <div className="how-to-section">
+                  <h5>{t('app.how_to_play_towers', 'Tower Strategy')}</h5>
+                  <p>- <strong>Indica:</strong> {t('app.how_to_play_indica', 'Heavy damage, slow fire rate - best for tough enemies')}</p>
+                  <p>- <strong>Sativa:</strong> {t('app.how_to_play_sativa', 'Fast fire rate, lower damage - keeps enemies at bay')}</p>
+                  <p>- <strong>Support:</strong> {t('app.how_to_play_support', 'Slows enemies down, no direct damage - pairs with shooters')}</p>
+                </div>
+                <div className="how-to-section">
+                  <h5>{t('app.how_to_play_economy', 'Economy & Survival')}</h5>
+                  <p>- {t('app.how_to_play_money', 'Earn money by defeating enemies')}</p>
+                  <p>- {t('app.how_to_play_lives', 'Lose lives when enemies reach the end')}</p>
+                  <p>- {t('app.how_to_play_build', 'Build strategically before starting waves')}</p>
+                </div>
+                <div className="how-to-section">
+                  <h5>{t('app.how_to_play_keys', 'Keyboard Shortcuts')}</h5>
+                  <p>- <strong>Space:</strong> {t('app.shortcut_space', 'Start/Pause game')}</p>
+                  <p>- <strong>1, 2, 3:</strong> {t('app.shortcut_speed', 'Change game speed (1x, 2x, 4x)')}</p>
+                  <p>- <strong>N:</strong> {t('app.shortcut_next_wave', 'Start next wave')}</p>
+                  <p>- <strong>R:</strong> {t('app.shortcut_reset', 'Reset game')}</p>
+                  <p>- <strong>Esc:</strong> {t('app.shortcut_cancel', 'Cancel tower selection')}</p>
+                </div>
+              </div>
+            )}
           </div>
-        )}
         </div>
-      </div>
 
-      <div
-        className={`overlay-panel gameover-overlay ${showGameOverOverlay ? 'visible' : ''}`}
-        aria-hidden={!showGameOverOverlay}
-      >
         <div
-          ref={gameOverOverlayRef}
-          className="overlay-card"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="gameover-overlay-title"
-          aria-describedby="gameover-overlay-desc"
-          tabIndex={-1}
+          className={`overlay-panel gameover-overlay ${showGameOverOverlay ? 'visible' : ''}`}
+          aria-hidden={!showGameOverOverlay}
         >
-          <p className="eyebrow">{snapshot?.status === 'won' ? t('app.trophy', 'Trophy') : t('app.warning', 'Warning')}</p>
-          <h2 id="gameover-overlay-title">
-            {snapshot?.status === 'won' ? t('app.garden_secured', 'Garden Secured') : t('app.garden_lost', 'Garden Lost')}
-          </h2>
-          <p id="gameover-overlay-desc" className="overlay-subtext">
-            {snapshot?.status === 'won'
-              ? t('app.gameover_win_desc', 'You stood strong through the planned waves. Restart to test balance.')
-              : t('app.gameover_loss_desc', 'The path was breached. Reset the prototype when you are ready to retry.')}
-          </p>
-          <button className="primary" onClick={handleRetry}>
-            {t('app.retry', 'Retry')}
-          </button>
+          <div
+            ref={gameOverOverlayRef}
+            className="overlay-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="gameover-overlay-title"
+            aria-describedby="gameover-overlay-desc"
+            tabIndex={-1}
+          >
+            <p className="eyebrow">{snapshot?.status === 'won' ? t('app.trophy', 'Trophy') : t('app.warning', 'Warning')}</p>
+            <h2 id="gameover-overlay-title">
+              {snapshot?.status === 'won' ? t('app.garden_secured', 'Garden Secured') : t('app.garden_lost', 'Garden Lost')}
+            </h2>
+            <p id="gameover-overlay-desc" className="overlay-subtext">
+              {snapshot?.status === 'won'
+                ? t('app.gameover_win_desc', 'You stood strong through the planned waves. Restart to test balance.')
+                : t('app.gameover_loss_desc', 'The path was breached. Reset the prototype when you are ready to retry.')}
+            </p>
+            <button className="primary" onClick={handleRetry}>
+              {t('app.retry', 'Retry')}
+            </button>
+          </div>
         </div>
+        <AchievementToast items={achievementToasts} onDismiss={dismissToast} />
+        {snapshot && (
+          <AchievementPanel
+            achievements={snapshot.achievements ?? []}
+            visible={showAchievementPanel}
+            onClose={() => setShowAchievementPanel(false)}
+          />
+        )}
       </div>
-      <AchievementToast items={achievementToasts} onDismiss={dismissToast} />
-      {snapshot && (
-        <AchievementPanel
-          achievements={snapshot.achievements ?? []}
-          visible={showAchievementPanel}
-          onClose={() => setShowAchievementPanel(false)}
-        />
-      )}
-    </div>
-  </ErrorBoundary>
+    </ErrorBoundary>
   )
 }
 
 export default App
-
-

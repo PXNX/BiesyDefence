@@ -154,6 +154,23 @@ interface GameState {
 }
 ```
 
+#### Zustand Store (UI bridge)
+- Store definition: `src/game/store/gameStore.ts`
+- Selectors: `src/game/store/selectors.ts` (e.g. `selectResources`, `selectWaveProgress`, `selectAutoWaveEnabled`, `selectActiveModifiers`)
+- UI reads from the store; the `GameController` pushes snapshots via `updateSnapshot`.
+- New UI components on top of the store:
+  - `HUD.tsx`: money/lives/score/wave/status
+  - `WaveControl.tsx`: start/pause/next/auto-wave
+  - `TowerShop.tsx`: tower costs + afford highlighting
+  - `ModifierDisplay.tsx`: active modifier overview from `ModifierManager`
+  - `DebugPanel.tsx`: store-driven toggles and telemetry readouts
+```tsx
+import { selectResources, selectWaveProgress } from '@/game/store/selectors'
+
+const { money, lives } = selectResources()
+const wave = selectWaveProgress() // { current, total, phase, nextAvailable, autoEnabled }
+```
+
 ## 🛠️ Development Workflow
 
 ### Prerequisites
