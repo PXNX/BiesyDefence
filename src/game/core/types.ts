@@ -235,7 +235,10 @@ export interface Tower {
     amount: number
     duration: number
   }
-  level?: TowerUpgrade['level']
+  level: TowerUpgrade['level']
+  kills: number
+  damageDealt: number
+  perks: string[]
   chainJumps?: number
   chainFalloff?: number
   // Upgrade/branch-derived stats
