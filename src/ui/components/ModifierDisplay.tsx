@@ -1,89 +1,70 @@
-import { useMemo } from 'react'
-import { selectActiveModifiers } from '@/game/store/selectors'
-import type { ModifierType } from '@/game/systems/ModifierSystem'
+import React from 'react'
+import { useGameStore } from '@/game/store/gameStore'
+import { Modifier } from '@/game/systems/ModifierSystem'
 
-const ICONS: Record<ModifierType, string> = {
-  slow: '🧊',
+// Icons mapping
+const MODIFIER_ICONS: Record<string, string> = {
+  slow: '❄️',
   dot: '☠️',
-  armor_reduction: '🛡️',
-  damage_mult: '💥',
-  speed_mult: '⚡',
-  range_mult: '📡',
-  fire_rate_mult: '🔥',
-  vulnerability: '🎯',
   burn: '🔥',
+  armor_reduction: '🛡️',
+  damage_mult: '⚔️',
+  speed_mult: '💨',
+  range_mult: '🎯',
+  fire_rate_mult: '⚡',
+  vulnerability: '💔',
 }
 
-export function ModifierDisplay() {
-  const active = selectActiveModifiers()
+interface ModifierDisplayProps {
+  targetId: string
+  type: 'enemy' | 'tower'
+}
 
-  const grouped = useMemo(() => {
-    const summary: Record<
-      ModifierType,
-      { count: number; maxRemaining: number; maxValue: number }
-    > = {} as any
-    Object.values(active).forEach((mods) => {
-      mods.forEach((mod) => {
-        if (!summary[mod.type]) {
-          summary[mod.type] = { count: 0, maxRemaining: 0, maxValue: 0 }
-        }
-        summary[mod.type].count += 1
-        summary[mod.type].maxRemaining = Math.max(summary[mod.type].maxRemaining, mod.remainingTime)
-        summary[mod.type].maxValue = Math.max(summary[mod.type].maxValue, mod.value)
-      })
-    })
-    return summary
-  }, [active])
+export const ModifierDisplay: React.FC<ModifierDisplayProps> = ({ targetId, type }) => {
+  // We need a way to get modifiers from the store or system.
+  // Currently modifiers are in ModifierManager which is in GameController.
+  // The store doesn't have them yet.
+  // We need to expose modifiers in the store or pass them down.
+  // For now, let's assume we can select them from the store if we add them there,
+  // OR we rely on the entity having a 'modifiers' array if we sync it.
 
-  const types = Object.entries(grouped)
-  if (types.length === 0) {
-    return null
-  }
+  // Wait, ModifierManager is the source of truth.
+  // We should probably sync active modifiers to the entity in the store snapshot
+  // so the UI can read it.
+
+  // Let's check GameState/Entity types.
+  // Enemy has 'effects' object currently.
+  // We should probably map ModifierManager state to a simple list on the entity for UI.
+
+  // For this implementation, I will assume the store has been updated to include a 
+  // 'modifiers' property on entities, populated by GameController from ModifierManager.
+
+  // Let's use a selector.
+  const modifiers = useGameStore(state => state.activeModifiers?.[targetId] || [])
+
+  if (!modifiers || modifiers.length === 0) return null
 
   return (
-    <div className="modifier-display" aria-label="Active modifiers">
-      {types.map(([type, meta]) => (
-        <div key={type} className="mod-chip">
-          <span className="icon">{ICONS[type as ModifierType] ?? '✨'}</span>
-          <div className="details">
-            <strong>{type}</strong>
-            <span className="meta">
-              {meta.count}x • max {meta.maxValue.toFixed(2)} • {meta.maxRemaining.toFixed(1)}s
-            </span>
+    <div className="flex gap-1 mt-1 flex-wrap">
+      {modifiers.map((mod: Modifier) => (
+        <div
+          key={mod.id}
+          className="relative group bg-gray-800/80 rounded p-1 border border-gray-600"
+          title={`${mod.type}: ${mod.value} (${mod.remainingTime.toFixed(1)}s)`}
+        >
+          <span className="text-sm">{MODIFIER_ICONS[mod.type] || '❓'}</span>
+
+          {/* Duration bar */}
+          <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gray-700">
+            <div
+              className="h-full bg-blue-400"
+              style={{ width: `${(mod.remainingTime / mod.duration) * 100}%` }}
+            />
           </div>
+
+          {/* Stack count if > 1 (not implemented in Modifier interface yet but useful) */}
         </div>
       ))}
-      <style>{`
-        .modifier-display {
-          display: grid;
-          gap: 0.35rem;
-          padding: 0.4rem;
-          background: rgba(4, 12, 8, 0.8);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 10px;
-          color: #e2e8f0;
-        }
-        .mod-chip {
-          display: grid;
-          grid-template-columns: auto 1fr;
-          gap: 0.35rem;
-          align-items: center;
-          padding: 0.35rem 0.45rem;
-          border-radius: 8px;
-          background: rgba(255, 255, 255, 0.04);
-        }
-        .icon {
-          font-size: 1.1rem;
-        }
-        .details strong {
-          text-transform: capitalize;
-        }
-        .meta {
-          display: block;
-          font-size: 0.85rem;
-          color: #94a3b8;
-        }
-      `}</style>
     </div>
   )
 }

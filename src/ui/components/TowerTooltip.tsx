@@ -11,14 +11,27 @@ export function TowerTooltip({ towerType }: TowerTooltipProps) {
 
   const modifiers: { label: string; rule: string; cap?: number }[] = []
   if (profile.slow) {
-    modifiers.push({ label: 'Slow (max stacking)', rule: 'max', cap: MODIFIER_CAPS.slow?.max })
+    const slowPct = Math.round((1 - profile.slow.multiplier) * 100)
+    modifiers.push({
+      label: `Slow: ${slowPct}%`,
+      rule: 'max',
+      cap: MODIFIER_CAPS.slow?.max
+    })
   }
   if (profile.dot) {
     const isBurn = profile.dot.damageType === 'burn'
-    modifiers.push({ label: isBurn ? 'Burn DoT (refresh)' : 'DoT (refresh)', rule: 'replace' })
+    modifiers.push({
+      label: `${isBurn ? 'Burn' : 'Poison'}: ${profile.dot.dps} DPS`,
+      rule: 'replace'
+    })
   }
   if (profile.vulnerabilityDebuff) {
-    modifiers.push({ label: 'Vulnerability (max)', rule: 'max', cap: MODIFIER_CAPS.vulnerability?.max })
+    const vuln = Math.round(profile.vulnerabilityDebuff.amount * 100)
+    modifiers.push({
+      label: `Vulnerability: +${vuln}% Dmg`,
+      rule: 'max',
+      cap: MODIFIER_CAPS.vulnerability?.max
+    })
   }
 
   if (modifiers.length === 0) {

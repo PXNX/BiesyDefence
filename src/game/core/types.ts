@@ -165,101 +165,44 @@ export type DamageResistances = {
   freeze?: number
 }
 
+import type { Modifier } from '@/game/systems/ModifierSystem'
+
+// ...
+
 export interface Enemy {
   id: string
   type: EnemyType
-  stats: EnemyStats
-  position: Vector2
-  pathIndex: number
-  route?: Vector2[]
-  health: number
-  maxHealth: number
-  isDead: boolean
-  reachedGoal: boolean
-  rewardClaimed: boolean
-  speedMultiplier: number
-  lastHitBy?: {
-    towerId: string
-    towerType?: TowerType
-  }
-  effects: {
-    slow: {
-      duration: number
-      remainingTime: number
-      multiplier: number
-      appliedBy: string // tower id
-    }[]
-    vulnerability: {
-      amount: number
-      remainingTime: number
-    }[]
-    dot: {
-      duration: number
-      remainingTime: number
-      dps: number
-      damageType: DamageType
-      appliedBy: string
-      appliedByType?: TowerType
-    }[]
-  }
-  resistances?: DamageResistances
-  vulnerability?: number
-  armorReduction?: number
-  damageTakenMult?: number
-  tags?: EnemyTag[]
+  // ...
+  modifiers?: Modifier[]
+  // ...
 }
 
 export interface Tower {
   id: string
   type: TowerType
-  position: Vector2
-  gridKey: string
-  range: number
-  fireRate: number
-  damage: number
-  projectileSpeed: number
-  cooldown: number
-  color: string
-  cost: number
-  damageType: DamageType
-  splashRadius?: number
-  splashFactor?: number
-  slow?: {
-    multiplier: number
-    duration: number
-  }
-  dot?: {
-    dps: number
-    duration: number
-    damageType: DamageType
-  }
-  vulnerabilityDebuff?: {
-    amount: number
-    duration: number
-  }
-  level: TowerUpgrade['level']
-  kills: number
-  damageDealt: number
-  perks: string[]
-  chainJumps?: number
-  chainFalloff?: number
-  // Upgrade/branch-derived stats
-  upgradeState?: {
-    level: 1 | 2 | 3
+  // ...
+  modifiers?: Modifier[]
+  // ...
+}
+chainJumps ?: number
+chainFalloff ?: number
+// Upgrade/branch-derived stats
+upgradeState ?: {
+  level: 1 | 2 | 3
     branch?: 'A' | 'B'
     perks?: string[]
-  }
-  mapBonuses?: {
-    rangeMult?: number
+}
+mapBonuses ?: {
+  rangeMult?: number
     damageMult?: number
     fireRateMult?: number
-  }
-  tagBonuses?: Partial<Record<EnemyTag, number>>
-  critChance?: number
-  critMultiplier?: number
-  stunChance?: number
-  stunDuration?: number
-  markDuration?: number
+}
+tagBonuses ?: Partial<Record<EnemyTag, number>>
+critChance ?: number
+critMultiplier ?: number
+stunChance ?: number
+stunDuration ?: number
+markDuration ?: number
 }
 
 export interface Projectile {

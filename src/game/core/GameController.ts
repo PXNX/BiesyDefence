@@ -524,7 +524,19 @@ export class GameController {
                 warnings: [],
             },
             balanceWarnings: [],
-            activeModifiers: this.modifierManager.getSnapshot(),
+            // Sync active modifiers for UI
+            activeModifiers: {
+                ...this.state.enemies.reduce((acc, enemy) => {
+                    const mods = this.modifierManager.getModifiers(enemy.id)
+                    if (mods.length > 0) acc[enemy.id] = mods
+                    return acc
+                }, {} as Record<string, import('@/game/systems/ModifierSystem').Modifier[]>),
+                ...this.state.towers.reduce((acc, tower) => {
+                    const mods = this.modifierManager.getModifiers(tower.id)
+                    if (mods.length > 0) acc[tower.id] = mods
+                    return acc
+                }, {} as Record<string, import('@/game/systems/ModifierSystem').Modifier[]>)
+            }
         })
     }
 
