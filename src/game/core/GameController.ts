@@ -75,6 +75,8 @@ export class GameController {
 
     // Auto-wave
     private autoWaveEnabled = GAME_CONFIG.gameplay.autoWaveDefault;
+    private graceTimer = 0;
+    private graceActive = false;
 
     constructor() {
         validateGameConfig(GAME_CONFIG);
@@ -96,6 +98,16 @@ export class GameController {
     private update(deltaSeconds: number): void {
         if (this.state.status !== 'running') {
             return;
+        }
+
+        // Update grace period timer
+        if (this.graceActive) {
+            this.graceTimer -= deltaSeconds;
+            if (this.graceTimer <= 0) {
+                this.graceActive = false;
+                this.beginNextWave();
+            }
+            this.updateStore(); // Update UI with countdown
         }
 
         // Update modifiers
@@ -310,27 +322,24 @@ export class GameController {
     // WAVE CONTROL
     // ============================================================================
 
-    beginNextWave(): boolean {
-        if (this.state.status !== 'running') {
-            return false;
+    beginNextWave(): void {
+        if (this.state.wavePhase !== 'idle' && this.state.wavePhase !== 'completed') {
+            return;
         }
 
-        if (
-            this.state.wavePhase === 'active' ||
-            this.state.wavePhase === 'finalized'
-        ) {
-            return false;
+        // Cancel grace period if manually triggered
+        if (this.graceActive) {
+            this.graceActive = false;
+            this.graceTimer = 0;
         }
 
-        if (this.state.wavePhase === 'completed') {
+        if (this.state.currentWaveIndex < this.state.waves.length - 1) {
             this.state.currentWaveIndex += 1;
         }
 
         this.state.wavePhase = 'active';
-        audioManager.playSoundEffect('wave-start', 0.8);
+        audioManager.playSoundEffect('wave_start', 0.7);
         this.updateStore();
-
-        return true;
     }
 
     toggleAutoWave(): void {
@@ -383,7 +392,8 @@ export class GameController {
         this.achievementSystem.trackWavesCleared(waveIndex + 1);
 
         if (this.autoWaveEnabled) {
-            setTimeout(() => this.beginNextWave(), 2000);
+            this.graceTimer = GAME_CONFIG.gameplay.autoWaveGracePeriod;
+            this.graceActive = true;
         }
 
         this.updateStore();
@@ -568,6 +578,8 @@ export class GameController {
             wavePreview: [],
             lastWaveSummary: null,
             autoWaveEnabled: this.autoWaveEnabled,
+            graceTimer: this.graceTimer,
+            graceActive: this.graceActive,
             showDamageNumbers: this.debugSettings.showDamageNumbers,
             fps: this.gameLoop.getFPS(),
             showRanges: this.debugSettings.showRanges,

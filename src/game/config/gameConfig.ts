@@ -9,6 +9,7 @@ export type GameConfig = {
   gameplay: {
     autoWaveDefault: boolean;
     graceSeconds: number;
+    autoWaveGracePeriod: number;
   };
   economy: {
     maxLives: number;
@@ -122,6 +123,7 @@ export const GAME_CONFIG: GameConfig = {
   gameplay: {
     autoWaveDefault: false,
     graceSeconds: 2,
+    autoWaveGracePeriod: 5,
   },
   economy: {
     maxLives: 999,

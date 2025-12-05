@@ -33,6 +33,8 @@ interface GameStore {
   wavePreview?: GameSnapshot['wavePreview'];
   lastWaveSummary?: GameSnapshot['lastWaveSummary'];
   autoWaveEnabled: boolean;
+  graceTimer: number;
+  graceActive: boolean;
   fps: number;
   gameSpeed: number;
 
@@ -90,6 +92,8 @@ export const useGameStore = create<GameStore>(set => ({
   nextSpawnCountdown: null,
   nextSpawnDelay: null,
   autoWaveEnabled: false,
+  graceTimer: 0,
+  graceActive: false,
   fps: 0,
   gameSpeed: 1,
 

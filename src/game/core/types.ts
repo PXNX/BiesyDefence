@@ -396,6 +396,8 @@ export interface GameSnapshot {
   wavePreview?: WavePreviewEntry[];
   lastWaveSummary?: LastWaveSummary | null;
   autoWaveEnabled?: boolean;
+  graceTimer?: number;
+  graceActive?: boolean;
   showDamageNumbers?: boolean;
   fps: number;
   showRanges: boolean;

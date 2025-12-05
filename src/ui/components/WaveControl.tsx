@@ -1,4 +1,5 @@
 import { selectWaveProgress } from '@/game/store/selectors';
+import { useGameStore } from '@/game/store/gameStore';
 
 interface WaveControlProps {
   onStart: () => void;
@@ -14,6 +15,8 @@ export function WaveControl({
   onToggleAutoWave,
 }: WaveControlProps) {
   const wave = selectWaveProgress();
+  const graceActive = useGameStore((state) => state.graceActive);
+  const graceTimer = useGameStore((state) => state.graceTimer);
 
   const isRunning = wave.phase !== 'idle' && wave.phase !== 'completed' && wave.phase !== 'finalized';
   const canStartNext = wave.nextAvailable && !isRunning;
@@ -32,6 +35,17 @@ export function WaveControl({
           <strong className="phase">{wave.phase}</strong>
         </div>
       </div>
+
+      {graceActive && (
+        <div className="grace-period">
+          <span className="grace-label">Next wave in:</span>
+          <strong className="grace-timer">{Math.ceil(graceTimer)}s</strong>
+          <button className="skip-grace" onClick={onNext}>
+            Skip
+          </button>
+        </div>
+      )}
+
       <div className="wave-actions">
         <button className="primary" onClick={isRunning ? onPause : onStart}>
           {isRunning ? 'Pause' : 'Start'}
@@ -110,6 +124,37 @@ export function WaveControl({
           gap: 0.35rem;
           color: #cbd5e1;
           font-size: 0.9rem;
+        }
+        .grace-period {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem;
+          background: rgba(52, 211, 153, 0.1);
+          border: 1px solid rgba(52, 211, 153, 0.3);
+          border-radius: 8px;
+        }
+        .grace-label {
+          font-size: 0.85rem;
+          color: rgba(226, 232, 240, 0.8);
+        }
+        .grace-timer {
+          font-size: 1.1rem;
+          color: #34d399;
+          font-weight: 700;
+          min-width: 2.5rem;
+          text-align: center;
+        }
+        .skip-grace {
+          margin-left: auto;
+          background: rgba(52, 211, 153, 0.15);
+          border-color: rgba(52, 211, 153, 0.4);
+          color: #34d399;
+          font-size: 0.85rem;
+          padding: 0.3rem 0.6rem;
+        }
+        .skip-grace:hover {
+          background: rgba(52, 211, 153, 0.25);
         }
       `}</style>
     </div>

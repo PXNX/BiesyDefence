@@ -372,14 +372,8 @@ function App() {
     if (!controller) {
       return;
     }
-
-    const started = controller.beginNextWave();
-    if (started) {
-      setFeedback('Next wave deployed.');
-    } else {
-      setFeedback('Wave not ready yet.');
-    }
-  }, [setFeedback, unlockAudioContext]);
+    controller.beginNextWave();
+  }, [unlockAudioContext]);
 
   const handleSetQuickWave = (index: number) => {
     setQuickWaveIndex(index);
@@ -976,13 +970,13 @@ function App() {
             <p id="gameover-overlay-desc" className="overlay-subtext">
               {snapshot?.status === 'won'
                 ? t(
-                    'app.gameover_win_desc',
-                    'You stood strong through the planned waves. Restart to test balance.'
-                  )
+                  'app.gameover_win_desc',
+                  'You stood strong through the planned waves. Restart to test balance.'
+                )
                 : t(
-                    'app.gameover_loss_desc',
-                    'The path was breached. Reset the prototype when you are ready to retry.'
-                  )}
+                  'app.gameover_loss_desc',
+                  'The path was breached. Reset the prototype when you are ready to retry.'
+                )}
             </p>
             <button className="primary" onClick={handleRetry}>
               {t('app.retry', 'Retry')}
