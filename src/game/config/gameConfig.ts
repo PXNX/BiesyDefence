@@ -29,6 +29,16 @@ export type GameConfig = {
     sativaDamageMultiplier: number;
     dotTickInterval: number;
   };
+  towers: {
+    upgrades: {
+      indica: { level2Cost: number; level2Mult: number; level3Cost: number; level3Mult: number };
+      sativa: { level2Cost: number; level2Mult: number; level3Cost: number; level3Mult: number };
+      support: { level2Cost: number; level2Mult: number; level3Cost: number; level3Mult: number };
+      sniper: { level2Cost: number; level2Mult: number; level3Cost: number; level3Mult: number };
+      flamethrower: { level2Cost: number; level2Mult: number; level3Cost: number; level3Mult: number };
+      chain: { level2Cost: number; level2Mult: number; level3Cost: number; level3Mult: number };
+    };
+  };
   visuals: {
     projectileSizes: {
       small: number;
@@ -61,6 +71,17 @@ export type GameConfig = {
     enableTelemetry: boolean;
     enablePerformanceLogs: boolean;
   };
+  telemetry: {
+    ringBufferSize: number;
+    overkillThreshold: number;
+    slowUptimeLow: number;
+    slowUptimeHigh: number;
+    slowUptimeCap: number;
+    waveDurationWarning: number;
+    hpRewardRatioMin: number;
+    hpRewardRatioMax: number;
+    bossSpawnSpanMax: number;
+  };
 };
 
 export const GAME_CONFIG: GameConfig = {
@@ -91,6 +112,16 @@ export const GAME_CONFIG: GameConfig = {
     defaultVulnerabilityAmount: 0.15,
     sativaDamageMultiplier: 0.6,
     dotTickInterval: 0.5,
+  },
+  towers: {
+    upgrades: {
+      indica: { level2Cost: 50, level2Mult: 1.15, level3Cost: 95, level3Mult: 1.35 },
+      sativa: { level2Cost: 45, level2Mult: 1.1, level3Cost: 85, level3Mult: 1.3 },
+      support: { level2Cost: 40, level2Mult: 1.05, level3Cost: 75, level3Mult: 1.2 },
+      sniper: { level2Cost: 70, level2Mult: 1.15, level3Cost: 120, level3Mult: 1.35 },
+      flamethrower: { level2Cost: 65, level2Mult: 1.12, level3Cost: 110, level3Mult: 1.3 },
+      chain: { level2Cost: 60, level2Mult: 1.15, level3Cost: 105, level3Mult: 1.35 },
+    },
   },
   visuals: {
     projectileSizes: {
@@ -123,6 +154,17 @@ export const GAME_CONFIG: GameConfig = {
     enableDebugPanels: import.meta.env.DEV,
     enableTelemetry: import.meta.env.DEV,
     enablePerformanceLogs: import.meta.env.DEV,
+  },
+  telemetry: {
+    ringBufferSize: 256,
+    overkillThreshold: 35,
+    slowUptimeLow: 0.1,
+    slowUptimeHigh: 0.85,
+    slowUptimeCap: 0.9,
+    waveDurationWarning: 60,
+    hpRewardRatioMin: 0.05,
+    hpRewardRatioMax: 0.2,
+    bossSpawnSpanMax: 15,
   },
 };
 

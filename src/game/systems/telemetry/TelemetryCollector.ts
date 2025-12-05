@@ -9,6 +9,7 @@ import type {
   TowerType,
 } from '@/game/core/types';
 import { TOWER_PROFILES } from '@/game/config/constants';
+import { GAME_CONFIG } from '@/game/config/gameConfig';
 import { logger } from '@/game/utils/logger';
 
 type DamageEvent = {
@@ -41,7 +42,7 @@ type SpawnStats = {
 
 export class TelemetryCollector {
   private readonly enabled: boolean;
-  private readonly ringBufferSize = 256;
+  private readonly ringBufferSize = GAME_CONFIG.telemetry.ringBufferSize;
   private events: DamageEvent[] = [];
   private towerStats = new Map<string, TowerTelemetry>();
   private totalDamage = 0;
@@ -257,13 +258,13 @@ export class TelemetryCollector {
     const dpsPerDollar =
       this.totalDamage > 0
         ? dps /
-          Math.max(
-            Array.from(this.towerStats.values()).reduce(
-              (sum, t) => sum + t.cost,
-              0
-            ),
-            1
-          )
+        Math.max(
+          Array.from(this.towerStats.values()).reduce(
+            (sum, t) => sum + t.cost,
+            0
+          ),
+          1
+        )
         : 0;
     const overkillPercent =
       this.totalDamage > 0 ? (this.totalOverkill / this.totalDamage) * 100 : 0;
@@ -296,14 +297,14 @@ export class TelemetryCollector {
       .slice(0, 3);
 
     const warnings: string[] = [];
-    if (overkillPercent > 35) {
-      warnings.push('Overkill above 35%');
+    if (overkillPercent > GAME_CONFIG.telemetry.overkillThreshold) {
+      warnings.push(`Overkill above ${GAME_CONFIG.telemetry.overkillThreshold}%`);
     }
-    if (slowUptime < 0.1) {
-      warnings.push('Low slow uptime (<10%)');
+    if (slowUptime < GAME_CONFIG.telemetry.slowUptimeLow) {
+      warnings.push(`Low slow uptime (<${GAME_CONFIG.telemetry.slowUptimeLow * 100}%)`);
     }
-    if (slowUptime > 0.85) {
-      warnings.push('Slow uptime near cap (>85%)');
+    if (slowUptime > GAME_CONFIG.telemetry.slowUptimeHigh) {
+      warnings.push(`Slow uptime near cap (>${GAME_CONFIG.telemetry.slowUptimeHigh * 100}%)`);
     }
 
     return {
@@ -323,18 +324,18 @@ export class TelemetryCollector {
     const warnings: string[] = [];
     const snapshot = this.buildSnapshot();
     const durationSeconds = this.getWaveDurationSeconds();
-    if (durationSeconds > 60) {
+    if (durationSeconds > GAME_CONFIG.telemetry.waveDurationWarning) {
       warnings.push(`Wave duration high: ${durationSeconds.toFixed(0)}s`);
     }
-    if (snapshot.overkillPercent > 35) {
+    if (snapshot.overkillPercent > GAME_CONFIG.telemetry.overkillThreshold) {
       warnings.push(
-        'Overkill above 35% - consider lowering burst or improving targeting'
+        `Overkill above ${GAME_CONFIG.telemetry.overkillThreshold}% - consider lowering burst or improving targeting`
       );
     }
-    if (snapshot.slowUptime < 0.1) {
-      warnings.push('Slow uptime below 10% - control might be too weak');
+    if (snapshot.slowUptime < GAME_CONFIG.telemetry.slowUptimeLow) {
+      warnings.push(`Slow uptime below ${GAME_CONFIG.telemetry.slowUptimeLow * 100}% - control might be too weak`);
     }
-    if (snapshot.slowUptime > 0.9) {
+    if (snapshot.slowUptime > GAME_CONFIG.telemetry.slowUptimeCap) {
       warnings.push(
         'Slow uptime above cap - control stacking may be too strong'
       );
@@ -346,17 +347,17 @@ export class TelemetryCollector {
         : null;
     if (
       hpRewardRatio !== null &&
-      (hpRewardRatio < 0.05 || hpRewardRatio > 0.2)
+      (hpRewardRatio < GAME_CONFIG.telemetry.hpRewardRatioMin || hpRewardRatio > GAME_CONFIG.telemetry.hpRewardRatioMax)
     ) {
       warnings.push('Reward/HP ratio outside target band');
     }
 
     const bossSpawnSpan =
       this.spawnStats.firstSpawnAt !== null &&
-      this.spawnStats.lastSpawnAt !== null
+        this.spawnStats.lastSpawnAt !== null
         ? this.spawnStats.lastSpawnAt - this.spawnStats.firstSpawnAt
         : null;
-    if (bossSpawnSpan !== null && bossSpawnSpan > 15) {
+    if (bossSpawnSpan !== null && bossSpawnSpan > GAME_CONFIG.telemetry.bossSpawnSpanMax) {
       warnings.push('Boss/Carrier spawn spread too long');
     }
 

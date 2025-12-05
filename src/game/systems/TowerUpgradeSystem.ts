@@ -3,6 +3,7 @@ import type {
   TowerUpgrade,
   TowerUpgradeSystem,
 } from '@/game/core/types';
+import { GAME_CONFIG } from '@/game/config/gameConfig';
 
 const TOWER_UPGRADE_PATHS: Record<TowerType, TowerUpgrade[]> = {
   indica: [
@@ -15,15 +16,15 @@ const TOWER_UPGRADE_PATHS: Record<TowerType, TowerUpgrade[]> = {
     },
     {
       level: 2,
-      cost: 50,
-      statMultiplier: 1.15,
+      cost: GAME_CONFIG.towers.upgrades.indica.level2Cost,
+      statMultiplier: GAME_CONFIG.towers.upgrades.indica.level2Mult,
       description:
         'Precision Rounds: +15% damage and +10% range for better pick-offs.',
     },
     {
       level: 3,
-      cost: 95,
-      statMultiplier: 1.35,
+      cost: GAME_CONFIG.towers.upgrades.indica.level3Cost,
+      statMultiplier: GAME_CONFIG.towers.upgrades.indica.level3Mult,
       description:
         'Overpenetration: +35% damage, minor pierce/bonus vs armored.',
     },
@@ -38,14 +39,14 @@ const TOWER_UPGRADE_PATHS: Record<TowerType, TowerUpgrade[]> = {
     },
     {
       level: 2,
-      cost: 45,
-      statMultiplier: 1.1,
+      cost: GAME_CONFIG.towers.upgrades.sativa.level2Cost,
+      statMultiplier: GAME_CONFIG.towers.upgrades.sativa.level2Mult,
       description: 'Ion Loops: +10% projectile speed and light splash.',
     },
     {
       level: 3,
-      cost: 85,
-      statMultiplier: 1.3,
+      cost: GAME_CONFIG.towers.upgrades.sativa.level3Cost,
+      statMultiplier: GAME_CONFIG.towers.upgrades.sativa.level3Mult,
       description:
         'Hyperfire Mode: +30% damage with expert timing on aoe bursts.',
     },
@@ -60,14 +61,14 @@ const TOWER_UPGRADE_PATHS: Record<TowerType, TowerUpgrade[]> = {
     },
     {
       level: 2,
-      cost: 40,
-      statMultiplier: 1.05,
+      cost: GAME_CONFIG.towers.upgrades.support.level2Cost,
+      statMultiplier: GAME_CONFIG.towers.upgrades.support.level2Mult,
       description: 'Temporal Nets: extends slow duration by 0.5 seconds.',
     },
     {
       level: 3,
-      cost: 75,
-      statMultiplier: 1.2,
+      cost: GAME_CONFIG.towers.upgrades.support.level3Cost,
+      statMultiplier: GAME_CONFIG.towers.upgrades.support.level3Mult,
       description: 'Phase Anchors: vulnerability debuff and DoT amplification.',
     },
   ],
@@ -80,14 +81,14 @@ const TOWER_UPGRADE_PATHS: Record<TowerType, TowerUpgrade[]> = {
     },
     {
       level: 2,
-      cost: 70,
-      statMultiplier: 1.15,
+      cost: GAME_CONFIG.towers.upgrades.sniper.level2Cost,
+      statMultiplier: GAME_CONFIG.towers.upgrades.sniper.level2Mult,
       description: 'Sharpened Optics: +15% dmg/range.',
     },
     {
       level: 3,
-      cost: 120,
-      statMultiplier: 1.35,
+      cost: GAME_CONFIG.towers.upgrades.sniper.level3Cost,
+      statMultiplier: GAME_CONFIG.towers.upgrades.sniper.level3Mult,
       description: 'Hyper-Pierce: +35% dmg, faster cycle.',
     },
   ],
@@ -100,14 +101,14 @@ const TOWER_UPGRADE_PATHS: Record<TowerType, TowerUpgrade[]> = {
     },
     {
       level: 2,
-      cost: 65,
-      statMultiplier: 1.12,
+      cost: GAME_CONFIG.towers.upgrades.flamethrower.level2Cost,
+      statMultiplier: GAME_CONFIG.towers.upgrades.flamethrower.level2Mult,
       description: 'Nitro Mix: +12% dmg, longer burn.',
     },
     {
       level: 3,
-      cost: 110,
-      statMultiplier: 1.3,
+      cost: GAME_CONFIG.towers.upgrades.flamethrower.level3Cost,
+      statMultiplier: GAME_CONFIG.towers.upgrades.flamethrower.level3Mult,
       description: 'White Flame: +30% dmg, wider arc.',
     },
   ],
@@ -120,14 +121,14 @@ const TOWER_UPGRADE_PATHS: Record<TowerType, TowerUpgrade[]> = {
     },
     {
       level: 2,
-      cost: 60,
-      statMultiplier: 1.15,
+      cost: GAME_CONFIG.towers.upgrades.chain.level2Cost,
+      statMultiplier: GAME_CONFIG.towers.upgrades.chain.level2Mult,
       description: 'Superconductive: +15% dmg, +1 jump.',
     },
     {
       level: 3,
-      cost: 105,
-      statMultiplier: 1.35,
+      cost: GAME_CONFIG.towers.upgrades.chain.level3Cost,
+      statMultiplier: GAME_CONFIG.towers.upgrades.chain.level3Mult,
       description: 'Overcharge: +35% dmg, slower falloff.',
     },
   ],

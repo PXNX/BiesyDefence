@@ -122,6 +122,8 @@ Basierend auf der erfolgreich abgeschlossenen GameController-Refaktorierung (69%
 - [x] Erweitere Config-Validator
 - [x] Teste: Validator grün, keine Regressions
 
+**ERLEDIGT:** TowerUpgradeSystem (12 Werte), TelemetryCollector (9 Thresholds), ModifierSystem, EconomySystem, GameController
+
 #### 3.2 Debug-Gating
 - [x] Wrappe Debug-Panels: `{GAME_CONFIG.debug.enableDebugPanels && <DebugPanel />}`
 - [x] Telemetry-UI nur in DEV
@@ -141,10 +143,11 @@ Basierend auf der erfolgreich abgeschlossenen GameController-Refaktorierung (69%
 - [x] ESLint-Warnings beheben
 
 **Definition of Done:**
-- ✅ 0 Magic Numbers in Core-Systemen
+- ✅ 0 Magic Numbers in Core-Systemen (TowerUpgradeSystem, TelemetryCollector migriert)
 - ✅ PROD-Build ohne Debug-UI
 - ✅ PROD-Build mit minimalen Logs
 - ✅ Code ist sauber und formatiert
+- ⚠️ GameController <500 LOC (aktuell 722 LOC - separates Refactoring-Ziel)
 
 ---
 
