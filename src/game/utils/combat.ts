@@ -1,48 +1,52 @@
-import type { DamageType, Enemy, Tower } from '@/game/core/types'
-import { distanceBetween } from '@/game/utils/math'
+import type { DamageType, Enemy, Tower } from '@/game/core/types';
+import { distanceBetween } from '@/game/utils/math';
 
-const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
+const clamp = (value: number, min: number, max: number) =>
+  Math.max(min, Math.min(max, value));
 
-export const getDamageMultiplier = (damageType: DamageType, enemy: Enemy): number => {
-  const resist = enemy.resistances?.[damageType] ?? 0
-  const armorReduction = enemy.armorReduction ?? 0
-  const vulnerability = enemy.vulnerability ?? 0
-  const damageTakenMult = enemy.damageTakenMult ?? 1
+export const getDamageMultiplier = (
+  damageType: DamageType,
+  enemy: Enemy
+): number => {
+  const resist = enemy.resistances?.[damageType] ?? 0;
+  const armorReduction = enemy.armorReduction ?? 0;
+  const vulnerability = enemy.vulnerability ?? 0;
+  const damageTakenMult = enemy.damageTakenMult ?? 1;
   // resist is reduction (0.25 => 25% less), negative resist = bonus
-  const base = 1 - Math.max(-0.9, resist - armorReduction)
-  return clamp(base, 0, 2.5) * (1 + vulnerability) * damageTakenMult
-}
+  const base = 1 - Math.max(-0.9, resist - armorReduction);
+  return clamp(base, 0, 2.5) * (1 + vulnerability) * damageTakenMult;
+};
 
 export const applyDamageToEnemy = (
   enemy: Enemy,
   baseDamage: number,
   damageType: DamageType
 ): number => {
-  const multiplier = getDamageMultiplier(damageType, enemy)
-  const damage = Math.max(0, baseDamage * multiplier)
-  enemy.health = Math.max(0, enemy.health - damage)
+  const multiplier = getDamageMultiplier(damageType, enemy);
+  const damage = Math.max(0, baseDamage * multiplier);
+  enemy.health = Math.max(0, enemy.health - damage);
   if (enemy.health <= 0) {
-    enemy.isDead = true
+    enemy.isDead = true;
   }
-  return damage
-}
+  return damage;
+};
 
 export const applyTowerBonusesToDamage = (
   tower: Tower | undefined,
   enemy: Enemy,
   baseDamage: number
 ): number => {
-  if (!tower || !enemy.tags || enemy.tags.length === 0) return baseDamage
-  if (!tower.tagBonuses) return baseDamage
-  let multiplier = 1
-  enemy.tags.forEach((tag) => {
-    const bonus = tower.tagBonuses?.[tag]
+  if (!tower || !enemy.tags || enemy.tags.length === 0) return baseDamage;
+  if (!tower.tagBonuses) return baseDamage;
+  let multiplier = 1;
+  enemy.tags.forEach(tag => {
+    const bonus = tower.tagBonuses?.[tag];
     if (typeof bonus === 'number') {
-      multiplier *= 1 + bonus
+      multiplier *= 1 + bonus;
     }
-  })
-  return Math.max(0, baseDamage * multiplier)
-}
+  });
+  return Math.max(0, baseDamage * multiplier);
+};
 
 export const applySlowToEnemy = (
   enemy: Enemy,
@@ -50,18 +54,18 @@ export const applySlowToEnemy = (
   duration: number,
   appliedBy: string
 ): void => {
-  const resist = enemy.resistances?.control ?? 0
-  const slowAmount = 1 - baseMultiplier
-  const effectiveSlow = slowAmount * (1 - resist)
-  const multiplier = clamp(1 - effectiveSlow, enemy.stats.slowCap ?? 0, 1)
+  const resist = enemy.resistances?.control ?? 0;
+  const slowAmount = 1 - baseMultiplier;
+  const effectiveSlow = slowAmount * (1 - resist);
+  const multiplier = clamp(1 - effectiveSlow, enemy.stats.slowCap ?? 0, 1);
 
   enemy.effects.slow.push({
     duration,
     remainingTime: duration,
     multiplier,
     appliedBy,
-  })
-}
+  });
+};
 
 export const applyDotToEnemy = (
   enemy: Enemy,
@@ -71,9 +75,9 @@ export const applyDotToEnemy = (
   appliedBy: string,
   appliedByType?: Tower['type']
 ): void => {
-  const resist = enemy.resistances?.dot ?? 0
-  const effectiveDps = Math.max(0, dps * (1 - resist))
-  if (effectiveDps <= 0) return
+  const resist = enemy.resistances?.dot ?? 0;
+  const effectiveDps = Math.max(0, dps * (1 - resist));
+  if (effectiveDps <= 0) return;
 
   enemy.effects.dot.push({
     duration,
@@ -82,31 +86,31 @@ export const applyDotToEnemy = (
     damageType,
     appliedBy,
     appliedByType,
-  })
-}
+  });
+};
 
 export const applyVulnerability = (
   enemy: Enemy,
   amount: number,
   duration: number
 ): void => {
-  enemy.vulnerability = Math.max(0, (enemy.vulnerability ?? 0) + amount)
-  enemy.effects.vulnerability.push({ amount, remainingTime: duration })
-}
+  enemy.vulnerability = Math.max(0, (enemy.vulnerability ?? 0) + amount);
+  enemy.effects.vulnerability.push({ amount, remainingTime: duration });
+};
 
 export const applyStunToEnemy = (
   enemy: Enemy,
   duration: number,
   appliedBy: string
 ): void => {
-  const multiplier = 0 // full stop
+  const multiplier = 0; // full stop
   enemy.effects.slow.push({
     duration,
     remainingTime: duration,
     multiplier,
     appliedBy,
-  })
-}
+  });
+};
 
 export const findSplashTargets = (
   origin: { x: number; y: number },
@@ -114,6 +118,12 @@ export const findSplashTargets = (
   radius: number,
   excludeId?: string
 ): Enemy[] => {
-  if (radius <= 0) return []
-  return enemies.filter((e) => !e.isDead && !e.reachedGoal && e.id !== excludeId && distanceBetween(origin, e.position) <= radius)
-}
+  if (radius <= 0) return [];
+  return enemies.filter(
+    e =>
+      !e.isDead &&
+      !e.reachedGoal &&
+      e.id !== excludeId &&
+      distanceBetween(origin, e.position) <= radius
+  );
+};

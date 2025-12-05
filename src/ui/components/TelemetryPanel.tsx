@@ -1,15 +1,15 @@
-import React from 'react'
-import type { TelemetrySnapshot } from '@/game/core/types'
+import React from 'react';
+import type { TelemetrySnapshot } from '@/game/core/types';
 
 interface TelemetryPanelProps {
-  telemetry?: TelemetrySnapshot
-  warnings?: string[]
-  visible: boolean
-  onToggle: () => void
+  telemetry?: TelemetrySnapshot;
+  warnings?: string[];
+  visible: boolean;
+  onToggle: () => void;
 }
 
-const formatPercent = (value: number) => `${Math.round(value * 100)}%`
-const clamp01 = (value: number) => Math.max(0, Math.min(1, value))
+const formatPercent = (value: number) => `${Math.round(value * 100)}%`;
+const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
 
 const TelemetryPanel: React.FC<TelemetryPanelProps> = ({
   telemetry,
@@ -18,20 +18,20 @@ const TelemetryPanel: React.FC<TelemetryPanelProps> = ({
   onToggle,
 }) => {
   const overkillWarning =
-    telemetry && telemetry.overkillPercent > 35 ? 'Overkill hoch' : undefined
+    telemetry && telemetry.overkillPercent > 35 ? 'Overkill hoch' : undefined;
 
-  const slowUptime = clamp01(telemetry?.slowUptime ?? 0)
-  const dotUptime = clamp01(telemetry?.dotUptime ?? 0)
-  const hitsPerShot = telemetry?.hitsPerShot ?? 0
-  const top = telemetry?.topDpsPerCost ?? []
-  const balanceWarnings = warnings.concat(telemetry?.warnings ?? [])
+  const slowUptime = clamp01(telemetry?.slowUptime ?? 0);
+  const dotUptime = clamp01(telemetry?.dotUptime ?? 0);
+  const hitsPerShot = telemetry?.hitsPerShot ?? 0;
+  const top = telemetry?.topDpsPerCost ?? [];
+  const balanceWarnings = warnings.concat(telemetry?.warnings ?? []);
 
   if (!visible) {
     return (
       <button className="telemetry-toggle" onClick={onToggle} type="button">
         Show Telemetry
       </button>
-    )
+    );
   }
 
   return (
@@ -53,12 +53,18 @@ const TelemetryPanel: React.FC<TelemetryPanelProps> = ({
         </div>
         <div className="metric">
           <span className="label">DPS/$</span>
-          <strong>{telemetry ? telemetry.dpsPerDollar.toFixed(3) : '--'}</strong>
+          <strong>
+            {telemetry ? telemetry.dpsPerDollar.toFixed(3) : '--'}
+          </strong>
         </div>
         <div className={`metric ${overkillWarning ? 'warn' : ''}`}>
           <span className="label">Overkill</span>
-          <strong>{telemetry ? telemetry.overkillPercent.toFixed(1) + '%' : '--'}</strong>
-          {overkillWarning && <span className="pill warn">{overkillWarning}</span>}
+          <strong>
+            {telemetry ? telemetry.overkillPercent.toFixed(1) + '%' : '--'}
+          </strong>
+          {overkillWarning && (
+            <span className="pill warn">{overkillWarning}</span>
+          )}
         </div>
         <div className="metric">
           <span className="label">Hits/Shot</span>
@@ -69,14 +75,20 @@ const TelemetryPanel: React.FC<TelemetryPanelProps> = ({
       <div className="uptime-row">
         <span className="label">Slow Uptime</span>
         <div className="bar">
-          <div className="bar-fill slow" style={{ width: formatPercent(slowUptime) }} />
+          <div
+            className="bar-fill slow"
+            style={{ width: formatPercent(slowUptime) }}
+          />
         </div>
         <span className="value">{formatPercent(slowUptime)}</span>
       </div>
       <div className="uptime-row">
         <span className="label">DoT Uptime</span>
         <div className="bar">
-          <div className="bar-fill dot" style={{ width: formatPercent(dotUptime) }} />
+          <div
+            className="bar-fill dot"
+            style={{ width: formatPercent(dotUptime) }}
+          />
         </div>
         <span className="value">{formatPercent(dotUptime)}</span>
       </div>
@@ -84,17 +96,20 @@ const TelemetryPanel: React.FC<TelemetryPanelProps> = ({
       <div className="top-towers">
         <div className="section-title">Top 3 Towers (DPS/$)</div>
         {top.length === 0 && <p className="empty">Keine Daten</p>}
-        {top.map((entry) => (
+        {top.map(entry => (
           <div key={entry.towerId} className="tower-row">
             <div>
               <strong>{entry.towerType.toUpperCase()}</strong>
               <span className="sub">
-                DPS: {entry.dps.toFixed(1)} • DPS/$: {entry.dpsPerCost.toFixed(3)}
+                DPS: {entry.dps.toFixed(1)} • DPS/$:{' '}
+                {entry.dpsPerCost.toFixed(3)}
               </span>
             </div>
             <div className="meta">
               <span className="pill">Shots {entry.shots}</span>
-              <span className="pill">{entry.overkillPercent.toFixed(1)}% OK</span>
+              <span className="pill">
+                {entry.overkillPercent.toFixed(1)}% OK
+              </span>
             </div>
           </div>
         ))}
@@ -111,7 +126,7 @@ const TelemetryPanel: React.FC<TelemetryPanelProps> = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export { TelemetryPanel }
+export { TelemetryPanel };

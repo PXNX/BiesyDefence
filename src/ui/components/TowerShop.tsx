@@ -1,33 +1,36 @@
-import { useState } from 'react'
-import { TOWER_PROFILES } from '@/game/config/constants'
-import type { TowerProfile } from '@/game/config/constants'
-import type { TowerType } from '@/game/core/types'
-import { selectSelectedTowerId, selectCanAffordTower } from '@/game/store/selectors'
-import { useGameStore } from '@/game/store/gameStore'
-import { TowerTooltip } from './TowerTooltip'
+import { useState } from 'react';
+import { TOWER_PROFILES } from '@/game/config/constants';
+import type { TowerProfile } from '@/game/config/constants';
+import type { TowerType } from '@/game/core/types';
+import {
+  selectSelectedTowerId,
+  selectCanAffordTower,
+} from '@/game/store/selectors';
+import { useGameStore } from '@/game/store/gameStore';
+import { TowerTooltip } from './TowerTooltip';
 
-const ENTRIES = Object.entries(TOWER_PROFILES) as [TowerType, TowerProfile][]
+const ENTRIES = Object.entries(TOWER_PROFILES) as [TowerType, TowerProfile][];
 
 interface TowerShopProps {
-  onSelect?: (type: TowerType) => void
+  onSelect?: (type: TowerType) => void;
 }
 
 export function TowerShop({ onSelect }: TowerShopProps) {
-  const selectedTower = selectSelectedTowerId()
-  const setSelectedTower = useGameStore((state) => state.setSelectedTower)
-  const [hovered, setHovered] = useState<TowerType | null>(null)
+  const selectedTower = selectSelectedTowerId();
+  const setSelectedTower = useGameStore(state => state.setSelectedTower);
+  const [hovered, setHovered] = useState<TowerType | null>(null);
 
   const handleSelect = (type: TowerType) => {
-    setSelectedTower(type)
-    onSelect?.(type)
-  }
+    setSelectedTower(type);
+    onSelect?.(type);
+  };
 
   return (
     <div className="tower-shop">
       <div className="shop-grid" role="listbox" aria-label="Tower shop">
         {ENTRIES.map(([type, profile]) => {
-          const canAfford = selectCanAffordTower(profile.cost)
-          const isSelected = selectedTower === type
+          const canAfford = selectCanAffordTower(profile.cost);
+          const isSelected = selectedTower === type;
 
           return (
             <button
@@ -57,10 +60,12 @@ export function TowerShop({ onSelect }: TowerShopProps) {
                 <span className="pill">{profile.damageType}</span>
                 {profile.slow ? <span className="pill">Slow</span> : null}
                 {profile.dot ? <span className="pill">DoT</span> : null}
-                {profile.vulnerabilityDebuff ? <span className="pill">Vulnerability</span> : null}
+                {profile.vulnerabilityDebuff ? (
+                  <span className="pill">Vulnerability</span>
+                ) : null}
               </div>
             </button>
-          )
+          );
         })}
       </div>
       {hovered ? (
@@ -140,5 +145,5 @@ export function TowerShop({ onSelect }: TowerShopProps) {
         }
       `}</style>
     </div>
-  )
+  );
 }

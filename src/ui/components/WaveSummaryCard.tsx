@@ -1,11 +1,11 @@
-import type { LastWaveSummary } from '@/game/core/types'
+import type { LastWaveSummary } from '@/game/core/types';
 
 interface WaveSummaryCardProps {
-  summary: LastWaveSummary
+  summary: LastWaveSummary;
 }
 
 export function WaveSummaryCard({ summary }: WaveSummaryCardProps) {
-  if (!summary) return null
+  if (!summary) return null;
 
   return (
     <section className="wave-summary-card" aria-label="Last wave summary">
@@ -71,5 +71,5 @@ export function WaveSummaryCard({ summary }: WaveSummaryCardProps) {
         }
       `}</style>
     </section>
-  )
+  );
 }

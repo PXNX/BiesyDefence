@@ -1,21 +1,21 @@
-import type { GameState, EnemyType } from '@/game/core/types'
+import type { GameState, EnemyType } from '@/game/core/types';
 
 const hasActiveEnemies = (state: GameState): boolean => {
-  return state.enemies.some((enemy) => !enemy.isDead && !enemy.reachedGoal)
-}
+  return state.enemies.some(enemy => !enemy.isDead && !enemy.reachedGoal);
+};
 
 export interface WaveSpawnRequest {
-  type: EnemyType
-  spawnPosition: { x: number; y: number }
-  waveIndex: number
-  elapsedTime: number
-  routeIndex?: number
+  type: EnemyType;
+  spawnPosition: { x: number; y: number };
+  waveIndex: number;
+  elapsedTime: number;
+  routeIndex?: number;
 }
 
 export interface WaveSystemCallbacks {
-  onEnemySpawn: (request: WaveSpawnRequest) => void
-  onWaveCompleted: (waveIndex: number) => void
-  onAllWavesCompleted: () => void
+  onEnemySpawn: (request: WaveSpawnRequest) => void;
+  onWaveCompleted: (waveIndex: number) => void;
+  onAllWavesCompleted: () => void;
 }
 
 export const updateWaves = (
@@ -24,79 +24,86 @@ export const updateWaves = (
   callbacks?: WaveSystemCallbacks
 ): void => {
   if (state.status !== 'running' || state.wavePhase !== 'active') {
-    return
+    return;
   }
 
-  const wave = state.waves[state.currentWaveIndex]
+  const wave = state.waves[state.currentWaveIndex];
   if (!wave) {
-    state.wavePhase = 'finalized'
+    state.wavePhase = 'finalized';
     // Note: Victory/defeat status is now handled by GameController.checkVictoryCondition()
-    callbacks?.onAllWavesCompleted()
-    return
+    callbacks?.onAllWavesCompleted();
+    return;
   }
 
-  wave.timer += deltaSeconds
-  let spawn = wave.spawnQueue[wave.nextIndex]
+  wave.timer += deltaSeconds;
+  let spawn = wave.spawnQueue[wave.nextIndex];
   while (spawn && wave.timer >= spawn.delay) {
-    wave.timer -= spawn.delay
-    const spawnPoints = state.map.spawnPoints && state.map.spawnPoints.length > 0
-      ? state.map.spawnPoints
-      : state.path.length > 0
-        ? [state.path[0]]
-        : []
-    const paths = state.paths && state.paths.length > 0 ? state.paths : [state.path]
-    const spawnIndex = spawnPoints.length > 0 ? Math.floor(Math.random() * spawnPoints.length) : 0
-    const gridOrigin = spawnPoints[spawnIndex]
+    wave.timer -= spawn.delay;
+    const spawnPoints =
+      state.map.spawnPoints && state.map.spawnPoints.length > 0
+        ? state.map.spawnPoints
+        : state.path.length > 0
+          ? [state.path[0]]
+          : [];
+    const paths =
+      state.paths && state.paths.length > 0 ? state.paths : [state.path];
+    const spawnIndex =
+      spawnPoints.length > 0
+        ? Math.floor(Math.random() * spawnPoints.length)
+        : 0;
+    const gridOrigin = spawnPoints[spawnIndex];
     if (!gridOrigin) {
-      console.warn('WaveSystem: cannot spawn enemies because path nodes are missing')
-      break
+      console.warn(
+        'WaveSystem: cannot spawn enemies because path nodes are missing'
+      );
+      break;
     }
 
-    const worldOrigin = gridOrigin
+    const worldOrigin = gridOrigin;
 
-    const jitterRadius = Math.max(2, state.map.cellSize * 0.15)
+    const jitterRadius = Math.max(2, state.map.cellSize * 0.15);
     const spawnPosition = {
       x: worldOrigin.x + (Math.random() - 0.5) * jitterRadius * 2,
       y: worldOrigin.y + (Math.random() - 0.5) * jitterRadius * 2,
-    }
-    
+    };
+
     callbacks?.onEnemySpawn({
       type: spawn.type,
       spawnPosition,
       waveIndex: state.currentWaveIndex,
       elapsedTime: wave.timer,
       routeIndex: paths.length > 1 ? spawnIndex % paths.length : 0,
-    })
-    
-    wave.nextIndex += 1
-    spawn = wave.spawnQueue[wave.nextIndex]
+    });
+
+    wave.nextIndex += 1;
+    spawn = wave.spawnQueue[wave.nextIndex];
   }
 
   if (!spawn) {
-    wave.finished = true
+    wave.finished = true;
   }
 
-  const enemiesCleared = wave.finished && !hasActiveEnemies(state)
+  const enemiesCleared = wave.finished && !hasActiveEnemies(state);
   if (!enemiesCleared) {
-    return
+    return;
   }
 
   if (state.currentWaveIndex >= state.waves.length - 1) {
-    state.wavePhase = 'finalized'
+    state.wavePhase = 'finalized';
     // Note: Victory/defeat status is now handled by GameController.checkVictoryCondition()
-    callbacks?.onAllWavesCompleted()
-    return
+    callbacks?.onAllWavesCompleted();
+    return;
   }
 
-  state.wavePhase = 'completed'
-  callbacks?.onWaveCompleted(state.currentWaveIndex)
-}
+  state.wavePhase = 'completed';
+  callbacks?.onWaveCompleted(state.currentWaveIndex);
+};
 
 /**
  * Get wave status information for UI integration
  */
 export const getWaveStatus = (state: GameState) => {
-  const currentWave = state.waves[state.currentWaveIndex]
+  const currentWave = state.waves[state.currentWaveIndex];
   if (!currentWave) {
     return {
       currentWave: state.currentWaveIndex + 1,
@@ -105,14 +112,16 @@ export const getWaveStatus = (state: GameState) => {
       enemiesInCurrentWave: 0,
       isWaveActive: false,
       isWaveCompleted: state.wavePhase === 'completed',
-      isAllWavesCompleted: state.wavePhase === 'finalized'
-    }
+      isAllWavesCompleted: state.wavePhase === 'finalized',
+    };
   }
 
-  const enemiesInCurrentWave = currentWave.spawnQueue.length
-  const enemiesSpawned = currentWave.nextIndex
-  const enemiesRemaining = enemiesInCurrentWave - enemiesSpawned
-  const activeEnemies = state.enemies.filter(e => !e.isDead && !e.reachedGoal).length
+  const enemiesInCurrentWave = currentWave.spawnQueue.length;
+  const enemiesSpawned = currentWave.nextIndex;
+  const enemiesRemaining = enemiesInCurrentWave - enemiesSpawned;
+  const activeEnemies = state.enemies.filter(
+    e => !e.isDead && !e.reachedGoal
+  ).length;
 
   return {
     currentWave: state.currentWaveIndex + 1,
@@ -124,6 +133,7 @@ export const getWaveStatus = (state: GameState) => {
     isWaveActive: state.wavePhase === 'active',
     isWaveCompleted: state.wavePhase === 'completed',
     isAllWavesCompleted: state.wavePhase === 'finalized',
-    nextSpawnDelay: currentWave.spawnQueue[currentWave.nextIndex]?.delay || null
-  }
-}
+    nextSpawnDelay:
+      currentWave.spawnQueue[currentWave.nextIndex]?.delay || null,
+  };
+};

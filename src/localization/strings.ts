@@ -44,16 +44,20 @@ export const GAME_STRINGS = {
     easy: 'Easy',
     normal: 'Normal',
     hard: 'Hard',
-    easy_desc: 'Perfect for beginners. Enemies are weaker and you get more resources.',
-    normal_desc: 'The standard challenge. Balanced gameplay for experienced players.',
-    hard_desc: 'For experts only. Enemies are stronger and resources are limited.',
+    easy_desc:
+      'Perfect for beginners. Enemies are weaker and you get more resources.',
+    normal_desc:
+      'The standard challenge. Balanced gameplay for experienced players.',
+    hard_desc:
+      'For experts only. Enemies are stronger and resources are limited.',
   },
 
   // Tower Types and Descriptions
   towers: {
     indica: {
       name: 'Indica Tower',
-      description: 'Single-Target-Hard-Hit: Heavy rounds for focused elimination.',
+      description:
+        'Single-Target-Hard-Hit: Heavy rounds for focused elimination.',
       cost: 'Cost: {cost} money',
       range: 'Range: {range}',
       damage: 'Damage: {damage}',
@@ -69,7 +73,8 @@ export const GAME_STRINGS = {
     },
     support: {
       name: 'Support Tower',
-      description: 'Slow-Support: Slows enemies 30% for 2 seconds, light damage.',
+      description:
+        'Slow-Support: Slows enemies 30% for 2 seconds, light damage.',
       cost: 'Cost: {cost} money',
       range: 'Range: {range}',
       damage: 'Damage: {damage}',
@@ -123,41 +128,47 @@ export const GAME_STRINGS = {
   maps: {
     default: {
       name: 'Greenfield Gardens',
-      description: 'The classic BiesyDefence experience. A gentle introduction to tower defense with balanced paths and clear sightlines.',
+      description:
+        'The classic BiesyDefence experience. A gentle introduction to tower defense with balanced paths and clear sightlines.',
       difficulty: 'All Difficulties',
       estimatedTime: '15-20 minutes',
     },
     misty_meadows: {
       name: 'Misty Meadows',
-      description: 'A challenging map with fog effects that reduce visibility. Perfect for experienced players who enjoy complex pathing.',
+      description:
+        'A challenging map with fog effects that reduce visibility. Perfect for experienced players who enjoy complex pathing.',
       difficulty: 'Normal, Hard',
       estimatedTime: '20-25 minutes',
       unlockRequirement: 'Clear 15 waves',
     },
     tight_terraces: {
       name: 'Terraced Gardens',
-      description: 'Narrow paths with limited tower placement opportunities. Requires careful strategic planning and efficient tower usage.',
+      description:
+        'Narrow paths with limited tower placement opportunities. Requires careful strategic planning and efficient tower usage.',
       difficulty: 'Hard',
       estimatedTime: '25-30 minutes',
       unlockRequirement: 'Earn Efficient Defender achievement',
     },
     circular_garden: {
       name: 'Circular Sanctuary',
-      description: 'A unique circular layout that challenges traditional tower placement strategies. The path spirals toward the center.',
+      description:
+        'A unique circular layout that challenges traditional tower placement strategies. The path spirals toward the center.',
       difficulty: 'Hard',
       estimatedTime: '30-35 minutes',
       unlockRequirement: 'Clear 25 waves',
     },
     herb_garden: {
       name: 'Herb Garden',
-      description: 'A peaceful garden setting focusing on aromatic herbs and natural wellness. Perfect for broader market appeal.',
+      description:
+        'A peaceful garden setting focusing on aromatic herbs and natural wellness. Perfect for broader market appeal.',
       difficulty: 'All Difficulties',
       estimatedTime: '15-20 minutes',
       theme: 'Alternative Theme',
     },
     laboratory: {
       name: 'Research Facility',
-      description: 'A futuristic laboratory setting where players defend against robotic threats. Tech-focused theme for broader appeal.',
+      description:
+        'A futuristic laboratory setting where players defend against robotic threats. Tech-focused theme for broader appeal.',
       difficulty: 'All Difficulties',
       estimatedTime: '15-20 minutes',
       theme: 'Alternative Theme',
@@ -225,15 +236,20 @@ export const GAME_STRINGS = {
   // Help and Tutorial
   help: {
     objective: 'Objective',
-    objective_text: 'Defend your garden from waves of pests by placing towers strategically along the path.',
+    objective_text:
+      'Defend your garden from waves of pests by placing towers strategically along the path.',
     tower_placement: 'Tower Placement',
-    tower_placement_text: 'Click on grass tiles to place towers. Each tower has different abilities and costs.',
+    tower_placement_text:
+      'Click on grass tiles to place towers. Each tower has different abilities and costs.',
     wave_system: 'Wave System',
-    wave_system_text: 'Complete waves to progress. Each wave becomes more challenging than the last.',
+    wave_system_text:
+      'Complete waves to progress. Each wave becomes more challenging than the last.',
     economy: 'Economy',
-    economy_text: 'Earn money by defeating enemies. Use money to buy more towers and upgrades.',
+    economy_text:
+      'Earn money by defeating enemies. Use money to buy more towers and upgrades.',
     victory: 'Victory',
-    victory_text: 'Survive all waves to achieve victory. Try to end with as much money as possible!',
+    victory_text:
+      'Survive all waves to achieve victory. Try to end with as much money as possible!',
   },
 
   // Settings
@@ -257,7 +273,8 @@ export const GAME_STRINGS = {
   themes: {
     cannabis: {
       name: 'Cannabis Garden',
-      description: 'The original BiesyDefence theme focusing on cannabis cultivation',
+      description:
+        'The original BiesyDefence theme focusing on cannabis cultivation',
       cultural_notes: 'May not be appropriate in all regions',
     },
     herbs: {
@@ -285,9 +302,11 @@ export const GAME_STRINGS = {
   // Cultural Considerations
   cultural: {
     sensitive_regions: {
-      middle_east: 'Middle Eastern regions may have restrictions on cannabis themes',
+      middle_east:
+        'Middle Eastern regions may have restrictions on cannabis themes',
       asia: 'Asian markets prefer zen/garden themes over cannabis',
-      general: 'Consider local laws and cultural sensitivities when choosing themes',
+      general:
+        'Consider local laws and cultural sensitivities when choosing themes',
     },
     alternatives: {
       primary: 'herbs',
@@ -312,16 +331,19 @@ export const GAME_STRINGS = {
     checking_for_updates: 'Checking for updates...',
     up_to_date: 'Game is up to date',
   },
-}
+};
 
 /**
  * String interpolation utility
  */
-export function interpolate(text: string, values: Record<string, string | number>): string {
+export function interpolate(
+  text: string,
+  values: Record<string, string | number>
+): string {
   return text.replace(/\{(\w+)\}/g, (match, key) => {
-    const value = values[key]
-    return value !== undefined ? String(value) : match
-  })
+    const value = values[key];
+    return value !== undefined ? String(value) : match;
+  });
 }
 
 /**
@@ -333,8 +355,8 @@ export function pluralize(
   count: number,
   translations: Record<string, string>
 ): string {
-  const pluralKey = getPluralKey(language, key, count)
-  return translations[pluralKey] || translations[key] || key
+  const pluralKey = getPluralKey(language, key, count);
+  return translations[pluralKey] || translations[key] || key;
 }
 
 /**
@@ -343,25 +365,31 @@ export function pluralize(
 function getPluralKey(language: string, key: string, count: number): string {
   switch (language) {
     case 'ar': // Arabic has 6 plural forms
-      if (count === 0) return `${key}_zero`
-      if (count === 1) return `${key}_one`
-      if (count === 2) return `${key}_two`
-      if (count <= 10) return `${key}_few`
-      if (count <= 99) return `${key}_many`
-      return `${key}_other`
-    
-    case 'ru': { // Russian has 3 plural forms
-      const lastDigit = count % 10
-      const lastTwoDigits = count % 100
-      
-      if (lastDigit === 1 && lastTwoDigits !== 11) return `${key}_one`
-      if (lastDigit >= 2 && lastDigit <= 4 && (lastTwoDigits < 10 || lastTwoDigits >= 20)) return `${key}_few`
-      return `${key}_many`
+      if (count === 0) return `${key}_zero`;
+      if (count === 1) return `${key}_one`;
+      if (count === 2) return `${key}_two`;
+      if (count <= 10) return `${key}_few`;
+      if (count <= 99) return `${key}_many`;
+      return `${key}_other`;
+
+    case 'ru': {
+      // Russian has 3 plural forms
+      const lastDigit = count % 10;
+      const lastTwoDigits = count % 100;
+
+      if (lastDigit === 1 && lastTwoDigits !== 11) return `${key}_one`;
+      if (
+        lastDigit >= 2 &&
+        lastDigit <= 4 &&
+        (lastTwoDigits < 10 || lastTwoDigits >= 20)
+      )
+        return `${key}_few`;
+      return `${key}_many`;
     }
-    
+
     case 'en':
     default:
-      return count === 1 ? `${key}_one` : `${key}_other`
+      return count === 1 ? `${key}_one` : `${key}_other`;
   }
 }
 
@@ -369,42 +397,58 @@ function getPluralKey(language: string, key: string, count: number): string {
  * Get culturally appropriate theme for region
  */
 export function getCulturallyAppropriateTheme(region: string): string {
-  const middleEasternRegions = ['SA', 'AE', 'QA', 'KW', 'BH', 'OM']
-  const asianRegions = ['CN', 'JP', 'KR', 'TW', 'SG', 'MY', 'TH', 'VN']
-  
+  const middleEasternRegions = ['SA', 'AE', 'QA', 'KW', 'BH', 'OM'];
+  const asianRegions = ['CN', 'JP', 'KR', 'TW', 'SG', 'MY', 'TH', 'VN'];
+
   if (middleEasternRegions.includes(region)) {
-    return 'garden' // Use garden theme for Middle Eastern markets
+    return 'garden'; // Use garden theme for Middle Eastern markets
   }
-  
+
   if (asianRegions.includes(region)) {
-    return 'garden' // Use garden theme for Asian markets
+    return 'garden'; // Use garden theme for Asian markets
   }
-  
-  return 'laboratory' // Default to laboratory for broader appeal
+
+  return 'laboratory'; // Default to laboratory for broader appeal
 }
 
 /**
  * Check if content is appropriate for region
  */
-export function isContentAppropriate(content: string, region: string): {
-  appropriate: boolean
-  alternative?: string
-  reason?: string
+export function isContentAppropriate(
+  content: string,
+  region: string
+): {
+  appropriate: boolean;
+  alternative?: string;
+  reason?: string;
 } {
-  const sensitiveRegions = ['SA', 'AE', 'QA', 'KW', 'BH', 'OM', 'CN', 'JP', 'KR']
-  
+  const sensitiveRegions = [
+    'SA',
+    'AE',
+    'QA',
+    'KW',
+    'BH',
+    'OM',
+    'CN',
+    'JP',
+    'KR',
+  ];
+
   if (!sensitiveRegions.includes(region)) {
-    return { appropriate: true }
+    return { appropriate: true };
   }
-  
+
   // Check for cannabis-related content
-  if (content.toLowerCase().includes('cannabis') || content.toLowerCase().includes('weed')) {
+  if (
+    content.toLowerCase().includes('cannabis') ||
+    content.toLowerCase().includes('weed')
+  ) {
     return {
       appropriate: false,
       alternative: 'herbs',
       reason: 'Cannabis content not appropriate for this region',
-    }
+    };
   }
-  
-  return { appropriate: true }
+
+  return { appropriate: true };
 }

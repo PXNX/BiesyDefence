@@ -1,37 +1,37 @@
-import { TOWER_PROFILES } from '@/game/config/constants'
-import type { TowerType } from '@/game/core/types'
-import { MODIFIER_CAPS } from '@/game/systems/ModifierSystem'
+import { TOWER_PROFILES } from '@/game/config/constants';
+import type { TowerType } from '@/game/core/types';
+import { MODIFIER_CAPS } from '@/game/systems/ModifierSystem';
 
 interface TowerTooltipProps {
-  towerType: TowerType
+  towerType: TowerType;
 }
 
 export function TowerTooltip({ towerType }: TowerTooltipProps) {
-  const profile = TOWER_PROFILES[towerType]
+  const profile = TOWER_PROFILES[towerType];
 
-  const modifiers: { label: string; rule: string; cap?: number }[] = []
+  const modifiers: { label: string; rule: string; cap?: number }[] = [];
   if (profile.slow) {
-    const slowPct = Math.round((1 - profile.slow.multiplier) * 100)
+    const slowPct = Math.round((1 - profile.slow.multiplier) * 100);
     modifiers.push({
       label: `Slow: ${slowPct}%`,
       rule: 'max',
-      cap: MODIFIER_CAPS.slow?.max
-    })
+      cap: MODIFIER_CAPS.slow?.max,
+    });
   }
   if (profile.dot) {
-    const isBurn = profile.dot.damageType === 'burn'
+    const isBurn = profile.dot.damageType === 'burn';
     modifiers.push({
       label: `${isBurn ? 'Burn' : 'Poison'}: ${profile.dot.dps} DPS`,
-      rule: 'replace'
-    })
+      rule: 'replace',
+    });
   }
   if (profile.vulnerabilityDebuff) {
-    const vuln = Math.round(profile.vulnerabilityDebuff.amount * 100)
+    const vuln = Math.round(profile.vulnerabilityDebuff.amount * 100);
     modifiers.push({
       label: `Vulnerability: +${vuln}% Dmg`,
       rule: 'max',
-      cap: MODIFIER_CAPS.vulnerability?.max
-    })
+      cap: MODIFIER_CAPS.vulnerability?.max,
+    });
   }
 
   if (modifiers.length === 0) {
@@ -39,18 +39,20 @@ export function TowerTooltip({ towerType }: TowerTooltipProps) {
       <div className="tower-tooltip">
         <p>No modifiers applied</p>
       </div>
-    )
+    );
   }
 
   return (
     <div className="tower-tooltip">
       <h4>Applies</h4>
       <ul>
-        {modifiers.map((mod) => (
+        {modifiers.map(mod => (
           <li key={mod.label}>
             <span className="label">{mod.label}</span>
             <span className="rule">Stacking: {mod.rule}</span>
-            {mod.cap !== undefined ? <span className="cap">Cap: {mod.cap}</span> : null}
+            {mod.cap !== undefined ? (
+              <span className="cap">Cap: {mod.cap}</span>
+            ) : null}
           </li>
         ))}
       </ul>
@@ -87,5 +89,5 @@ export function TowerTooltip({ towerType }: TowerTooltipProps) {
         .rule, .cap { font-size: 0.85rem; color: #94a3b8; }
       `}</style>
     </div>
-  )
+  );
 }

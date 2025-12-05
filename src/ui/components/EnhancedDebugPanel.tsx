@@ -1,48 +1,48 @@
-import React, { memo, useCallback, useState, useEffect } from 'react'
-import type { ChangeEvent } from 'react'
-import { logger } from '@/game/utils/logger'
+import React, { memo, useCallback, useState, useEffect } from 'react';
+import type { ChangeEvent } from 'react';
+import { logger } from '@/game/utils/logger';
 
 interface EnhancedDebugPanelProps {
-  showRanges: boolean
-  showHitboxes: boolean
-  fps: number
-  currentWave: number
-  totalWaves: number
-  quickWaveIndex: number
-  onToggleRanges: () => void
-  onToggleHitboxes: () => void
-  onSetQuickWave: (_index: number) => void
-  onQuickStartWave: () => void
+  showRanges: boolean;
+  showHitboxes: boolean;
+  fps: number;
+  currentWave: number;
+  totalWaves: number;
+  quickWaveIndex: number;
+  onToggleRanges: () => void;
+  onToggleHitboxes: () => void;
+  onSetQuickWave: (_index: number) => void;
+  onQuickStartWave: () => void;
   // Enhanced performance monitoring props
-  renderTime?: number
+  renderTime?: number;
   entityCount?: {
-    enemies: number
-    towers: number
-    projectiles: number
-    particles: number
-  }
+    enemies: number;
+    towers: number;
+    projectiles: number;
+    particles: number;
+  };
   memoryUsage?: {
-    used: string
-    delta: string
-    trend: string
-  }
+    used: string;
+    delta: string;
+    trend: string;
+  };
   poolStats?: {
-    projectilePoolSize: number
-    particlePoolSize: number
-    efficiency: number
-  }
+    projectilePoolSize: number;
+    particlePoolSize: number;
+    efficiency: number;
+  };
   spatialGridStats?: {
-    cellCount: number
-    entityCount: number
-    avgEntitiesPerCell: number
-  }
+    cellCount: number;
+    entityCount: number;
+    avgEntitiesPerCell: number;
+  };
 }
 
 interface PerformanceMetric {
-  name: string
-  value: string | number
-  status: 'good' | 'warning' | 'critical'
-  description: string
+  name: string;
+  value: string | number;
+  status: 'good' | 'warning' | 'critical';
+  description: string;
 }
 
 export const EnhancedDebugPanel = memo(function EnhancedDebugPanel({
@@ -60,11 +60,15 @@ export const EnhancedDebugPanel = memo(function EnhancedDebugPanel({
   entityCount = { enemies: 0, towers: 0, projectiles: 0, particles: 0 },
   memoryUsage,
   poolStats,
-  spatialGridStats
+  spatialGridStats,
 }: EnhancedDebugPanelProps) {
-  const [activeTab, setActiveTab] = useState<'basic' | 'performance' | 'memory' | 'logs'>('basic')
-  const [autoRefresh, setAutoRefresh] = useState(true)
-  const [logLevel, setLogLevel] = useState<'debug' | 'info' | 'warn' | 'error'>('info')
+  const [activeTab, setActiveTab] = useState<
+    'basic' | 'performance' | 'memory' | 'logs'
+  >('basic');
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [logLevel, setLogLevel] = useState<'debug' | 'info' | 'warn' | 'error'>(
+    'info'
+  );
 
   // Performance metrics calculation
   const performanceMetrics: PerformanceMetric[] = [
@@ -72,85 +76,113 @@ export const EnhancedDebugPanel = memo(function EnhancedDebugPanel({
       name: 'FPS',
       value: fps.toFixed(1),
       status: fps >= 55 ? 'good' : fps >= 30 ? 'warning' : 'critical',
-      description: 'Frames per second - aim for 60+'
+      description: 'Frames per second - aim for 60+',
     },
     {
       name: 'Render Time',
       value: `${renderTime.toFixed(2)}ms`,
-      status: renderTime < 16.67 ? 'good' : renderTime < 33 ? 'warning' : 'critical',
-      description: 'Time to render a frame'
+      status:
+        renderTime < 16.67 ? 'good' : renderTime < 33 ? 'warning' : 'critical',
+      description: 'Time to render a frame',
     },
     {
       name: 'Total Entities',
-      value: entityCount.enemies + entityCount.towers + entityCount.projectiles + entityCount.particles,
-      status: (entityCount.enemies + entityCount.towers + entityCount.projectiles + entityCount.particles) < 100 ? 'good' : 'warning',
-      description: 'Total active game entities'
+      value:
+        entityCount.enemies +
+        entityCount.towers +
+        entityCount.projectiles +
+        entityCount.particles,
+      status:
+        entityCount.enemies +
+          entityCount.towers +
+          entityCount.projectiles +
+          entityCount.particles <
+        100
+          ? 'good'
+          : 'warning',
+      description: 'Total active game entities',
     },
     {
       name: 'Memory Usage',
       value: memoryUsage?.used || 'N/A',
       status: 'good', // Will be calculated based on memory delta
-      description: 'Current memory usage'
-    }
-  ]
+      description: 'Current memory usage',
+    },
+  ];
 
-  const handleRangeChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    onSetQuickWave(Number(event.target.value) - 1)
-  }, [onSetQuickWave])
+  const handleRangeChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      onSetQuickWave(Number(event.target.value) - 1);
+    },
+    [onSetQuickWave]
+  );
 
-  const handleLogLevelChange = useCallback((level: 'debug' | 'info' | 'warn' | 'error') => {
-    setLogLevel(level)
-    logger.setLevel(level)
-  }, [])
+  const handleLogLevelChange = useCallback(
+    (level: 'debug' | 'info' | 'warn' | 'error') => {
+      setLogLevel(level);
+      logger.setLevel(level);
+    },
+    []
+  );
 
   const exportLogs = useCallback(() => {
-    const logs = logger.getLogs({ level: logLevel, limit: 1000 })
-    const logText = logs.map(log => {
-      const time = new Date(log.timestamp).toISOString()
-      const category = log.category ? `[${log.category}]` : ''
-      return `${time} ${log.level.toUpperCase()} ${category} ${log.message}`
-    }).join('\n')
-    
-    const blob = new Blob([logText], { type: 'text/plain' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `biesydefence-logs-${new Date().toISOString().split('T')[0]}.txt`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-  }, [logLevel])
+    const logs = logger.getLogs({ level: logLevel, limit: 1000 });
+    const logText = logs
+      .map(log => {
+        const time = new Date(log.timestamp).toISOString();
+        const category = log.category ? `[${log.category}]` : '';
+        return `${time} ${log.level.toUpperCase()} ${category} ${log.message}`;
+      })
+      .join('\n');
+
+    const blob = new Blob([logText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `biesydefence-logs-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [logLevel]);
 
   const clearLogs = useCallback(() => {
-    logger.clearLogs()
-  }, [])
+    logger.clearLogs();
+  }, []);
 
   const forceGarbageCollection = useCallback(() => {
     if ('gc' in window && typeof (window as any).gc === 'function') {
-      (window as any).gc()
-      logger.info('Manual garbage collection triggered', undefined, 'performance')
+      (window as any).gc();
+      logger.info(
+        'Manual garbage collection triggered',
+        undefined,
+        'performance'
+      );
     }
-  }, [])
+  }, []);
 
   // Auto-refresh metrics
   useEffect(() => {
-    if (!autoRefresh) return
+    if (!autoRefresh) return;
 
     const interval = setInterval(() => {
       // This will trigger a re-render with updated stats
-      logger.debug('Auto-refreshing debug panel metrics', undefined, 'performance')
-    }, 1000)
+      logger.debug(
+        'Auto-refreshing debug panel metrics',
+        undefined,
+        'performance'
+      );
+    }, 1000);
 
-    return () => clearInterval(interval)
-  }, [autoRefresh])
+    return () => clearInterval(interval);
+  }, [autoRefresh]);
 
   // Only render in development mode
   if (import.meta.env.DEV !== true) {
-    return null
+    return null;
   }
 
-  const fpsLabel = Number.isFinite(fps) ? fps : 0
+  const fpsLabel = Number.isFinite(fps) ? fps : 0;
 
   return (
     <div className="enhanced-debug-panel">
@@ -161,7 +193,7 @@ export const EnhancedDebugPanel = memo(function EnhancedDebugPanel({
             <input
               type="checkbox"
               checked={autoRefresh}
-              onChange={(e) => setAutoRefresh(e.target.checked)}
+              onChange={e => setAutoRefresh(e.target.checked)}
             />
             Auto Refresh
           </label>
@@ -174,7 +206,7 @@ export const EnhancedDebugPanel = memo(function EnhancedDebugPanel({
           { key: 'basic', label: 'Basic', icon: '🎮' },
           { key: 'performance', label: 'Performance', icon: '⚡' },
           { key: 'memory', label: 'Memory', icon: '💾' },
-          { key: 'logs', label: 'Logs', icon: '📋' }
+          { key: 'logs', label: 'Logs', icon: '📋' },
         ].map(tab => (
           <button
             key={tab.key}
@@ -192,14 +224,14 @@ export const EnhancedDebugPanel = memo(function EnhancedDebugPanel({
           <div className="dev-mode-warning">
             <strong>⚠️ Development Mode Only</strong>
           </div>
-          
+
           <div className="debug-row">
             <span>Debug FPS</span>
             <strong className={`fps-display ${performanceMetrics[0].status}`}>
               {fpsLabel.toFixed(1)}
             </strong>
           </div>
-          
+
           <div className="debug-row">
             <span>Wave</span>
             <strong>
@@ -208,10 +240,16 @@ export const EnhancedDebugPanel = memo(function EnhancedDebugPanel({
           </div>
 
           <div className="debug-row toggle-row">
-            <button className={`toggle ${showRanges ? 'active' : ''}`} onClick={onToggleRanges}>
+            <button
+              className={`toggle ${showRanges ? 'active' : ''}`}
+              onClick={onToggleRanges}
+            >
               Tower ranges
             </button>
-            <button className={`toggle ${showHitboxes ? 'active' : ''}`} onClick={onToggleHitboxes}>
+            <button
+              className={`toggle ${showHitboxes ? 'active' : ''}`}
+              onClick={onToggleHitboxes}
+            >
               Hitboxes
             </button>
           </div>
@@ -226,7 +264,7 @@ export const EnhancedDebugPanel = memo(function EnhancedDebugPanel({
               onChange={handleRangeChange}
             />
           </label>
-          
+
           <button className="ghost" onClick={onQuickStartWave}>
             Jump to wave {quickWaveIndex + 1}
           </button>
@@ -237,10 +275,13 @@ export const EnhancedDebugPanel = memo(function EnhancedDebugPanel({
       {activeTab === 'performance' && (
         <div className="debug-section">
           <h4>Performance Metrics</h4>
-          
+
           <div className="performance-grid">
             {performanceMetrics.map(metric => (
-              <div key={metric.name} className={`performance-metric ${metric.status}`}>
+              <div
+                key={metric.name}
+                className={`performance-metric ${metric.status}`}
+              >
                 <div className="metric-name">{metric.name}</div>
                 <div className="metric-value">{metric.value}</div>
                 <div className="metric-description">{metric.description}</div>
@@ -273,10 +314,7 @@ export const EnhancedDebugPanel = memo(function EnhancedDebugPanel({
             <button onClick={forceGarbageCollection} className="ghost">
               Force GC
             </button>
-            <button 
-              onClick={() => logger.snapshotMemory()} 
-              className="ghost"
-            >
+            <button onClick={() => logger.snapshotMemory()} className="ghost">
               Memory Snapshot
             </button>
           </div>
@@ -287,7 +325,7 @@ export const EnhancedDebugPanel = memo(function EnhancedDebugPanel({
       {activeTab === 'memory' && (
         <div className="debug-section">
           <h4>Memory & Pool Statistics</h4>
-          
+
           {memoryUsage && (
             <div className="memory-stats">
               <div className="memory-item">
@@ -296,7 +334,11 @@ export const EnhancedDebugPanel = memo(function EnhancedDebugPanel({
               </div>
               <div className="memory-item">
                 <span>Delta:</span>
-                <strong className={memoryUsage.trend === 'increasing' ? 'warning' : 'good'}>
+                <strong
+                  className={
+                    memoryUsage.trend === 'increasing' ? 'warning' : 'good'
+                  }
+                >
                   {memoryUsage.delta}
                 </strong>
               </div>
@@ -340,13 +382,13 @@ export const EnhancedDebugPanel = memo(function EnhancedDebugPanel({
       {activeTab === 'logs' && (
         <div className="debug-section">
           <h4>Debug Logs</h4>
-          
+
           <div className="log-controls">
             <label>
               Log Level:
-              <select 
-                value={logLevel} 
-                onChange={(e) => handleLogLevelChange(e.target.value as any)}
+              <select
+                value={logLevel}
+                onChange={e => handleLogLevelChange(e.target.value as any)}
               >
                 <option value="debug">Debug</option>
                 <option value="info">Info</option>
@@ -354,7 +396,7 @@ export const EnhancedDebugPanel = memo(function EnhancedDebugPanel({
                 <option value="error">Error</option>
               </select>
             </label>
-            
+
             <div className="log-actions">
               <button onClick={exportLogs} className="ghost">
                 Export Logs
@@ -370,24 +412,26 @@ export const EnhancedDebugPanel = memo(function EnhancedDebugPanel({
               <span>Recent Logs (last 50 entries)</span>
             </div>
             <div className="log-entries">
-              {logger.getLogs({ level: logLevel, limit: 50 }).map((log, index) => (
-                <div key={index} className={`log-entry ${log.level}`}>
-                  <span className="log-time">
-                    {new Date(log.timestamp).toLocaleTimeString()}
-                  </span>
-                  <span className="log-level">{log.level.toUpperCase()}</span>
-                  {log.category && (
-                    <span className="log-category">[{log.category}]</span>
-                  )}
-                  <span className="log-message">{log.message}</span>
-                </div>
-              ))}
+              {logger
+                .getLogs({ level: logLevel, limit: 50 })
+                .map((log, index) => (
+                  <div key={index} className={`log-entry ${log.level}`}>
+                    <span className="log-time">
+                      {new Date(log.timestamp).toLocaleTimeString()}
+                    </span>
+                    <span className="log-level">{log.level.toUpperCase()}</span>
+                    {log.category && (
+                      <span className="log-category">[{log.category}]</span>
+                    )}
+                    <span className="log-message">{log.message}</span>
+                  </div>
+                ))}
             </div>
           </div>
         </div>
       )}
     </div>
-  )
-})
+  );
+});
 
-export default EnhancedDebugPanel
+export default EnhancedDebugPanel;

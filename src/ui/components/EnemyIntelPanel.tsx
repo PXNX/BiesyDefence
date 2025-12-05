@@ -1,13 +1,13 @@
-import { ENEMY_PROFILES } from '@/game/entities/enemies'
-import type { EnemyType } from '@/game/core/types'
+import { ENEMY_PROFILES } from '@/game/entities/enemies';
+import type { EnemyType } from '@/game/core/types';
 
 interface EnemyIntelPanelProps {
-  types: EnemyType[]
+  types: EnemyType[];
 }
 
 export function EnemyIntelPanel({ types }: EnemyIntelPanelProps) {
-  const uniqueTypes = Array.from(new Set(types))
-  if (uniqueTypes.length === 0) return null
+  const uniqueTypes = Array.from(new Set(types));
+  if (uniqueTypes.length === 0) return null;
 
   return (
     <section className="enemy-intel-panel" aria-label="Enemy intel">
@@ -16,14 +16,16 @@ export function EnemyIntelPanel({ types }: EnemyIntelPanelProps) {
         <strong>Enemy Intel</strong>
       </header>
       <div className="intel-grid">
-        {uniqueTypes.map((type) => {
-          const profile = ENEMY_PROFILES[type]
-          if (!profile) return null
+        {uniqueTypes.map(type => {
+          const profile = ENEMY_PROFILES[type];
+          if (!profile) return null;
           return (
             <article key={type} className="intel-card">
               <div className="intel-row">
                 <span className="type">{type}</span>
-                <span className="tags">{profile.tags?.join(', ') ?? 'generalist'}</span>
+                <span className="tags">
+                  {profile.tags?.join(', ') ?? 'generalist'}
+                </span>
               </div>
               <div className="intel-stats">
                 <span>HP {profile.health}</span>
@@ -33,12 +35,14 @@ export function EnemyIntelPanel({ types }: EnemyIntelPanelProps) {
               {profile.resistances && (
                 <div className="intel-resists">
                   {Object.entries(profile.resistances).map(([key, value]) => (
-                    <span key={key}>{key}: {(value * 100).toFixed(0)}%</span>
+                    <span key={key}>
+                      {key}: {(value * 100).toFixed(0)}%
+                    </span>
                   ))}
                 </div>
               )}
             </article>
-          )
+          );
         })}
       </div>
       <style>{`
@@ -100,5 +104,5 @@ export function EnemyIntelPanel({ types }: EnemyIntelPanelProps) {
         }
       `}</style>
     </section>
-  )
+  );
 }

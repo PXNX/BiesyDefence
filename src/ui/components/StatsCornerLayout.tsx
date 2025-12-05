@@ -3,7 +3,7 @@ import {
   selectResources,
   selectWave,
   selectMapStatus,
-  selectScore
+  selectScore,
 } from '@/game/store/selectors';
 
 const StatsCornerLayout = () => {

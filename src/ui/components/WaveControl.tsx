@@ -1,17 +1,22 @@
-import { selectWaveProgress } from '@/game/store/selectors'
+import { selectWaveProgress } from '@/game/store/selectors';
 
 interface WaveControlProps {
-  onStart: () => void
-  onPause: () => void
-  onNext: () => void
-  onToggleAutoWave: (enabled: boolean) => void
+  onStart: () => void;
+  onPause: () => void;
+  onNext: () => void;
+  onToggleAutoWave: (enabled: boolean) => void;
 }
 
-export function WaveControl({ onStart, onPause, onNext, onToggleAutoWave }: WaveControlProps) {
-  const wave = selectWaveProgress()
+export function WaveControl({
+  onStart,
+  onPause,
+  onNext,
+  onToggleAutoWave,
+}: WaveControlProps) {
+  const wave = selectWaveProgress();
 
-  const isRunning = wave.phase === 'active' || wave.phase === 'spawning'
-  const canStartNext = wave.nextAvailable && !isRunning
+  const isRunning = wave.phase !== 'idle' && wave.phase !== 'completed' && wave.phase !== 'finalized';
+  const canStartNext = wave.nextAvailable && !isRunning;
 
   return (
     <div className="wave-control" role="group" aria-label="Wave control">
@@ -38,7 +43,7 @@ export function WaveControl({ onStart, onPause, onNext, onToggleAutoWave }: Wave
           <input
             type="checkbox"
             checked={wave.autoEnabled}
-            onChange={(e) => onToggleAutoWave(e.target.checked)}
+            onChange={e => onToggleAutoWave(e.target.checked)}
           />
           <span>Auto-Wave</span>
         </label>
@@ -108,5 +113,5 @@ export function WaveControl({ onStart, onPause, onNext, onToggleAutoWave }: Wave
         }
       `}</style>
     </div>
-  )
+  );
 }

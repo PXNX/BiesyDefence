@@ -1,8 +1,7 @@
-import React from 'react'
-import { useGameStore } from '@/game/store/gameStore'
-import { Modifier } from '@/game/systems/ModifierSystem'
+import React from 'react';
+import { useGameStore } from '@/game/store/gameStore';
+import type { Modifier } from '@/game/systems/ModifierSystem';
 
-// Icons mapping
 const MODIFIER_ICONS: Record<string, string> = {
   slow: '❄️',
   dot: '☠️',
@@ -13,58 +12,59 @@ const MODIFIER_ICONS: Record<string, string> = {
   range_mult: '🎯',
   fire_rate_mult: '⚡',
   vulnerability: '💔',
-}
+};
 
-interface ModifierDisplayProps {
-  targetId: string
-  type: 'enemy' | 'tower'
-}
+/**
+ * Displays a summary of all active modifiers in the game.
+ * Shows modifier counts grouped by type.
+ */
+export const ModifierDisplay: React.FC = () => {
+  const activeModifiers = useGameStore((state) => state.activeModifiers);
 
-export const ModifierDisplay: React.FC<ModifierDisplayProps> = ({ targetId, type }) => {
-  // We need a way to get modifiers from the store or system.
-  // Currently modifiers are in ModifierManager which is in GameController.
-  // The store doesn't have them yet.
-  // We need to expose modifiers in the store or pass them down.
-  // For now, let's assume we can select them from the store if we add them there,
-  // OR we rely on the entity having a 'modifiers' array if we sync it.
+  if (!activeModifiers || Object.keys(activeModifiers).length === 0) {
+    return null;
+  }
 
-  // Wait, ModifierManager is the source of truth.
-  // We should probably sync active modifiers to the entity in the store snapshot
-  // so the UI can read it.
+  // Aggregate modifiers by type
+  const modCounts: Record<string, number> = {};
+  for (const mods of Object.values(activeModifiers)) {
+    for (const mod of mods as Modifier[]) {
+      modCounts[mod.type] = (modCounts[mod.type] || 0) + 1;
+    }
+  }
 
-  // Let's check GameState/Entity types.
-  // Enemy has 'effects' object currently.
-  // We should probably map ModifierManager state to a simple list on the entity for UI.
-
-  // For this implementation, I will assume the store has been updated to include a 
-  // 'modifiers' property on entities, populated by GameController from ModifierManager.
-
-  // Let's use a selector.
-  const modifiers = useGameStore(state => state.activeModifiers?.[targetId] || [])
-
-  if (!modifiers || modifiers.length === 0) return null
+  if (Object.keys(modCounts).length === 0) return null;
 
   return (
-    <div className="flex gap-1 mt-1 flex-wrap">
-      {modifiers.map((mod: Modifier) => (
-        <div
-          key={mod.id}
-          className="relative group bg-gray-800/80 rounded p-1 border border-gray-600"
-          title={`${mod.type}: ${mod.value} (${mod.remainingTime.toFixed(1)}s)`}
-        >
-          <span className="text-sm">{MODIFIER_ICONS[mod.type] || '❓'}</span>
-
-          {/* Duration bar */}
-          <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gray-700">
-            <div
-              className="h-full bg-blue-400"
-              style={{ width: `${(mod.remainingTime / mod.duration) * 100}%` }}
-            />
-          </div>
-
-          {/* Stack count if > 1 (not implemented in Modifier interface yet but useful) */}
-        </div>
-      ))}
+    <div className="modifier-summary">
+      <p className="eyebrow">Active Effects</p>
+      <div className="modifier-row">
+        {Object.entries(modCounts).map(([type, count]) => (
+          <span key={type} className="modifier-badge" title={`${type}: ${count} active`}>
+            {MODIFIER_ICONS[type] || '❓'} {count}
+          </span>
+        ))}
+      </div>
+      <style>{`
+        .modifier-summary {
+          background: rgba(0, 0, 0, 0.5);
+          border-radius: 8px;
+          padding: 0.5rem;
+          margin-top: 0.5rem;
+        }
+        .modifier-row {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+        }
+        .modifier-badge {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 4px;
+          padding: 0.25rem 0.5rem;
+          font-size: 0.85rem;
+        }
+      `}</style>
     </div>
-  )
-}
+  );
+};
+

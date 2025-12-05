@@ -1,18 +1,18 @@
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent } from 'react';
 import {
   selectShowRanges,
   selectShowHitboxes,
   selectFPS,
   selectWave,
-  selectTelemetry
-} from '@/game/store/selectors'
+  selectTelemetry,
+} from '@/game/store/selectors';
 
 interface DebugPanelProps {
-  quickWaveIndex: number
-  onSetQuickWave: (_index: number) => void
-  onQuickStartWave: () => void
-  onToggleRanges: () => void
-  onToggleHitboxes: () => void
+  quickWaveIndex: number;
+  onSetQuickWave: (_index: number) => void;
+  onQuickStartWave: () => void;
+  onToggleRanges: () => void;
+  onToggleHitboxes: () => void;
 }
 
 export function DebugPanel({
@@ -22,21 +22,21 @@ export function DebugPanel({
   onToggleRanges,
   onToggleHitboxes,
 }: DebugPanelProps) {
-  const showRanges = selectShowRanges()
-  const showHitboxes = selectShowHitboxes()
-  const fps = selectFPS()
-  const wave = selectWave()
-  const telemetry = selectTelemetry()
+  const showRanges = selectShowRanges();
+  const showHitboxes = selectShowHitboxes();
+  const fps = selectFPS();
+  const wave = selectWave();
+  const telemetry = selectTelemetry();
 
   const handleRangeChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onSetQuickWave(Number(event.target.value) - 1)
-  }
+    onSetQuickWave(Number(event.target.value) - 1);
+  };
 
-  const fpsLabel = Number.isFinite(fps) ? fps : 0
+  const fpsLabel = Number.isFinite(fps) ? fps : 0;
 
   // Only render in development mode
   if (import.meta.env.DEV !== true) {
-    return null
+    return null;
   }
 
   return (
@@ -55,10 +55,16 @@ export function DebugPanel({
         </strong>
       </div>
       <div className="debug-row toggle-row">
-        <button className={`toggle ${showRanges ? 'active' : ''}`} onClick={onToggleRanges}>
+        <button
+          className={`toggle ${showRanges ? 'active' : ''}`}
+          onClick={onToggleRanges}
+        >
           Tower ranges
         </button>
-        <button className={`toggle ${showHitboxes ? 'active' : ''}`} onClick={onToggleHitboxes}>
+        <button
+          className={`toggle ${showHitboxes ? 'active' : ''}`}
+          onClick={onToggleHitboxes}
+        >
           Hitboxes
         </button>
       </div>
@@ -80,5 +86,5 @@ export function DebugPanel({
         Jump to wave {quickWaveIndex + 1}
       </button>
     </div>
-  )
+  );
 }

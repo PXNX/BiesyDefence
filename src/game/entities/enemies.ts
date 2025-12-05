@@ -6,9 +6,9 @@ import type {
   EnemyType,
   EnemyTag,
   Vector2,
-} from '@/game/core/types'
-import { createEntityId } from '@/game/utils/id'
-import { MapManager } from '@/game/maps/MapManager'
+} from '@/game/core/types';
+import { createEntityId } from '@/game/utils/id';
+import { MapManager } from '@/game/maps/MapManager';
 
 export const ENEMY_PROFILES: Record<EnemyType, EnemyStats> = {
   pest: {
@@ -149,13 +149,14 @@ export const ENEMY_PROFILES: Record<EnemyType, EnemyStats> = {
       count: 2,
     },
   },
-}
+};
 
-const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
+const clamp = (value: number, min: number, max: number) =>
+  Math.max(min, Math.min(max, value));
 
 const getWaveScaling = (waveIndex: number) => {
   // Difficulty curve (Phase-based): smoother early game, controlled mid, assertive late
-  const phase = waveIndex + 1
+  const phase = waveIndex + 1;
   const hpBase =
     phase <= 5
       ? 1 + 0.05 * phase // gentler start
@@ -163,24 +164,24 @@ const getWaveScaling = (waveIndex: number) => {
         ? 1.25 + 0.06 * (phase - 5)
         : phase <= 15
           ? 1.55 + 0.07 * (phase - 10)
-          : 1.9 + 0.08 * (phase - 15)
+          : 1.9 + 0.08 * (phase - 15);
 
-  const hpScale = clamp(hpBase, 1, 2.5)
-  const speedScale = clamp(1 + 0.02 * phase, 1, 1.45)
+  const hpScale = clamp(hpBase, 1, 2.5);
+  const speedScale = clamp(1 + 0.02 * phase, 1, 1.45);
 
   // Rewards now synced to HP scaling (same progression) to avoid economic starvation
-  const rewardScale = hpScale
+  const rewardScale = hpScale;
 
   // Elite boosts stay multiplicative on top
   const isEliteBoost =
-    phase === 9 || phase === 14 ? 1.2 : phase === 19 ? 1.25 : 1
+    phase === 9 || phase === 14 ? 1.2 : phase === 19 ? 1.25 : 1;
 
   return {
     hpScale: hpScale * isEliteBoost,
     speedScale: speedScale * isEliteBoost,
     rewardScale: rewardScale * isEliteBoost,
-  }
-}
+  };
+};
 
 export const createEnemy = (
   type: EnemyType,
@@ -188,29 +189,40 @@ export const createEnemy = (
   waveIndex = 0,
   options?: { noReward?: boolean; noLifeDamage?: boolean; route?: Vector2[] }
 ): Enemy => {
-  const base = ENEMY_PROFILES[type] ?? ENEMY_PROFILES.pest
-  const difficultyConfig = MapManager.getInstance().getCurrentDifficultyConfig()
-  const mapModifiers = MapManager.getInstance().getCurrentMap()?.modifiers ?? {}
-  const { hpScale, speedScale, rewardScale } = getWaveScaling(waveIndex)
+  const base = ENEMY_PROFILES[type] ?? ENEMY_PROFILES.pest;
+  const difficultyConfig =
+    MapManager.getInstance().getCurrentDifficultyConfig();
+  const mapModifiers =
+    MapManager.getInstance().getCurrentMap()?.modifiers ?? {};
+  const { hpScale, speedScale, rewardScale } = getWaveScaling(waveIndex);
 
   const stats: EnemyStats = {
     ...base,
     speed: Math.round(
-      base.speed * speedScale * difficultyConfig.enemySpeedMultiplier * (mapModifiers.enemySpeedMultiplier ?? 1)
+      base.speed *
+        speedScale *
+        difficultyConfig.enemySpeedMultiplier *
+        (mapModifiers.enemySpeedMultiplier ?? 1)
     ),
     health: Math.round(
-      base.health * hpScale * difficultyConfig.enemyHealthMultiplier * (mapModifiers.enemyHealthMultiplier ?? 1)
+      base.health *
+        hpScale *
+        difficultyConfig.enemyHealthMultiplier *
+        (mapModifiers.enemyHealthMultiplier ?? 1)
     ),
     reward: Math.round(
-      base.reward * rewardScale * difficultyConfig.enemyRewardMultiplier * (mapModifiers.enemyRewardMultiplier ?? 1)
+      base.reward *
+        rewardScale *
+        difficultyConfig.enemyRewardMultiplier *
+        (mapModifiers.enemyRewardMultiplier ?? 1)
     ),
     damageToLives: base.damageToLives,
-  }
+  };
   if (options?.noReward) {
-    stats.reward = 0
+    stats.reward = 0;
   }
   if (options?.noLifeDamage) {
-    stats.damageToLives = 0
+    stats.damageToLives = 0;
   }
 
   return {
@@ -234,66 +246,65 @@ export const createEnemy = (
     resistances: stats.resistances,
     vulnerability: stats.vulnerability ?? 0,
     tags: stats.tags as EnemyTag[] | undefined,
-  }
-}
-
+  };
+};
 
 /**
  * Enemy class with path movement functionality for Canvas 2D rendering
  * This class provides the core enemy behavior including movement along predefined paths
  */
 export class EnemyEntity {
-  public readonly id: string
-  public readonly type: EnemyType
-  public readonly stats: EnemyStats
-  public position: Vector2
-  public pathIndex: number
-  public health: number
-  public readonly maxHealth: number
-  public isDead: boolean
-  public reachedGoal: boolean
-  public rewardClaimed: boolean
-  public speedMultiplier: number
+  public readonly id: string;
+  public readonly type: EnemyType;
+  public readonly stats: EnemyStats;
+  public position: Vector2;
+  public pathIndex: number;
+  public health: number;
+  public readonly maxHealth: number;
+  public isDead: boolean;
+  public reachedGoal: boolean;
+  public rewardClaimed: boolean;
+  public speedMultiplier: number;
   public effects: {
     slow: {
-      duration: number
-      remainingTime: number
-      multiplier: number
-      appliedBy: string // tower id
-    }[]
+      duration: number;
+      remainingTime: number;
+      multiplier: number;
+      appliedBy: string; // tower id
+    }[];
     vulnerability: {
-      amount: number
-      remainingTime: number
-    }[]
+      amount: number;
+      remainingTime: number;
+    }[];
     dot: {
-      duration: number
-      remainingTime: number
-      dps: number
-      damageType: DamageType
-      appliedBy: string // tower id
-    }[]
-  }
-  public resistances?: DamageResistances
-  public vulnerability?: number
-  public tags?: EnemyTag[]
+      duration: number;
+      remainingTime: number;
+      dps: number;
+      damageType: DamageType;
+      appliedBy: string; // tower id
+    }[];
+  };
+  public resistances?: DamageResistances;
+  public vulnerability?: number;
+  public tags?: EnemyTag[];
 
   constructor(type: EnemyType, spawnPosition: Vector2) {
-    const stats = ENEMY_PROFILES[type]
-    this.id = createEntityId('enemy')
-    this.type = type
-    this.stats = stats
-    this.position = { ...spawnPosition }
-    this.pathIndex = 0
-    this.health = stats.health
-    this.maxHealth = stats.health
-    this.isDead = false
-    this.reachedGoal = false
-    this.rewardClaimed = false
-    this.speedMultiplier = 1
-    this.effects = { slow: [], vulnerability: [], dot: [] }
-    this.resistances = stats.resistances
-    this.vulnerability = stats.vulnerability ?? 0
-    this.tags = stats.tags as EnemyTag[] | undefined
+    const stats = ENEMY_PROFILES[type];
+    this.id = createEntityId('enemy');
+    this.type = type;
+    this.stats = stats;
+    this.position = { ...spawnPosition };
+    this.pathIndex = 0;
+    this.health = stats.health;
+    this.maxHealth = stats.health;
+    this.isDead = false;
+    this.reachedGoal = false;
+    this.rewardClaimed = false;
+    this.speedMultiplier = 1;
+    this.effects = { slow: [], vulnerability: [], dot: [] };
+    this.resistances = stats.resistances;
+    this.vulnerability = stats.vulnerability ?? 0;
+    this.tags = stats.tags as EnemyTag[] | undefined;
   }
 
   /**
@@ -304,68 +315,70 @@ export class EnemyEntity {
    */
   public update(path: Vector2[], deltaTime: number): boolean {
     if (this.isDead || this.reachedGoal) {
-      return false
+      return false;
     }
 
     // Update slow effects
     this.effects.slow = this.effects.slow.filter(effect => {
-      effect.remainingTime -= deltaTime
-      return effect.remainingTime > 0
-    })
-    
+      effect.remainingTime -= deltaTime;
+      return effect.remainingTime > 0;
+    });
+
     // Calculate effective speed multiplier from active slow effects
-    const activeSlowEffect = this.effects.slow.find(effect => effect.remainingTime > 0)
-    this.speedMultiplier = activeSlowEffect ? activeSlowEffect.multiplier : 1
+    const activeSlowEffect = this.effects.slow.find(
+      effect => effect.remainingTime > 0
+    );
+    this.speedMultiplier = activeSlowEffect ? activeSlowEffect.multiplier : 1;
 
     // Check if we've reached the end of the path
     if (this.pathIndex >= path.length - 1) {
       if (!this.reachedGoal) {
-        this.reachedGoal = true
-        this.isDead = true
-        this.rewardClaimed = true
-        return true // Signal that enemy reached the goal
+        this.reachedGoal = true;
+        this.isDead = true;
+        this.rewardClaimed = true;
+        return true; // Signal that enemy reached the goal
       }
-      return false
+      return false;
     }
 
-    const targetNode = path[this.pathIndex + 1]
+    const targetNode = path[this.pathIndex + 1];
     if (!targetNode) {
-      return false
+      return false;
     }
 
     // Calculate movement towards next waypoint
     const toTarget = {
       x: targetNode.x - this.position.x,
       y: targetNode.y - this.position.y,
-    }
+    };
 
-    const travelDistance = this.stats.speed * this.speedMultiplier * deltaTime
-    const distToTarget = Math.hypot(toTarget.x, toTarget.y)
-    
+    const travelDistance = this.stats.speed * this.speedMultiplier * deltaTime;
+    const distToTarget = Math.hypot(toTarget.x, toTarget.y);
+
     if (distToTarget <= travelDistance) {
       // Reached the waypoint
-      this.position.x = targetNode.x
-      this.position.y = targetNode.y
-      this.pathIndex = Math.min(this.pathIndex + 1, path.length - 1)
-      
+      this.position.x = targetNode.x;
+      this.position.y = targetNode.y;
+      this.pathIndex = Math.min(this.pathIndex + 1, path.length - 1);
+
       // Check if this was the final waypoint
       if (this.pathIndex >= path.length - 1) {
-        this.reachedGoal = true
-        this.isDead = true
-        this.rewardClaimed = true
-        return true // Signal that enemy reached the goal
+        this.reachedGoal = true;
+        this.isDead = true;
+        this.rewardClaimed = true;
+        return true; // Signal that enemy reached the goal
       }
     } else {
       // Move towards the waypoint
       const movement = {
         x: (toTarget.x / distToTarget) * travelDistance,
         y: (toTarget.y / distToTarget) * travelDistance,
-      }
-      this.position.x += movement.x
-      this.position.y += movement.y
+      };
+      this.position.x += movement.x;
+      this.position.y += movement.y;
     }
 
-    return false
+    return false;
   }
 
   /**
@@ -375,15 +388,15 @@ export class EnemyEntity {
    */
   public takeDamage(damage: number): boolean {
     if (this.isDead) {
-      return false
+      return false;
     }
 
-    this.health = Math.max(0, this.health - damage)
+    this.health = Math.max(0, this.health - damage);
     if (this.health <= 0) {
-      this.isDead = true
-      return true
+      this.isDead = true;
+      return true;
     }
-    return false
+    return false;
   }
 
   /**
@@ -392,13 +405,17 @@ export class EnemyEntity {
    * @param duration - Duration of the slow effect in seconds
    * @param towerId - ID of the tower that applied the slow
    */
-  public applySlow(multiplier: number, duration: number, towerId: string): void {
+  public applySlow(
+    multiplier: number,
+    duration: number,
+    towerId: string
+  ): void {
     this.effects.slow.push({
       duration,
       remainingTime: duration,
       multiplier,
       appliedBy: towerId,
-    })
+    });
   }
 
   /**
@@ -406,7 +423,7 @@ export class EnemyEntity {
    * @returns number - Current speed in pixels per second
    */
   public getEffectiveSpeed(): number {
-    return this.stats.speed * this.speedMultiplier
+    return this.stats.speed * this.speedMultiplier;
   }
 
   /**
@@ -414,7 +431,7 @@ export class EnemyEntity {
    * @returns number - Money reward
    */
   public getReward(): number {
-    return this.stats.reward
+    return this.stats.reward;
   }
 
   /**
@@ -422,7 +439,7 @@ export class EnemyEntity {
    * @returns number - Lives damage
    */
   public getDamageToLives(): number {
-    return this.stats.damageToLives
+    return this.stats.damageToLives;
   }
 
   /**
@@ -450,6 +467,6 @@ export class EnemyEntity {
       resistances: this.resistances,
       vulnerability: this.vulnerability,
       tags: this.tags,
-    }
+    };
   }
 }

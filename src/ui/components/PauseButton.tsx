@@ -1,6 +1,12 @@
 import React from 'react';
 
-const PauseButton = ({ isPaused, onClick }: { isPaused: boolean; onClick: () => void }) => (
+const PauseButton = ({
+  isPaused,
+  onClick,
+}: {
+  isPaused: boolean;
+  onClick: () => void;
+}) => (
   <button
     className="pause-button"
     onClick={onClick}

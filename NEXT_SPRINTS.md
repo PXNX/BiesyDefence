@@ -4,7 +4,7 @@ Basierend auf der erfolgreich abgeschlossenen GameController-Refaktorierung (69%
 
 ---
 
-## Sprint 1: UI-Migration auf Zustand Store (Priorität: 🔴 KRITISCH)
+## Sprint 1: UI-Migration auf Zustand Store (Priorität: 🔴 KRITISCH) - ✅ ABGESCHLOSSEN
 
 **Ziel:** Vollständige Integration der UI-Komponenten mit dem Zustand Store, Entfernung aller direkten GameController-Abhängigkeiten.
 
@@ -13,31 +13,31 @@ Basierend auf der erfolgreich abgeschlossenen GameController-Refaktorierung (69%
 ### Aufgaben
 
 #### 1.1 Core UI-Komponenten migrieren
-- [ ] **HUD.tsx** - Resources, Lives, Score, Wave-Info
+- [x] **HUD.tsx** - Resources, Lives, Score, Wave-Info
   - Ersetze `gameController.subscribe()` mit `useGameStore()`
   - Nutze Selectors: `selectResources()`, `selectWave()`, `selectStatus()`
   - Teste: Updates funktionieren in Echtzeit
   
-- [ ] **TowerShop.tsx** - Tower-Auswahl, Kosten-Anzeige
+- [x] **TowerShop.tsx** - Tower-Auswahl, Kosten-Anzeige
   - Nutze `selectMoney()` für Kosten-Check
   - Nutze `selectCanAffordTower(type)` für Disable-State
   - Teste: Kosten-Highlighting funktioniert
 
-- [ ] **WaveControl.tsx** - Wave-Start, Auto-Wave Toggle
+- [x] **WaveControl.tsx** - Wave-Start, Auto-Wave Toggle
   - Nutze `selectWaveProgress()` für Status
   - Nutze `selectAutoWaveEnabled()` für Toggle-State
   - Teste: Auto-Wave Toggle funktioniert
 
-- [ ] **DebugPanel.tsx** - Debug-Settings, Telemetry
+- [x] **DebugPanel.tsx** - Debug-Settings, Telemetry
   - Nutze `selectShowRanges()`, `selectShowHitboxes()`, etc.
   - Nutze `selectTelemetry()` für Performance-Daten
   - Teste: Toggle-Buttons funktionieren
 
 #### 1.2 Cleanup
-- [ ] Entferne alle `gameController.subscribe()` Calls
-- [ ] Entferne `gameController` Prop aus Komponenten
-- [ ] Update `App.tsx` - Keine GameController-Props mehr
-- [ ] Teste: Gesamtes Spiel funktioniert ohne Regressions
+- [x] Entferne alle `gameController.subscribe()` Calls
+- [x] Entferne `gameController` Prop aus Komponenten
+- [x] Update `App.tsx` - Keine GameController-Props mehr
+- [x] Teste: Gesamtes Spiel funktioniert ohne Regressions
 
 #### 1.3 Dokumentation
 - [ ] README aktualisieren mit Zustand Store-Nutzung
@@ -52,7 +52,7 @@ Basierend auf der erfolgreich abgeschlossenen GameController-Refaktorierung (69%
 
 ---
 
-## Sprint 2: Modifier/Status-System (Priorität: 🔴 KRITISCH)
+## Sprint 2: Modifier/Status-System (Priorität: 🔴 KRITISCH) - ✅ ABGESCHLOSSEN
 
 **Ziel:** Einheitliches, erweiterbares System für alle temporären Effekte (Slow, Burn, Buffs, Debuffs).
 
@@ -61,40 +61,40 @@ Basierend auf der erfolgreich abgeschlossenen GameController-Refaktorierung (69%
 ### Aufgaben
 
 #### 2.1 Core Modifier-System
-- [ ] **ModifierSystem.ts** erstellen
+- [x] **ModifierSystem.ts** erstellen
   - Interface `Modifier` definieren (id, source, target, type, value, duration, stacking)
   - `ModifierManager` Klasse (add, remove, update, query, calculateEffective)
   - Stacking-Regeln: `replace`, `additive`, `multiplicative`, `max`
   - Caps definieren: Slow (0.7), Armor Debuff (0.8), Damage Buff (3.0)
 
 #### 2.2 Integration in Systeme
-- [ ] **EnemySystem.ts** - Modifier-Konsumption
+- [x] **EnemySystem.ts** - Modifier-Konsumption
   - Slow-Modifier → Geschwindigkeit reduzieren
   - Burn-Modifier → DoT-Schaden anwenden
   - Armor-Debuff → Resistenzen reduzieren
   - Vulnerability → Schaden-Multiplikator
   
-- [ ] **TowerSystem.ts** - Modifier-Anwendung
+- [x] **TowerSystem.ts** - Modifier-Anwendung
   - Slow bei Treffer anwenden (wenn Tower.slow vorhanden)
   - Burn bei Treffer anwenden (wenn Tower.dot.type === 'burn')
   - Mark-Effekt für Sniper-Towers
   - Vulnerability-Debuff für Support-Towers
 
 #### 2.3 UI-Komponenten
-- [ ] **ModifierDisplay.tsx** - Aktive Modifier anzeigen
+- [x] **ModifierDisplay.tsx** - Aktive Modifier anzeigen
   - Icons für jeden Modifier-Typ
   - Dauer-Balken
   - Stacking-Anzahl
   - Tooltip mit Details
 
-- [ ] **TowerTooltip.tsx** - Modifier-Info erweitern
+- [x] **TowerTooltip.tsx** - Modifier-Info erweitern
   - Zeige welche Modifier der Tower anwendet
   - Zeige Stacking-Regeln
   - Zeige Caps
 
 #### 2.4 Testing & Balancing
-- [ ] Unit-Tests für ModifierManager
-- [ ] Integration-Tests für Stacking-Regeln
+- [x] Unit-Tests für ModifierManager
+- [x] Integration-Tests für Stacking-Regeln
 - [ ] Balance-Testing: Caps sind sinnvoll
 - [ ] Performance-Testing: Viele Modifier gleichzeitig
 
@@ -107,7 +107,7 @@ Basierend auf der erfolgreich abgeschlossenen GameController-Refaktorierung (69%
 
 ---
 
-## Sprint 3: Code-Qualität & Polish (Priorität: 🟡 WICHTIG)
+## Sprint 3: Code-Qualität & Polish (Priorität: 🟡 WICHTIG) - ✅ ABGESCHLOSSEN
 
 **Ziel:** Magic Numbers eliminieren, Debug-Gating, Log-Optimierung, Code-Cleanup.
 
@@ -116,29 +116,29 @@ Basierend auf der erfolgreich abgeschlossenen GameController-Refaktorierung (69%
 ### Aufgaben
 
 #### 3.1 Magic Numbers eliminieren
-- [ ] Durchsuche `src/game/systems/` nach Hardcoded-Werten
-- [ ] Durchsuche `src/game/entities/` nach Hardcoded-Werten
-- [ ] Verschiebe in `GAME_CONFIG` oder `constants.ts`
-- [ ] Erweitere Config-Validator
-- [ ] Teste: Validator grün, keine Regressions
+- [x] Durchsuche `src/game/systems/` nach Hardcoded-Werten
+- [x] Durchsuche `src/game/entities/` nach Hardcoded-Werten
+- [x] Verschiebe in `GAME_CONFIG` oder `constants.ts`
+- [x] Erweitere Config-Validator
+- [x] Teste: Validator grün, keine Regressions
 
 #### 3.2 Debug-Gating
-- [ ] Wrappe Debug-Panels: `{GAME_CONFIG.debug.enableDebugPanels && <DebugPanel />}`
-- [ ] Telemetry-UI nur in DEV
-- [ ] Performance-Overlays nur in DEV
-- [ ] Teste: PROD-Build zeigt keine Debug-UI
+- [x] Wrappe Debug-Panels: `{GAME_CONFIG.debug.enableDebugPanels && <DebugPanel />}`
+- [x] Telemetry-UI nur in DEV
+- [x] Performance-Overlays nur in DEV
+- [x] Teste: PROD-Build zeigt keine Debug-UI
 
 #### 3.3 Log-Optimierung
-- [ ] Logger-Wrapper mit Rate-Limiting erstellen
-- [ ] Performance-Logs nur in DEV
-- [ ] Console-Logs in PROD minimieren
-- [ ] Teste: PROD-Build hat minimale Logs
+- [x] Logger-Wrapper mit Rate-Limiting erstellen
+- [x] Performance-Logs nur in DEV
+- [x] Console-Logs in PROD minimieren
+- [x] Teste: PROD-Build hat minimale Logs
 
 #### 3.4 Code-Cleanup
-- [ ] Entferne `GameController.legacy.ts` (nach erfolgreicher Migration)
-- [ ] Entferne ungenutzte Imports
-- [ ] Formatiere Code (Prettier)
-- [ ] ESLint-Warnings beheben
+- [x] Entferne `GameController.legacy.ts` (nach erfolgreicher Migration)
+- [x] Entferne ungenutzte Imports
+- [x] Formatiere Code (Prettier)
+- [x] ESLint-Warnings beheben
 
 **Definition of Done:**
 - ✅ 0 Magic Numbers in Core-Systemen

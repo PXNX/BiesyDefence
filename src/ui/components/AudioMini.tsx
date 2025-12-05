@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
 
-const AudioMini = ({ muted, volume, onToggleMute, onVolumeChange }: {
+const AudioMini = ({
+  muted,
+  volume,
+  onToggleMute,
+  onVolumeChange,
+}: {
   muted: boolean;
   volume: number;
   onToggleMute: () => void;
   onVolumeChange: (vol: number) => void;
 }) => {
   const [isAdjusting, setIsAdjusting] = useState(false);
-  const sliderStyle = { '--volume-level': `${volume * 100}%` } as React.CSSProperties;
+  const sliderStyle = {
+    '--volume-level': `${volume * 100}%`,
+  } as React.CSSProperties;
 
   return (
     <div className="audio-mini">
@@ -24,7 +31,7 @@ const AudioMini = ({ muted, volume, onToggleMute, onVolumeChange }: {
         max="1"
         step="0.1"
         value={volume}
-        onChange={(e) => onVolumeChange(parseFloat(e.target.value))}
+        onChange={e => onVolumeChange(parseFloat(e.target.value))}
         onMouseDown={() => setIsAdjusting(true)}
         onMouseUp={() => setIsAdjusting(false)}
         onTouchStart={() => setIsAdjusting(true)}

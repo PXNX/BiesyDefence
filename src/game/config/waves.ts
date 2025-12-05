@@ -1,25 +1,31 @@
-import type { EnemyType, WaveSpawn } from '@/game/core/types'
+import type { EnemyType, WaveSpawn } from '@/game/core/types';
 
 interface WaveScheduleEntry {
-  type: EnemyType
-  count: number
-  firstDelay: number
-  interval: number
+  type: EnemyType;
+  count: number;
+  firstDelay: number;
+  interval: number;
 }
 
-const createSpawnQueue = (schedule: WaveScheduleEntry[], strengthMultiplier: number): WaveSpawn[] => {
-  const queue: WaveSpawn[] = []
-  schedule.forEach((entry) => {
-    const scaledCount = Math.max(1, Math.round(entry.count * strengthMultiplier))
+const createSpawnQueue = (
+  schedule: WaveScheduleEntry[],
+  strengthMultiplier: number
+): WaveSpawn[] => {
+  const queue: WaveSpawn[] = [];
+  schedule.forEach(entry => {
+    const scaledCount = Math.max(
+      1,
+      Math.round(entry.count * strengthMultiplier)
+    );
     for (let i = 0; i < scaledCount; i += 1) {
       queue.push({
         type: entry.type,
         delay: i === 0 ? entry.firstDelay : entry.interval,
-      })
+      });
     }
-  })
-  return queue
-}
+  });
+  return queue;
+};
 
 const waveTemplates: WaveScheduleEntry[][] = [
   // Phase A – Einstieg
@@ -159,13 +165,17 @@ const waveTemplates: WaveScheduleEntry[][] = [
     { type: 'armored_beetle', count: 6, firstDelay: 1.2, interval: 1.5 },
     { type: 'swarm', count: 16, firstDelay: 0.45, interval: 0.3 },
   ],
-]
+];
 
-export const buildWaveSchedules = (strengthMultiplier: number = 1): WaveSpawn[][] => {
-  return waveTemplates.map((template) => createSpawnQueue(template, strengthMultiplier))
-}
+export const buildWaveSchedules = (
+  strengthMultiplier: number = 1
+): WaveSpawn[][] => {
+  return waveTemplates.map(template =>
+    createSpawnQueue(template, strengthMultiplier)
+  );
+};
 
-export const WAVE_SCHEDULES: WaveSpawn[][] = buildWaveSchedules()
+export const WAVE_SCHEDULES: WaveSpawn[][] = buildWaveSchedules();
 
 // Chapter 2 Balance: Extended wave system with progressive difficulty phases
 // Phase 1 (Waves 1-3): Tutorial - Basic enemy types, low count

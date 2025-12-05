@@ -1,44 +1,44 @@
-import type { TowerProfile, TOWER_PROFILES } from '@/game/config/constants'
-import type { EnemyTag, TowerType } from '@/game/core/types'
+import type { TowerProfile, TOWER_PROFILES } from '@/game/config/constants';
+import type { EnemyTag, TowerType } from '@/game/core/types';
 
-export type BranchId = 'A' | 'B'
+export type BranchId = 'A' | 'B';
 
 export interface UpgradePerk {
-  id: string
-  name: string
-  description: string
-  cost: number
-  branch: BranchId
+  id: string;
+  name: string;
+  description: string;
+  cost: number;
+  branch: BranchId;
   effects: Partial<{
-    damageMult: number
-    fireRateMult: number
-    rangeAdd: number
-    splashRadiusAdd: number
-    splashFactorAdd: number
-    chainJumpsAdd: number
-    chainFalloffMult: number
-    slowMult: number
-    slowDurationAdd: number
-    dotDpsMult: number
-    dotDurationAdd: number
-    vulnerabilityAdd: number
-    critChance: number
-    critMultiplier: number
-    stunChance: number
-    stunDuration: number
-    markDuration: number
-    burnPuddle: boolean
-    onKillSplash: boolean
-    tagDamageBonus: Partial<Record<EnemyTag, number>>
-  }>
+    damageMult: number;
+    fireRateMult: number;
+    rangeAdd: number;
+    splashRadiusAdd: number;
+    splashFactorAdd: number;
+    chainJumpsAdd: number;
+    chainFalloffMult: number;
+    slowMult: number;
+    slowDurationAdd: number;
+    dotDpsMult: number;
+    dotDurationAdd: number;
+    vulnerabilityAdd: number;
+    critChance: number;
+    critMultiplier: number;
+    stunChance: number;
+    stunDuration: number;
+    markDuration: number;
+    burnPuddle: boolean;
+    onKillSplash: boolean;
+    tagDamageBonus: Partial<Record<EnemyTag, number>>;
+  }>;
 }
 
 export interface TowerUpgradePlan {
-  baseCosts: { level2: number; level3: number }
-  perks: UpgradePerk[]
+  baseCosts: { level2: number; level3: number };
+  perks: UpgradePerk[];
 }
 
-const pct = (value: number, pctValue: number) => value * pctValue
+const pct = (value: number, pctValue: number) => value * pctValue;
 
 export const TOWER_UPGRADES: Record<TowerType, TowerUpgradePlan> = {
   indica: {
@@ -47,15 +47,21 @@ export const TOWER_UPGRADES: Record<TowerType, TowerUpgradePlan> = {
       {
         id: 'indica-rupture-1',
         name: 'Rupture',
-        description: 'Mehr Splash, trifft Schw\u00e4rme besser und schw\u00e4cht Ziele.',
+        description:
+          'Mehr Splash, trifft Schw\u00e4rme besser und schw\u00e4cht Ziele.',
         branch: 'A',
         cost: 70,
-        effects: { splashRadiusAdd: 16, vulnerabilityAdd: 0.06, tagDamageBonus: { swarm: 0.08 } },
+        effects: {
+          splashRadiusAdd: 16,
+          vulnerabilityAdd: 0.06,
+          tagDamageBonus: { swarm: 0.08 },
+        },
       },
       {
         id: 'indica-rupture-2',
         name: 'Rupture+',
-        description: 'Stronger splash and vulnerability, tuned for swarm/armor.',
+        description:
+          'Stronger splash and vulnerability, tuned for swarm/armor.',
         branch: 'A',
         cost: 90,
         effects: {
@@ -102,7 +108,11 @@ export const TOWER_UPGRADES: Record<TowerType, TowerUpgradePlan> = {
         description: 'Mehr Pellets, etwas weniger Schaden, Splash-Faktor hoch.',
         branch: 'A',
         cost: 65,
-        effects: { damageMult: 0.88, splashFactorAdd: 0.18, tagDamageBonus: { swarm: 0.12 } },
+        effects: {
+          damageMult: 0.88,
+          splashFactorAdd: 0.18,
+          tagDamageBonus: { swarm: 0.12 },
+        },
       },
       {
         id: 'sativa-shrapnel-2',
@@ -110,7 +120,11 @@ export const TOWER_UPGRADES: Record<TowerType, TowerUpgradePlan> = {
         description: 'Noch mehr Pellets und Splash-Radius.',
         branch: 'A',
         cost: 85,
-        effects: { splashRadiusAdd: 10, splashFactorAdd: 0.24, tagDamageBonus: { swarm: 0.1 } },
+        effects: {
+          splashRadiusAdd: 10,
+          splashFactorAdd: 0.24,
+          tagDamageBonus: { swarm: 0.1 },
+        },
       },
       {
         id: 'sativa-focus-1',
@@ -132,7 +146,12 @@ export const TOWER_UPGRADES: Record<TowerType, TowerUpgradePlan> = {
         description: 'Krit-Chance und mehr Schaden.',
         branch: 'B',
         cost: 90,
-        effects: { damageMult: 1.1, critChance: 0.1, critMultiplier: 1.7, tagDamageBonus: { boss: 0.1 } },
+        effects: {
+          damageMult: 1.1,
+          critChance: 0.1,
+          critMultiplier: 1.7,
+          tagDamageBonus: { boss: 0.1 },
+        },
       },
     ],
   },
@@ -253,7 +272,11 @@ export const TOWER_UPGRADES: Record<TowerType, TowerUpgradePlan> = {
         description: 'Längere Burn-Dauer, Boden-DoT-Pfütze.',
         branch: 'A',
         cost: 80,
-        effects: { dotDurationAdd: 0.7, burnPuddle: true, tagDamageBonus: { swarm: 0.12, regenerator: 0.1 } },
+        effects: {
+          dotDurationAdd: 0.7,
+          burnPuddle: true,
+          tagDamageBonus: { swarm: 0.12, regenerator: 0.1 },
+        },
       },
       {
         id: 'flame-napalm-2',
@@ -261,7 +284,11 @@ export const TOWER_UPGRADES: Record<TowerType, TowerUpgradePlan> = {
         description: 'Mehr Burn-DPS und Dauer.',
         branch: 'A',
         cost: 100,
-        effects: { dotDpsMult: 1.15, dotDurationAdd: 0.6, tagDamageBonus: { swarm: 0.08, elite: 0.05 } },
+        effects: {
+          dotDpsMult: 1.15,
+          dotDurationAdd: 0.6,
+          tagDamageBonus: { swarm: 0.08, elite: 0.05 },
+        },
       },
       {
         id: 'flame-pressure-1',
@@ -283,7 +310,11 @@ export const TOWER_UPGRADES: Record<TowerType, TowerUpgradePlan> = {
         description: 'Periodischer Fireburst, mehr Burn-DPS.',
         branch: 'B',
         cost: 100,
-        effects: { damageMult: 1.1, dotDpsMult: 1.15, tagDamageBonus: { boss: 0.06, armored: 0.06 } },
+        effects: {
+          damageMult: 1.1,
+          dotDpsMult: 1.15,
+          tagDamageBonus: { boss: 0.06, armored: 0.06 },
+        },
       },
     ],
   },
@@ -347,12 +378,18 @@ export const TOWER_UPGRADES: Record<TowerType, TowerUpgradePlan> = {
       },
     ],
   },
-}
+};
 
-export const getBaseUpgradeCosts = (towerType: TowerType, profile: TowerProfile) => {
-  const plan = TOWER_UPGRADES[towerType]
+export const getBaseUpgradeCosts = (
+  towerType: TowerType,
+  profile: TowerProfile
+) => {
+  const plan = TOWER_UPGRADES[towerType];
   if (!plan) {
-    return { level2: Math.round(profile.cost * 1.5), level3: Math.round(profile.cost * 2.3) }
+    return {
+      level2: Math.round(profile.cost * 1.5),
+      level3: Math.round(profile.cost * 2.3),
+    };
   }
-  return plan.baseCosts
-}
+  return plan.baseCosts;
+};

@@ -7,7 +7,7 @@ import {
   TowerType,
   Vector2,
   Wave,
-} from '@/game/core/types'
+} from '@/game/core/types';
 import {
   CELL_SIZE,
   GRID_HEIGHT,
@@ -18,68 +18,73 @@ import {
   PATH_GRID_NODES,
   MapManager,
   TOWER_PROFILES,
-} from '@/game/config/constants'
-import { buildWaveSchedules } from '@/game/config/waves'
-import { createEntityId } from '@/game/utils/id'
-import type { PlayerProgress } from '@/game/progression/PlayerProgress'
+} from '@/game/config/constants';
+import { buildWaveSchedules } from '@/game/config/waves';
+import { createEntityId } from '@/game/utils/id';
+import type { PlayerProgress } from '@/game/progression/PlayerProgress';
 
-const gridKey = (x: number, y: number) => `${x}:${y}`
+const gridKey = (x: number, y: number) => `${x}:${y}`;
 
 const gridToWorld = (point: Vector2): Vector2 => {
   return {
     x: point.x * CELL_SIZE + CELL_SIZE / 2,
     y: point.y * CELL_SIZE + CELL_SIZE / 2,
-  }
-}
+  };
+};
 
 const buildPathGridKeys = (nodes: Vector2[]): Set<string> => {
-  const keys = new Set<string>()
+  const keys = new Set<string>();
   for (let i = 0; i < nodes.length - 1; i += 1) {
-    const start = nodes[i]
-    const end = nodes[i + 1]
-    const dx = Math.sign(end.x - start.x)
-    const dy = Math.sign(end.y - start.y)
-    const steps = Math.max(Math.abs(end.x - start.x), Math.abs(end.y - start.y))
+    const start = nodes[i];
+    const end = nodes[i + 1];
+    const dx = Math.sign(end.x - start.x);
+    const dy = Math.sign(end.y - start.y);
+    const steps = Math.max(
+      Math.abs(end.x - start.x),
+      Math.abs(end.y - start.y)
+    );
     for (let step = 0; step <= steps; step += 1) {
-      const x = start.x + dx * step
-      const y = start.y + dy * step
-      keys.add(gridKey(x, y))
+      const x = start.x + dx * step;
+      const y = start.y + dy * step;
+      keys.add(gridKey(x, y));
     }
   }
-  return keys
-}
+  return keys;
+};
 
-const INITIAL_TOWER_TYPES: TowerType[] = ['indica', 'sativa']
+const INITIAL_TOWER_TYPES: TowerType[] = ['indica', 'sativa'];
 
 const CARDINAL_OFFSETS = [
   { dx: -1, dy: 0 },
   { dx: 1, dy: 0 },
   { dx: 0, dy: -1 },
   { dx: 0, dy: 1 },
-]
+];
 
 const isAdjacentToPath = (tile: MapTile, map: MapData): boolean => {
   if (tile.type !== 'grass') {
-    return false
+    return false;
   }
 
   return CARDINAL_OFFSETS.some(({ dx, dy }) => {
-    const neighbor = map.tileLookup.get(gridKey(tile.grid.x + dx, tile.grid.y + dy))
-    return neighbor?.type === 'path'
-  })
-}
+    const neighbor = map.tileLookup.get(
+      gridKey(tile.grid.x + dx, tile.grid.y + dy)
+    );
+    return neighbor?.type === 'path';
+  });
+};
 
 const collectPathAdjacentTiles = (map: MapData): MapTile[] =>
-  map.tiles.filter((tile) => isAdjacentToPath(tile, map))
+  map.tiles.filter(tile => isAdjacentToPath(tile, map));
 
 const buildMap = (pathNodes: Vector2[]): MapData => {
-  const pathGrid = buildPathGridKeys(PATH_GRID_NODES)
-  const tiles: MapTile[] = []
-  const tileLookup = new Map<string, MapTile>()
+  const pathGrid = buildPathGridKeys(PATH_GRID_NODES);
+  const tiles: MapTile[] = [];
+  const tileLookup = new Map<string, MapTile>();
   for (let y = 0; y < GRID_HEIGHT; y += 1) {
     for (let x = 0; x < GRID_WIDTH; x += 1) {
-      const key = gridKey(x, y)
-      const type: TileType = pathGrid.has(key) ? 'path' : 'grass'
+      const key = gridKey(x, y);
+      const type: TileType = pathGrid.has(key) ? 'path' : 'grass';
       const tile = {
         grid: { x, y },
         center: {
@@ -88,9 +93,9 @@ const buildMap = (pathNodes: Vector2[]): MapData => {
         },
         type,
         key,
-      }
-      tiles.push(tile)
-      tileLookup.set(key, tile)
+      };
+      tiles.push(tile);
+      tileLookup.set(key, tile);
     }
   }
 
@@ -104,61 +109,68 @@ const buildMap = (pathNodes: Vector2[]): MapData => {
     tileLookup,
     pathNodes,
     pathGridKeys: pathGrid,
-  }
-}
+  };
+};
 
 const buildWaves = (strengthMultiplier: number): Wave[] => {
-  const waveSchedules = buildWaveSchedules(strengthMultiplier)
+  const waveSchedules = buildWaveSchedules(strengthMultiplier);
   return waveSchedules.map((spawnQueue, index) => ({
     id: index,
     spawnQueue,
     timer: 0,
     nextIndex: 0,
     finished: false,
-  }))
-}
+  }));
+};
 
-const findPlacementTile = (map: MapData, anchor: Vector2): MapTile | undefined => {
-  const clamp = (value: number, max: number) => Math.min(Math.max(0, value), max - 1)
-  const maxRadius = 4
+const findPlacementTile = (
+  map: MapData,
+  anchor: Vector2
+): MapTile | undefined => {
+  const clamp = (value: number, max: number) =>
+    Math.min(Math.max(0, value), max - 1);
+  const maxRadius = 4;
 
   for (let radius = 0; radius <= maxRadius; radius += 1) {
     for (let dx = -radius; dx <= radius; dx += 1) {
       for (let dy = -radius; dy <= radius; dy += 1) {
-        const gridX = clamp(anchor.x + dx, map.width)
-        const gridY = clamp(anchor.y + dy, map.height)
-        const tile = map.tileLookup.get(`${gridX}:${gridY}`)
+        const gridX = clamp(anchor.x + dx, map.width);
+        const gridY = clamp(anchor.y + dy, map.height);
+        const tile = map.tileLookup.get(`${gridX}:${gridY}`);
         if (tile && tile.type === 'grass') {
-          return tile
+          return tile;
         }
       }
     }
   }
 
-  return map.tiles.find((tile) => tile.type === 'grass')
-}
+  return map.tiles.find(tile => tile.type === 'grass');
+};
 
 const createInitialTowers = (map: MapData): Tower[] => {
-  const towers: Tower[] = []
-  const availableTiles = collectPathAdjacentTiles(map)
+  const towers: Tower[] = [];
+  const availableTiles = collectPathAdjacentTiles(map);
 
-  INITIAL_TOWER_TYPES.forEach((type) => {
-    const profile = TOWER_PROFILES[type]
-    let tile: MapTile | undefined
+  INITIAL_TOWER_TYPES.forEach(type => {
+    const profile = TOWER_PROFILES[type];
+    let tile: MapTile | undefined;
 
     if (availableTiles.length > 0) {
-      const index = Math.floor(Math.random() * availableTiles.length)
-      tile = availableTiles.splice(index, 1)[0]
+      const index = Math.floor(Math.random() * availableTiles.length);
+      tile = availableTiles.splice(index, 1)[0];
     }
 
     if (!tile && PATH_GRID_NODES.length > 0) {
-      const anchor = PATH_GRID_NODES[Math.floor(Math.random() * PATH_GRID_NODES.length)]
-      tile = findPlacementTile(map, anchor)
+      const anchor =
+        PATH_GRID_NODES[Math.floor(Math.random() * PATH_GRID_NODES.length)];
+      tile = findPlacementTile(map, anchor);
     }
 
     if (!tile) {
-      console.warn(`Unable to place initial ${type} tower, skipping placement.`)
-      return
+      console.warn(
+        `Unable to place initial ${type} tower, skipping placement.`
+      );
+      return;
     }
 
     towers.push({
@@ -176,52 +188,61 @@ const createInitialTowers = (map: MapData): Tower[] => {
       damageType: profile.damageType,
       splashRadius: profile.splashRadius,
       slow: profile.slow,
-      dot: profile.dot ? { ...profile.dot, damageType: profile.dot.damageType ?? 'dot' } : undefined,
+      dot: profile.dot
+        ? { ...profile.dot, damageType: profile.dot.damageType ?? 'dot' }
+        : undefined,
       vulnerabilityDebuff: profile.vulnerabilityDebuff,
       splashFactor: profile.splashFactor,
       level: 1,
+      kills: 0,
+      damageDealt: 0,
+      perks: [],
       chainJumps: profile.chainJumps,
       chainFalloff: profile.chainFalloff,
       upgradeState: { level: 1, branch: undefined, perks: [] },
-    })
-  })
+    });
+  });
 
-  return towers
-}
+  return towers;
+};
 
 // Chapter 6 Future Expansion: Enhanced state creation with map and difficulty support
 export const createInitialState = (options?: {
-  mapId?: string
-  difficulty?: 'easy' | 'normal' | 'hard'
-  useNewSystem?: boolean
+  mapId?: string;
+  difficulty?: 'easy' | 'normal' | 'hard';
+  useNewSystem?: boolean;
 }): GameState => {
-  const mapManager = MapManager.getInstance()
-  const mapId = options?.mapId ?? mapManager.getRandomMapId()
-  const difficulty = options?.difficulty ?? 'normal'
-  mapManager.setDifficulty(difficulty)
+  const mapManager = MapManager.getInstance();
+  const mapId = options?.mapId ?? mapManager.getRandomMapId();
+  const difficulty = options?.difficulty ?? 'normal';
+  mapManager.setDifficulty(difficulty);
 
-  let mapData: MapData
+  let mapData: MapData;
   try {
-    mapData = mapManager.loadMap(mapId, difficulty)
+    mapData = mapManager.loadMap(mapId, difficulty);
   } catch (error) {
-    console.warn(`Failed to load map '${mapId}', falling back to legacy layout:`, error)
-  const legacyPathNodes = PATH_GRID_NODES.map(gridToWorld)
-    mapData = buildMap(legacyPathNodes)
+    console.warn(
+      `Failed to load map '${mapId}', falling back to legacy layout:`,
+      error
+    );
+    const legacyPathNodes = PATH_GRID_NODES.map(gridToWorld);
+    mapData = buildMap(legacyPathNodes);
   }
 
-  const difficultyConfig = mapManager.getCurrentDifficultyConfig()
+  const difficultyConfig = mapManager.getCurrentDifficultyConfig();
   const initialResources = mapManager.applyDifficultyModifiers({
     initialMoney: difficultyConfig.initialMoney ?? INITIAL_MONEY,
     initialLives: difficultyConfig.initialLives,
-  })
+  });
 
-  const initialTowers = createInitialTowers(mapData)
+  const initialTowers = createInitialTowers(mapData);
 
-  const pathsWorld = mapData.paths?.map((p) => p.map(gridToWorld))
-  const primaryPath = pathsWorld?.[0] ?? mapData.pathNodes.map(gridToWorld)
+  const pathsWorld = mapData.paths?.map(p => p.map(gridToWorld));
+  const primaryPath = pathsWorld?.[0] ?? mapData.pathNodes.map(gridToWorld);
 
-  const spawnPoints = (mapData.spawnPoints ?? [mapData.pathNodes[0]])
-    .map(gridToWorld)
+  const spawnPoints = (mapData.spawnPoints ?? [mapData.pathNodes[0]]).map(
+    gridToWorld
+  );
 
   return {
     map: {
@@ -245,45 +266,47 @@ export const createInitialState = (options?: {
     status: 'idle',
     wavePhase: 'idle',
     particles: [],
-  }
-}
+  };
+};
 
 // Chapter 6 Future Expansion: Enhanced state creation with progress integration
-export const createProgressAwareState = (playerProgress?: {
-  preferredDifficulty?: 'easy' | 'normal' | 'hard'
-  unlockedMaps?: string[]
-} | PlayerProgress): GameState => {
+export const createProgressAwareState = (
+  playerProgress?:
+    | {
+      preferredDifficulty?: 'easy' | 'normal' | 'hard';
+      unlockedMaps?: string[];
+    }
+    | PlayerProgress
+): GameState => {
   // Determine map and difficulty from progress
   const preferredDifficulty =
     (playerProgress as any)?.preferredDifficulty ||
     (playerProgress as any)?.settings?.preferredDifficulty ||
-    'normal'
-  const unlockedMaps =
-    (playerProgress as any)?.unlockedMaps ||
-    (playerProgress as any)?.mapsUnlocked ||
-    ['default']
-  const selectedMap = unlockedMaps[0] || 'default'
-  
+    'normal';
+  const unlockedMaps = (playerProgress as any)?.unlockedMaps ||
+    (playerProgress as any)?.mapsUnlocked || ['default'];
+  const selectedMap = unlockedMaps[0] || 'default';
+
   return createInitialState({
     mapId: selectedMap,
     difficulty: preferredDifficulty,
     useNewSystem: true,
-  })
-}
+  });
+};
 
 // Chapter 6 Future Expansion: Difficulty-aware resource adjustment
 export const adjustResourcesForDifficulty = (
   baseResources: { money: number; lives: number },
   difficulty: 'easy' | 'normal' | 'hard'
 ): { money: number; lives: number } => {
-  const mapManager = MapManager.getInstance()
-  mapManager.setDifficulty(difficulty)
+  const mapManager = MapManager.getInstance();
+  mapManager.setDifficulty(difficulty);
   const adjusted = mapManager.applyDifficultyModifiers({
     initialMoney: baseResources.money,
     initialLives: baseResources.lives,
-  })
+  });
   return {
     money: adjusted.initialMoney,
     lives: adjusted.initialLives,
-  }
-}
+  };
+};

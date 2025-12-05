@@ -1,9 +1,13 @@
-import { selectResources, selectWave, selectStatus } from '@/game/store/selectors'
+import {
+  selectResources,
+  selectWave,
+  selectStatus,
+} from '@/game/store/selectors';
 
 export function HUD() {
-  const { money, lives, score } = selectResources()
-  const wave = selectWave()
-  const status = selectStatus()
+  const { money, lives, score } = selectResources();
+  const wave = selectWave();
+  const status = selectStatus();
 
   return (
     <div className="hud-bar" role="status" aria-label="Game HUD">
@@ -73,5 +77,5 @@ export function HUD() {
         .status-chip.won { background: rgba(248, 113, 113, 0.18); color: #f87171; }
       `}</style>
     </div>
-  )
+  );
 }

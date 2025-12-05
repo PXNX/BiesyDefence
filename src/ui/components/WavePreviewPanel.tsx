@@ -1,11 +1,11 @@
-import type { WavePreviewEntry } from '@/game/core/types'
+import type { WavePreviewEntry } from '@/game/core/types';
 
 interface WavePreviewPanelProps {
-  preview: WavePreviewEntry[]
+  preview: WavePreviewEntry[];
 }
 
 export function WavePreviewPanel({ preview }: WavePreviewPanelProps) {
-  if (!preview || preview.length === 0) return null
+  if (!preview || preview.length === 0) return null;
 
   return (
     <section className="wave-preview-panel" aria-label="Upcoming waves">
@@ -14,16 +14,18 @@ export function WavePreviewPanel({ preview }: WavePreviewPanelProps) {
         <strong>Wave Intel</strong>
       </header>
       <div className="wave-preview-grid">
-        {preview.map((entry) => (
+        {preview.map(entry => (
           <article key={entry.waveNumber} className="wave-preview-card">
             <div className="wave-row">
               <span className="wave-label">Wave {entry.waveNumber}</span>
               {entry.warnings.length > 0 && (
-                <span className="warning-text">{entry.warnings.join(' · ')}</span>
+                <span className="warning-text">
+                  {entry.warnings.join(' · ')}
+                </span>
               )}
             </div>
             <ul className="composition-list">
-              {entry.composition.map((comp) => (
+              {entry.composition.map(comp => (
                 <li key={comp.type} className="composition-item">
                   <span className="type">{comp.type}</span>
                   <span className="count">×{comp.count}</span>
@@ -113,5 +115,5 @@ export function WavePreviewPanel({ preview }: WavePreviewPanelProps) {
         }
       `}</style>
     </section>
-  )
+  );
 }

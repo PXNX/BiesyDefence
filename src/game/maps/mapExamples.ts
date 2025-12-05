@@ -1,4 +1,4 @@
-import type { MapConfiguration } from '@/game/maps/MapConfiguration'
+import type { MapConfiguration } from '@/game/maps/MapConfiguration';
 
 /**
  * Example map configurations for future expansion
@@ -9,7 +9,8 @@ export const exampleMaps: MapConfiguration[] = [
   {
     id: 'misty_meadows',
     name: 'Misty Meadows',
-    description: 'A challenging map with fog effects that reduce visibility. Perfect for experienced players who enjoy complex pathing.',
+    description:
+      'A challenging map with fog effects that reduce visibility. Perfect for experienced players who enjoy complex pathing.',
     width: 14,
     height: 10,
     cellSize: 65,
@@ -43,7 +44,8 @@ export const exampleMaps: MapConfiguration[] = [
   {
     id: 'tight_terraces',
     name: 'Terraced Gardens',
-    description: 'Narrow paths with limited tower placement opportunities. Requires careful strategic planning and efficient tower usage.',
+    description:
+      'Narrow paths with limited tower placement opportunities. Requires careful strategic planning and efficient tower usage.',
     width: 10,
     height: 12,
     cellSize: 60,
@@ -77,7 +79,8 @@ export const exampleMaps: MapConfiguration[] = [
   {
     id: 'circular_garden',
     name: 'Circular Sanctuary',
-    description: 'A unique circular layout that challenges traditional tower placement strategies. The path spirals toward the center.',
+    description:
+      'A unique circular layout that challenges traditional tower placement strategies. The path spirals toward the center.',
     width: 16,
     height: 12,
     cellSize: 55,
@@ -108,7 +111,7 @@ export const exampleMaps: MapConfiguration[] = [
       tags: ['unique', 'circular', 'advanced'],
     },
   },
-]
+];
 
 /**
  * Example maps for different cultural themes
@@ -119,7 +122,8 @@ export const alternativeThemeMaps: MapConfiguration[] = [
   {
     id: 'herb_garden_safe',
     name: 'Herb Garden',
-    description: 'A peaceful garden setting focusing on aromatic herbs and natural wellness. Perfect for broader market appeal.',
+    description:
+      'A peaceful garden setting focusing on aromatic herbs and natural wellness. Perfect for broader market appeal.',
     width: 12,
     height: 8,
     cellSize: 70,
@@ -147,7 +151,8 @@ export const alternativeThemeMaps: MapConfiguration[] = [
   {
     id: 'laboratory_safe',
     name: 'Research Facility',
-    description: 'A futuristic laboratory setting where players defend against robotic threats. Tech-focused theme for broader appeal.',
+    description:
+      'A futuristic laboratory setting where players defend against robotic threats. Tech-focused theme for broader appeal.',
     width: 12,
     height: 8,
     cellSize: 70,
@@ -172,9 +177,9 @@ export const alternativeThemeMaps: MapConfiguration[] = [
       tags: ['beginner', 'alternative_theme', 'scifi'],
     },
   },
-]
+];
 
 /**
  * Export all example maps
  */
-export const allExampleMaps = [...exampleMaps, ...alternativeThemeMaps]
+export const allExampleMaps = [...exampleMaps, ...alternativeThemeMaps];

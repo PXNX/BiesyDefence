@@ -1,33 +1,44 @@
-import type { Particle, Vector2 } from '@/game/core/types'
-import { createEntityId } from '@/game/utils/id'
-import { normalize } from '@/game/utils/math'
+import type { Particle, Vector2 } from '@/game/core/types';
+import { createEntityId } from '@/game/utils/id';
+import { normalize } from '@/game/utils/math';
 
-const randomBetween = (min: number, max: number): number => Math.random() * (max - min) + min
+const randomBetween = (min: number, max: number): number =>
+  Math.random() * (max - min) + min;
 const randomUnit = (): Vector2 => {
-  const angle = Math.random() * Math.PI * 2
-  return { x: Math.cos(angle), y: Math.sin(angle) }
-}
+  const angle = Math.random() * Math.PI * 2;
+  return { x: Math.cos(angle), y: Math.sin(angle) };
+};
 
-export const createImpactParticles = (position: Vector2, color: string): Particle[] => {
-  const samples = 6
-  const particles: Particle[] = []
+export const createImpactParticles = (
+  position: Vector2,
+  color: string
+): Particle[] => {
+  const samples = 6;
+  const particles: Particle[] = [];
   for (let i = 0; i < samples; i += 1) {
-    const velocity = normalize(randomUnit())
+    const velocity = normalize(randomUnit());
     particles.push({
       id: createEntityId('particle'),
       position: { ...position },
-      velocity: { x: velocity.x * randomBetween(40, 70), y: velocity.y * randomBetween(40, 70) },
+      velocity: {
+        x: velocity.x * randomBetween(40, 70),
+        y: velocity.y * randomBetween(40, 70),
+      },
       radius: randomBetween(3, 6),
       life: randomBetween(0.4, 0.7),
       maxLife: 0.7,
       color,
       kind: 'hit',
-    })
+    });
   }
-  return particles
-}
+  return particles;
+};
 
-export const createHitMarker = (position: Vector2, color: string, value?: number): Particle => ({
+export const createHitMarker = (
+  position: Vector2,
+  color: string,
+  value?: number
+): Particle => ({
   id: createEntityId('particle'),
   position: { ...position },
   velocity: { x: 0, y: -40 },
@@ -37,7 +48,7 @@ export const createHitMarker = (position: Vector2, color: string, value?: number
   color,
   kind: 'damage',
   value,
-})
+});
 
 export const createImpactSparkSprite = (position: Vector2): Particle => ({
   id: createEntityId('particle'),
@@ -56,9 +67,12 @@ export const createImpactSparkSprite = (position: Vector2): Particle => ({
   additive: true,
   baseAlpha: 0.85,
   freezeFrame: true,
-})
+});
 
-export const createDamageImpactOverlay = (position: Vector2, damageType: string): Particle | null => {
+export const createDamageImpactOverlay = (
+  position: Vector2,
+  damageType: string
+): Particle | null => {
   const keyMap: Record<string, { key: any; size?: number; alpha?: number }> = {
     chain: { key: 'effect-explosion-electric', size: 72, alpha: 0.65 },
     electric: { key: 'effect-explosion-electric', size: 72, alpha: 0.65 },
@@ -69,9 +83,9 @@ export const createDamageImpactOverlay = (position: Vector2, damageType: string)
     dot: { key: 'effect-poison-impact', size: 64, alpha: 0.55 },
     poison: { key: 'effect-poison-impact', size: 64, alpha: 0.55 },
     control: { key: 'effect-freeze-impact', size: 64, alpha: 0.5 },
-  }
-  const mapped = keyMap[damageType]
-  if (!mapped) return null
+  };
+  const mapped = keyMap[damageType];
+  if (!mapped) return null;
   return {
     id: createEntityId('particle'),
     position: { ...position },
@@ -88,10 +102,13 @@ export const createDamageImpactOverlay = (position: Vector2, damageType: string)
     additive: true,
     baseAlpha: mapped.alpha ?? 0.6,
     freezeFrame: true,
-  }
-}
+  };
+};
 
-export const createSplashIndicatorParticle = (position: Vector2, radius: number): Particle => ({
+export const createSplashIndicatorParticle = (
+  position: Vector2,
+  radius: number
+): Particle => ({
   id: createEntityId('particle'),
   position: { ...position },
   velocity: { x: 0, y: 0 },
@@ -106,7 +123,7 @@ export const createSplashIndicatorParticle = (position: Vector2, radius: number)
   sizeWorld: Math.max(32, radius * 2.2),
   additive: true,
   baseAlpha: 0.6,
-})
+});
 
 export const createMuzzleParticles = (
   towerPosition: Vector2,
@@ -116,13 +133,13 @@ export const createMuzzleParticles = (
   const direction = normalize({
     x: targetPosition.x - towerPosition.x,
     y: targetPosition.y - towerPosition.y,
-  })
+  });
 
   return Array.from({ length: 4 }, () => {
     const jitter = normalize({
       x: direction.x + randomBetween(-0.25, 0.25),
       y: direction.y + randomBetween(-0.25, 0.25),
-    })
+    });
 
     return {
       id: createEntityId('particle'),
@@ -135,9 +152,9 @@ export const createMuzzleParticles = (
       life: randomBetween(0.12, 0.3),
       maxLife: 0.3,
       color,
-    }
-  })
-}
+    };
+  });
+};
 
 export const createRingEffect = (
   position: Vector2,
@@ -156,28 +173,39 @@ export const createRingEffect = (
   additive: true,
   baseAlpha: alpha,
   sizeWorld: Math.max(32, radiusWorld * 2),
-})
+});
 
-export const createSparkBurst = (position: Vector2, color: string, count = 8): Particle[] => {
-  const out: Particle[] = []
+export const createSparkBurst = (
+  position: Vector2,
+  color: string,
+  count = 8
+): Particle[] => {
+  const out: Particle[] = [];
   for (let i = 0; i < count; i += 1) {
-    const v = normalize(randomUnit())
+    const v = normalize(randomUnit());
     out.push({
       id: createEntityId('particle'),
       position: { ...position },
-      velocity: { x: v.x * randomBetween(120, 180), y: v.y * randomBetween(120, 180) },
+      velocity: {
+        x: v.x * randomBetween(120, 180),
+        y: v.y * randomBetween(120, 180),
+      },
       radius: randomBetween(3, 6),
       life: randomBetween(0.25, 0.45),
       maxLife: 0.45,
       color,
       additive: true,
       baseAlpha: 0.9,
-    })
+    });
   }
-  return out
-}
+  return out;
+};
 
-export const createPuddleEffect = (position: Vector2, color: string, radius = 38): Particle[] => [
+export const createPuddleEffect = (
+  position: Vector2,
+  color: string,
+  radius = 38
+): Particle[] => [
   createRingEffect(position, radius, color, 1.2, 0.45),
   {
     id: createEntityId('particle'),
@@ -189,7 +217,7 @@ export const createPuddleEffect = (position: Vector2, color: string, radius = 38
     color,
     baseAlpha: 0.28,
   },
-]
+];
 
 export const createWeakpointMarker = (position: Vector2): Particle[] => [
   createRingEffect(position, 24, 'rgba(255,90,90,0.9)', 0.5, 0.85),
@@ -204,7 +232,7 @@ export const createWeakpointMarker = (position: Vector2): Particle[] => [
     additive: true,
     baseAlpha: 0.9,
   },
-]
+];
 
 export const createCritMarker = (position: Vector2): Particle => ({
   id: createEntityId('particle'),
@@ -219,7 +247,7 @@ export const createCritMarker = (position: Vector2): Particle => ({
   size: 36,
   additive: true,
   baseAlpha: 0.95,
-})
+});
 
 export const createDotMarker = (position: Vector2): Particle => ({
   id: createEntityId('particle'),
@@ -234,7 +262,7 @@ export const createDotMarker = (position: Vector2): Particle => ({
   size: 32,
   additive: true,
   baseAlpha: 0.9,
-})
+});
 
 export const createChainArcImpact = (position: Vector2): Particle => ({
   id: createEntityId('particle'),
@@ -252,7 +280,7 @@ export const createChainArcImpact = (position: Vector2): Particle => ({
   size: 72,
   additive: true,
   baseAlpha: 0.85,
-})
+});
 
 export const createStormImpact = (position: Vector2): Particle => ({
   id: createEntityId('particle'),
@@ -270,9 +298,12 @@ export const createStormImpact = (position: Vector2): Particle => ({
   size: 80,
   additive: true,
   baseAlpha: 0.85,
-})
+});
 
-export const createNapalmPuddle = (position: Vector2, radius = 48): Particle[] => [
+export const createNapalmPuddle = (
+  position: Vector2,
+  radius = 48
+): Particle[] => [
   createRingEffect(position, radius, 'rgba(255,132,79,0.35)', 1.4, 0.6),
   {
     id: createEntityId('particle'),
@@ -288,7 +319,7 @@ export const createNapalmPuddle = (position: Vector2, radius = 48): Particle[] =
     additive: false,
     baseAlpha: 0.28,
   },
-]
+];
 
 export const createFireTrail = (position: Vector2, radius = 32): Particle[] => [
   createRingEffect(position, radius, 'rgba(255,180,120,0.4)', 0.8, 0.6),
@@ -306,9 +337,12 @@ export const createFireTrail = (position: Vector2, radius = 32): Particle[] => [
     additive: true,
     baseAlpha: 0.7,
   },
-]
+];
 
-export const createShrapnelImpact = (position: Vector2, radius = 42): Particle[] => [
+export const createShrapnelImpact = (
+  position: Vector2,
+  radius = 42
+): Particle[] => [
   createRingEffect(position, radius, 'rgba(255,248,180,0.55)', 0.6, 0.75),
   {
     id: createEntityId('particle'),
@@ -327,7 +361,7 @@ export const createShrapnelImpact = (position: Vector2, radius = 42): Particle[]
     additive: true,
     baseAlpha: 0.85,
   },
-]
+];
 
 export const createCryoRing = (position: Vector2, radius = 40): Particle => ({
   id: createEntityId('particle'),
@@ -345,7 +379,7 @@ export const createCryoRing = (position: Vector2, radius = 40): Particle => ({
   sizeWorld: radius * 2,
   additive: true,
   baseAlpha: 0.9,
-})
+});
 
 export const createToxinCloud = (position: Vector2, radius = 42): Particle => ({
   id: createEntityId('particle'),
@@ -363,4 +397,4 @@ export const createToxinCloud = (position: Vector2, radius = 42): Particle => ({
   sizeWorld: radius * 2,
   additive: true,
   baseAlpha: 0.75,
-})
+});

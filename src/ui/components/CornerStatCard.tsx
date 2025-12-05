@@ -19,7 +19,7 @@ const CornerStatCard = ({
   critical = false,
   trend = 'neutral',
   className = '',
-  useFixedPosition = true
+  useFixedPosition = true,
 }: CornerStatCardProps) => {
   const [previousValue, setPreviousValue] = useState(value);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -38,16 +38,19 @@ const CornerStatCard = ({
 
   const positionClasses = {
     'top-left': 'corner-card top-left',
-    'top-right': 'corner-card top-right', 
+    'top-right': 'corner-card top-right',
     'bottom-left': 'corner-card bottom-left',
-    'bottom-right': 'corner-card bottom-right'
+    'bottom-right': 'corner-card bottom-right',
   };
 
   const getTrendIcon = () => {
     switch (trend) {
-      case 'up': return '↗️';
-      case 'down': return '↘️';
-      default: return '';
+      case 'up':
+        return '↗️';
+      case 'down':
+        return '↘️';
+      default:
+        return '';
     }
   };
 
@@ -79,9 +82,7 @@ const CornerStatCard = ({
             </span>
           )}
         </div>
-        <div className="corner-stat-label">
-          {label}
-        </div>
+        <div className="corner-stat-label">{label}</div>
       </div>
       <style>{`
         .corner-stat-card {

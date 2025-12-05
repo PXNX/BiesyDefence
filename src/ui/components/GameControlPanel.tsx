@@ -1,17 +1,21 @@
-import React from 'react'
-import { SpeedChips } from './SpeedChips'
-import { PauseButton } from './PauseButton'
-import { AudioMini } from './AudioMini'
-import type { AudioConfig } from '@/game/audio/AudioManager'
-import { selectGameSpeed, selectIsPaused, selectHoverTower } from '@/game/store/selectors'
+import React from 'react';
+import { SpeedChips } from './SpeedChips';
+import { PauseButton } from './PauseButton';
+import { AudioMini } from './AudioMini';
+import type { AudioConfig } from '@/game/audio/AudioManager';
+import {
+  selectGameSpeed,
+  selectIsPaused,
+  selectHoverTower,
+} from '@/game/store/selectors';
 
 interface GameControlPanelProps {
-  onSpeedChange: (speed: number) => void
-  onPauseToggle: () => void
-  audioConfig: AudioConfig
-  onToggleMute: () => void
-  onMasterVolumeChange: (volume: number) => void
-  t: (key: string, fallback: string) => string
+  onSpeedChange: (speed: number) => void;
+  onPauseToggle: () => void;
+  audioConfig: AudioConfig;
+  onToggleMute: () => void;
+  onMasterVolumeChange: (volume: number) => void;
+  t: (key: string, fallback: string) => string;
 }
 
 const GameControlPanel = ({
@@ -22,12 +26,16 @@ const GameControlPanel = ({
   onMasterVolumeChange,
   t,
 }: GameControlPanelProps) => {
-  const speed = selectGameSpeed()
-  const isPaused = selectIsPaused()
-  const hoverTower = selectHoverTower()
+  const speed = selectGameSpeed();
+  const isPaused = selectIsPaused();
+  const hoverTower = selectHoverTower();
 
   return (
-    <div className="game-control-panel" role="toolbar" aria-label="Game Controls">
+    <div
+      className="game-control-panel"
+      role="toolbar"
+      aria-label="Game Controls"
+    >
       <div className="control-row control-row-single">
         <div className="control-section">
           <SpeedChips speed={speed} onChange={onSpeedChange} />
@@ -40,9 +48,15 @@ const GameControlPanel = ({
             type="button"
             className={`audio-toggle-only ${audioConfig.muted ? 'muted' : ''}`}
             onClick={onToggleMute}
-            aria-label={audioConfig.muted ? t('controls.unmute', 'Unmute audio') : t('controls.mute', 'Mute audio')}
+            aria-label={
+              audioConfig.muted
+                ? t('controls.unmute', 'Unmute audio')
+                : t('controls.mute', 'Mute audio')
+            }
           >
-            {audioConfig.muted ? t('controls.mute', 'Mute') : t('controls.sound', 'Sound')}
+            {audioConfig.muted
+              ? t('controls.mute', 'Mute')
+              : t('controls.sound', 'Sound')}
           </button>
           <AudioMini
             muted={audioConfig.muted}
@@ -307,7 +321,7 @@ const GameControlPanel = ({
         }
       `}</style>
     </div>
-  )
-}
+  );
+};
 
-export { GameControlPanel }
+export { GameControlPanel };

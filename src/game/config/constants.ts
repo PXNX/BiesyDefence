@@ -1,18 +1,18 @@
-import type { TowerType } from '@/game/core/types'
+import type { TowerType } from '@/game/core/types';
 
 // Chapter 6 Future Expansion: Map Configuration Integration
 // These constants now work with the MapManager system for forward compatibility
-import { MapManager } from '@/game/maps/MapManager'
+import { MapManager } from '@/game/maps/MapManager';
 
-export const GRID_WIDTH = 45
-export const GRID_HEIGHT = 30
-export const CELL_SIZE = 48
+export const GRID_WIDTH = 45;
+export const GRID_HEIGHT = 30;
+export const CELL_SIZE = 48;
 
 // Chapter 3 Balance: Early economy relief
 // Increase starting money to enable build diversity and reduce death spiral risk
-export const INITIAL_MONEY = 200
-export const INITIAL_LIVES = 20
-export const INITIAL_SCORE = 0
+export const INITIAL_MONEY = 200;
+export const INITIAL_LIVES = 20;
+export const INITIAL_SCORE = 0;
 
 export const PATH_GRID_NODES = [
   { x: 0, y: 14 },
@@ -25,37 +25,37 @@ export const PATH_GRID_NODES = [
   { x: 38, y: 10 },
   { x: 38, y: 24 },
   { x: 44, y: 24 },
-]
+];
 
 export interface TowerProfile {
-  name: string
-  description: string
-  range: number
-  fireRate: number
-  damage: number
-  projectileSpeed: number
-  cost: number
-  color: string
-  damageType: 'impact' | 'volley' | 'control' | 'pierce' | 'chain' | 'burn'
-  splashRadius?: number
-  splashFactor?: number
+  name: string;
+  description: string;
+  range: number;
+  fireRate: number;
+  damage: number;
+  projectileSpeed: number;
+  cost: number;
+  color: string;
+  damageType: 'impact' | 'volley' | 'control' | 'pierce' | 'chain' | 'burn';
+  splashRadius?: number;
+  splashFactor?: number;
   slow?: {
-    multiplier: number
-    duration: number
-  }
+    multiplier: number;
+    duration: number;
+  };
   dot?: {
-    dps: number
-    duration: number
-    damageType?: 'dot' | 'control' | 'burn'
-  }
+    dps: number;
+    duration: number;
+    damageType?: 'dot' | 'control' | 'burn';
+  };
   vulnerabilityDebuff?: {
-    amount: number
-    duration: number
-  }
-  chainJumps?: number
-  chainFalloff?: number
-  critChance?: number
-  critMultiplier?: number
+    amount: number;
+    duration: number;
+  };
+  chainJumps?: number;
+  chainFalloff?: number;
+  critChance?: number;
+  critMultiplier?: number;
 }
 
 // Chapter 2 Balance: TOWER-ROLE & ROLE DIFFERENTIATION
@@ -67,7 +67,8 @@ export interface TowerProfile {
 export const TOWER_PROFILES: Record<TowerType, TowerProfile> = {
   indica: {
     name: 'Indica Tower',
-    description: 'Single-Target-Hard-Hit: Heavy rounds for focused elimination.',
+    description:
+      'Single-Target-Hard-Hit: Heavy rounds for focused elimination.',
     range: 142,
     fireRate: 1.25,
     damage: 32,
@@ -157,7 +158,7 @@ export const TOWER_PROFILES: Record<TowerType, TowerProfile> = {
     chainJumps: 2,
     chainFalloff: 0.75,
   },
-}
+};
 
 // Chapter 6 Future Expansion: Backward Compatibility Functions
 // These functions ensure existing code continues to work while integrating new systems
@@ -174,7 +175,7 @@ export function getCurrentMapConfig() {
     pathNodes: PATH_GRID_NODES,
     initialMoney: INITIAL_MONEY,
     initialLives: INITIAL_LIVES,
-  }
+  };
 }
 
 /**
@@ -184,8 +185,8 @@ export function applyDifficultyModifications(
   initialMoney: number = INITIAL_MONEY,
   initialLives: number = INITIAL_LIVES
 ) {
-  const mapManager = MapManager.getInstance()
-  return mapManager.applyDifficultyModifiers({ initialMoney, initialLives })
+  const mapManager = MapManager.getInstance();
+  return mapManager.applyDifficultyModifiers({ initialMoney, initialLives });
 }
 
 /**
@@ -199,8 +200,8 @@ export function getMapDimensions() {
     cellSize: CELL_SIZE,
     worldWidth: GRID_WIDTH * CELL_SIZE,
     worldHeight: GRID_HEIGHT * CELL_SIZE,
-  }
+  };
 }
 
 // Export MapManager for direct access if needed
-export { MapManager }
+export { MapManager };

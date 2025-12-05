@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { selectNextSpawnCountdown, selectNextSpawnDelay } from '@/game/store/selectors';
+import {
+  selectNextSpawnCountdown,
+  selectNextSpawnDelay,
+} from '@/game/store/selectors';
 
 const SpawnTicker = () => {
   const countdown = selectNextSpawnCountdown();
@@ -28,7 +31,9 @@ const SpawnTicker = () => {
       aria-label={`Next enemy in ${countdown.toFixed(1)} seconds`}
     >
       <div className="banner-content">
-        <span className="wave-icon" aria-hidden="true">🌊</span>
+        <span className="wave-icon" aria-hidden="true">
+          🌊
+        </span>
         <span className="wave-text">{waveInfo}</span>
         <div className="countdown-section">
           <span className="countdown-label">Next:</span>

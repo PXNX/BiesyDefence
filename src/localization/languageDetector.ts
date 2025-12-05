@@ -3,48 +3,48 @@
  * Detects user preferences and determines appropriate language/theme settings
  */
 
-import type { Language } from './TranslationService'
+import type { Language } from './TranslationService';
 
 export interface UserPreferences {
-  language: Language
-  region: string
-  theme: 'cannabis' | 'herbs' | 'laboratory' | 'garden' | 'farm'
-  timezone: string
-  currency: string
-  dateFormat: string
-  numberFormat: string
+  language: Language;
+  region: string;
+  theme: 'cannabis' | 'herbs' | 'laboratory' | 'garden' | 'farm';
+  timezone: string;
+  currency: string;
+  dateFormat: string;
+  numberFormat: string;
 }
 
 export interface DetectionResult {
-  language: Language
-  confidence: number
-  source: 'browser' | 'storage' | 'default' | 'geoip'
-  region?: string
+  language: Language;
+  confidence: number;
+  source: 'browser' | 'storage' | 'default' | 'geoip';
+  region?: string;
   culturalSensitivity?: {
-    level: 'low' | 'medium' | 'high'
-    reasons: string[]
-    recommendedTheme: string
-  }
+    level: 'low' | 'medium' | 'high';
+    reasons: string[];
+    recommendedTheme: string;
+  };
 }
 
 export class LanguageDetector {
-  private static instance: LanguageDetector | null = null
+  private static instance: LanguageDetector | null = null;
 
   public static getInstance(): LanguageDetector {
     if (!LanguageDetector.instance) {
-      LanguageDetector.instance = new LanguageDetector()
+      LanguageDetector.instance = new LanguageDetector();
     }
-    return LanguageDetector.instance
+    return LanguageDetector.instance;
   }
 
   /**
    * Detect user's preferred language and cultural preferences
    */
   public detectUserPreferences(): DetectionResult {
-    const browserLang = this.detectBrowserLanguage()
-    const storedPrefs = this.getStoredPreferences()
-    const region = this.detectRegion()
-    const culturalSensitivity = this.assessCulturalSensitivity(region)
+    const browserLang = this.detectBrowserLanguage();
+    const storedPrefs = this.getStoredPreferences();
+    const region = this.detectRegion();
+    const culturalSensitivity = this.assessCulturalSensitivity(region);
 
     // Priority: Stored preferences > Browser settings > Geographic detection
     if (storedPrefs && storedPrefs.language) {
@@ -54,7 +54,7 @@ export class LanguageDetector {
         source: 'storage',
         region,
         culturalSensitivity,
-      }
+      };
     }
 
     return {
@@ -63,55 +63,55 @@ export class LanguageDetector {
       source: 'browser',
       region,
       culturalSensitivity,
-    }
+    };
   }
 
   /**
    * Detect language from browser settings
    */
   private detectBrowserLanguage(): Language {
-    const browserLanguages = navigator.languages || [navigator.language]
-    
+    const browserLanguages = navigator.languages || [navigator.language];
+
     // Common language mappings
     const languageMap: Record<string, Language> = {
-      'en': 'en',
+      en: 'en',
       'en-US': 'en',
       'en-GB': 'en',
-      'es': 'es',
+      es: 'es',
       'es-ES': 'es',
       'es-MX': 'es',
-      'fr': 'fr',
+      fr: 'fr',
       'fr-FR': 'fr',
       'fr-CA': 'fr',
-      'de': 'de',
+      de: 'de',
       'de-DE': 'de',
       'de-AT': 'de',
-      'zh': 'zh',
+      zh: 'zh',
       'zh-CN': 'zh',
       'zh-TW': 'zh',
-      'ja': 'ja',
+      ja: 'ja',
       'ja-JP': 'ja',
-      'ar': 'ar',
+      ar: 'ar',
       'ar-SA': 'ar',
       'ar-AE': 'ar',
-      'ru': 'ru',
+      ru: 'ru',
       'ru-RU': 'ru',
-      'pt': 'pt',
+      pt: 'pt',
       'pt-BR': 'pt',
       'pt-PT': 'pt',
-      'it': 'it',
+      it: 'it',
       'it-IT': 'it',
-    }
+    };
 
     // Try to match browser languages with supported languages
     for (const browserLang of browserLanguages) {
-      const langCode = browserLang.split('-')[0].toLowerCase()
+      const langCode = browserLang.split('-')[0].toLowerCase();
       if (languageMap[browserLang] || languageMap[langCode]) {
-        return languageMap[browserLang] || languageMap[langCode] || 'en'
+        return languageMap[browserLang] || languageMap[langCode] || 'en';
       }
     }
 
-    return 'en' // Default fallback
+    return 'en'; // Default fallback
   }
 
   /**
@@ -119,11 +119,11 @@ export class LanguageDetector {
    */
   private getStoredPreferences(): UserPreferences | null {
     try {
-      const stored = localStorage.getItem('biesydefence_user_preferences')
-      return stored ? JSON.parse(stored) : null
+      const stored = localStorage.getItem('biesydefence_user_preferences');
+      return stored ? JSON.parse(stored) : null;
     } catch (error) {
-      console.warn('Failed to load stored preferences:', error)
-      return null
+      console.warn('Failed to load stored preferences:', error);
+      return null;
     }
   }
 
@@ -137,8 +137,8 @@ export class LanguageDetector {
     // - Browser timezone
     // - User's locale settings
 
-    const browserLang = navigator.language
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    const browserLang = navigator.language;
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     // Map common timezone regions
     const regionMappings: Record<string, string> = {
@@ -158,7 +158,7 @@ export class LanguageDetector {
       'Asia/Kolkata': 'IN',
       'Australia/Sydney': 'AU',
       'America/Sao_Paulo': 'BR',
-    }
+    };
 
     // Map from browser language if timezone mapping fails
     const languageRegionMap: Record<string, string> = {
@@ -181,21 +181,41 @@ export class LanguageDetector {
       'pt-BR': 'BR',
       'pt-PT': 'PT',
       'it-IT': 'IT',
-    }
+    };
 
-    return regionMappings[timezone] || languageRegionMap[browserLang] || 'US'
+    return regionMappings[timezone] || languageRegionMap[browserLang] || 'US';
   }
 
   /**
    * Assess cultural sensitivity requirements
    */
   private assessCulturalSensitivity(region: string): {
-    level: 'low' | 'medium' | 'high'
-    reasons: string[]
-    recommendedTheme: string
+    level: 'low' | 'medium' | 'high';
+    reasons: string[];
+    recommendedTheme: string;
   } {
-    const highSensitivityRegions = ['SA', 'AE', 'QA', 'KW', 'BH', 'OM', 'CN', 'JP', 'KR', 'SG']
-    const mediumSensitivityRegions = ['MY', 'TH', 'VN', 'ID', 'PH', 'IN', 'PK', 'BD']
+    const highSensitivityRegions = [
+      'SA',
+      'AE',
+      'QA',
+      'KW',
+      'BH',
+      'OM',
+      'CN',
+      'JP',
+      'KR',
+      'SG',
+    ];
+    const mediumSensitivityRegions = [
+      'MY',
+      'TH',
+      'VN',
+      'ID',
+      'PH',
+      'IN',
+      'PK',
+      'BD',
+    ];
 
     if (highSensitivityRegions.includes(region)) {
       return {
@@ -206,7 +226,7 @@ export class LanguageDetector {
           'Cultural sensitivities around drug-related content',
         ],
         recommendedTheme: 'herbs', // Use herbs theme as primary alternative
-      }
+      };
     }
 
     if (mediumSensitivityRegions.includes(region)) {
@@ -217,50 +237,63 @@ export class LanguageDetector {
           'Alternative themes may be more widely accepted',
         ],
         recommendedTheme: 'laboratory', // Tech theme as secondary alternative
-      }
+      };
     }
 
     return {
       level: 'low',
       reasons: ['Generally permissive attitude toward gaming content'],
       recommendedTheme: 'cannabis', // Original theme is fine
-    }
+    };
   }
 
   /**
    * Get recommended theme based on cultural assessment
    */
   public getRecommendedTheme(culturalSensitivity: {
-    level: 'low' | 'medium' | 'high'
-    recommendedTheme: string
+    level: 'low' | 'medium' | 'high';
+    recommendedTheme: string;
   }): string {
     if (culturalSensitivity.level === 'high') {
-      return culturalSensitivity.recommendedTheme // 'herbs' for high sensitivity
+      return culturalSensitivity.recommendedTheme; // 'herbs' for high sensitivity
     }
-    
+
     if (culturalSensitivity.level === 'medium') {
-      return 'laboratory' // Tech theme for medium sensitivity
+      return 'laboratory'; // Tech theme for medium sensitivity
     }
-    
-    return 'cannabis' // Original theme for low sensitivity
+
+    return 'cannabis'; // Original theme for low sensitivity
   }
 
   /**
    * Check if current theme is appropriate for region
    */
-  public isThemeAppropriate(theme: string, region: string): {
-    appropriate: boolean
-    alternative?: string
-    reason?: string
+  public isThemeAppropriate(
+    theme: string,
+    region: string
+  ): {
+    appropriate: boolean;
+    alternative?: string;
+    reason?: string;
   } {
-    const highSensitivityRegions = ['SA', 'AE', 'QA', 'KW', 'BH', 'OM', 'CN', 'JP', 'KR']
+    const highSensitivityRegions = [
+      'SA',
+      'AE',
+      'QA',
+      'KW',
+      'BH',
+      'OM',
+      'CN',
+      'JP',
+      'KR',
+    ];
 
     if (theme === 'cannabis' && highSensitivityRegions.includes(region)) {
       return {
         appropriate: false,
         alternative: 'herbs',
         reason: 'Cannabis theme not appropriate for this region',
-      }
+      };
     }
 
     // Additional cultural checks
@@ -269,10 +302,10 @@ export class LanguageDetector {
         appropriate: false,
         alternative: 'garden',
         reason: 'Scientific theme may not align with local preferences',
-      }
+      };
     }
 
-    return { appropriate: true }
+    return { appropriate: true };
   }
 
   /**
@@ -280,9 +313,12 @@ export class LanguageDetector {
    */
   public savePreferences(preferences: UserPreferences): void {
     try {
-      localStorage.setItem('biesydefence_user_preferences', JSON.stringify(preferences))
+      localStorage.setItem(
+        'biesydefence_user_preferences',
+        JSON.stringify(preferences)
+      );
     } catch (error) {
-      console.error('Failed to save preferences:', error)
+      console.error('Failed to save preferences:', error);
     }
   }
 
@@ -291,42 +327,42 @@ export class LanguageDetector {
    */
   public getRegionCurrencies(region: string): string[] {
     const currencyMap: Record<string, string[]> = {
-      'US': ['USD'],
-      'GB': ['GBP'],
-      'DE': ['EUR'],
-      'FR': ['EUR'],
-      'ES': ['EUR'],
-      'IT': ['EUR'],
-      'JP': ['JPY'],
-      'CN': ['CNY'],
-      'KR': ['KRW'],
-      'SA': ['SAR'],
-      'AE': ['AED'],
-      'IN': ['INR'],
-      'BR': ['BRL'],
-      'CA': ['CAD'],
-      'AU': ['AUD'],
-      'RU': ['RUB'],
-    }
+      US: ['USD'],
+      GB: ['GBP'],
+      DE: ['EUR'],
+      FR: ['EUR'],
+      ES: ['EUR'],
+      IT: ['EUR'],
+      JP: ['JPY'],
+      CN: ['CNY'],
+      KR: ['KRW'],
+      SA: ['SAR'],
+      AE: ['AED'],
+      IN: ['INR'],
+      BR: ['BRL'],
+      CA: ['CAD'],
+      AU: ['AUD'],
+      RU: ['RUB'],
+    };
 
-    return currencyMap[region] || ['USD'] // Default to USD
+    return currencyMap[region] || ['USD']; // Default to USD
   }
 
   /**
    * Format currency according to region
    */
   public formatCurrency(amount: number, region: string): string {
-    const currencies = this.getRegionCurrencies(region)
-    const currency = currencies[0] || 'USD'
+    const currencies = this.getRegionCurrencies(region);
+    const currency = currencies[0] || 'USD';
 
     try {
       return new Intl.NumberFormat(`en-${region}`, {
         style: 'currency',
         currency,
-      }).format(amount)
+      }).format(amount);
     } catch (error) {
       // Fallback for unsupported regions
-      return `${amount} ${currency}`
+      return `${amount} ${currency}`;
     }
   }
 
@@ -334,17 +370,17 @@ export class LanguageDetector {
    * Check if language supports RTL
    */
   public isRTLLanguage(language: Language): boolean {
-    const rtlLanguages: Language[] = ['ar', 'he', 'fa', 'ur']
-    return rtlLanguages.includes(language)
+    const rtlLanguages: Language[] = ['ar', 'he', 'fa', 'ur'];
+    return rtlLanguages.includes(language);
   }
 
   /**
    * Get font recommendations for language
    */
   public getFontRecommendations(language: Language): {
-    primary: string
-    fallback: string[]
-    script?: string
+    primary: string;
+    fallback: string[];
+    script?: string;
   } {
     const fontRecommendations: Record<string, any> = {
       en: {
@@ -370,8 +406,8 @@ export class LanguageDetector {
         primary: 'Inter, system-ui, sans-serif',
         fallback: ['Arial', 'Helvetica', 'sans-serif'],
       },
-    }
+    };
 
-    return fontRecommendations[language] || fontRecommendations.default
+    return fontRecommendations[language] || fontRecommendations.default;
   }
 }
