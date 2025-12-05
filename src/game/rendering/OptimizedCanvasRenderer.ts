@@ -10,6 +10,7 @@ import type {
 } from '@/game/core/types';
 import { palette } from '@/assets/theme';
 import { logger } from '@/game/utils/logger';
+import { GAME_CONFIG } from '@/game/config/gameConfig';
 
 export interface CanvasHighlight {
   tile: MapTile;
@@ -153,7 +154,7 @@ class RenderCache {
   private imageCache = new Map<TextureKey, HTMLImageElement | null>();
 
   // Viewport culling bounds
-  private cullingMargin = 50; // Extra margin to prevent edge popping
+  private cullingMargin = GAME_CONFIG.renderer.cullingMargin;
 
   constructor() {
     this.initializeOffscreenCanvas();
@@ -252,7 +253,7 @@ class RenderCache {
 
 // Spatial partitioning for efficient entity management
 class SpatialGrid {
-  private gridSize = 64; // Grid cell size in world units
+  private gridSize = GAME_CONFIG.renderer.gridCellSize;
   private entities = new Map<string, Set<any>>();
 
   clear() {

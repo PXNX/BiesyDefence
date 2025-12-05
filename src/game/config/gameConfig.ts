@@ -82,6 +82,35 @@ export type GameConfig = {
     hpRewardRatioMax: number;
     bossSpawnSpanMax: number;
   };
+  limits: {
+    maxMoney: number;
+    maxScore: number;
+  };
+  particles: {
+    impactSamples: number;
+    impactVelocityMin: number;
+    impactVelocityMax: number;
+    impactRadiusMin: number;
+    impactRadiusMax: number;
+    impactLifeMin: number;
+    impactLifeMax: number;
+    hitMarkerVelocityY: number;
+    hitMarkerLife: number;
+    muzzleCount: number;
+    muzzleVelocityMin: number;
+    muzzleVelocityMax: number;
+    sparkBurstCount: number;
+    sparkVelocityMin: number;
+    sparkVelocityMax: number;
+  };
+  pools: {
+    projectileMaxSize: number;
+    projectileCleanupThreshold: number;
+  };
+  renderer: {
+    cullingMargin: number;
+    gridCellSize: number;
+  };
 };
 
 export const GAME_CONFIG: GameConfig = {
@@ -165,6 +194,35 @@ export const GAME_CONFIG: GameConfig = {
     hpRewardRatioMin: 0.05,
     hpRewardRatioMax: 0.2,
     bossSpawnSpanMax: 15,
+  },
+  limits: {
+    maxMoney: 999_999_999,
+    maxScore: 999_999_999,
+  },
+  particles: {
+    impactSamples: 6,
+    impactVelocityMin: 40,
+    impactVelocityMax: 70,
+    impactRadiusMin: 3,
+    impactRadiusMax: 6,
+    impactLifeMin: 0.4,
+    impactLifeMax: 0.7,
+    hitMarkerVelocityY: -40,
+    hitMarkerLife: 0.6,
+    muzzleCount: 4,
+    muzzleVelocityMin: 180,
+    muzzleVelocityMax: 250,
+    sparkBurstCount: 8,
+    sparkVelocityMin: 120,
+    sparkVelocityMax: 180,
+  },
+  pools: {
+    projectileMaxSize: 500,
+    projectileCleanupThreshold: 1000,
+  },
+  renderer: {
+    cullingMargin: 50,
+    gridCellSize: 64,
   },
 };
 

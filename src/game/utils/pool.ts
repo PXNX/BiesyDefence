@@ -1,10 +1,11 @@
 import { createEntityId } from '@/game/utils/id';
 import type { Projectile, Vector2 } from '@/game/core/types';
+import { GAME_CONFIG } from '@/game/config/gameConfig';
 
 // Memory management with size limits
 const projectilePool: Projectile[] = [];
-const MAX_POOL_SIZE = 500; // Maximum projectiles to keep in pool
-const CLEANUP_THRESHOLD = 1000; // Clean up when pool exceeds this size
+const MAX_POOL_SIZE = GAME_CONFIG.pools.projectileMaxSize;
+const CLEANUP_THRESHOLD = GAME_CONFIG.pools.projectileCleanupThreshold;
 
 const blankVector = (): Vector2 => ({ x: 0, y: 0 });
 

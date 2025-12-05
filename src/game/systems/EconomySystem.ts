@@ -1,4 +1,5 @@
 import type { EconomyEvent, GameState } from '@/game/core/types';
+import { GAME_CONFIG } from '@/game/config/gameConfig';
 
 export interface EconomyDelta {
   moneyDelta: number;
@@ -28,10 +29,9 @@ export const queueEconomyEvent = (
 };
 
 const clampMoney = (value: number): number =>
-  Math.max(0, Math.min(999_999_999, value));
+  Math.max(0, Math.min(GAME_CONFIG.limits.maxMoney, value));
 const clampScore = (value: number): number =>
-  Math.max(0, Math.min(999_999_999, value));
-import { GAME_CONFIG } from '@/game/config/gameConfig';
+  Math.max(0, Math.min(GAME_CONFIG.limits.maxScore, value));
 
 const clampLives = (value: number): number =>
   Math.max(0, Math.min(GAME_CONFIG.economy.maxLives, value));

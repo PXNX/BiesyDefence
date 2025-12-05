@@ -1,6 +1,7 @@
 import type { Particle, Vector2 } from '@/game/core/types';
 import { createEntityId } from '@/game/utils/id';
 import { normalize } from '@/game/utils/math';
+import { GAME_CONFIG } from '@/game/config/gameConfig';
 
 const randomBetween = (min: number, max: number): number =>
   Math.random() * (max - min) + min;
@@ -13,7 +14,7 @@ export const createImpactParticles = (
   position: Vector2,
   color: string
 ): Particle[] => {
-  const samples = 6;
+  const samples = GAME_CONFIG.particles.impactSamples;
   const particles: Particle[] = [];
   for (let i = 0; i < samples; i += 1) {
     const velocity = normalize(randomUnit());
@@ -21,12 +22,12 @@ export const createImpactParticles = (
       id: createEntityId('particle'),
       position: { ...position },
       velocity: {
-        x: velocity.x * randomBetween(40, 70),
-        y: velocity.y * randomBetween(40, 70),
+        x: velocity.x * randomBetween(GAME_CONFIG.particles.impactVelocityMin, GAME_CONFIG.particles.impactVelocityMax),
+        y: velocity.y * randomBetween(GAME_CONFIG.particles.impactVelocityMin, GAME_CONFIG.particles.impactVelocityMax),
       },
-      radius: randomBetween(3, 6),
-      life: randomBetween(0.4, 0.7),
-      maxLife: 0.7,
+      radius: randomBetween(GAME_CONFIG.particles.impactRadiusMin, GAME_CONFIG.particles.impactRadiusMax),
+      life: randomBetween(GAME_CONFIG.particles.impactLifeMin, GAME_CONFIG.particles.impactLifeMax),
+      maxLife: GAME_CONFIG.particles.impactLifeMax,
       color,
       kind: 'hit',
     });
@@ -41,10 +42,10 @@ export const createHitMarker = (
 ): Particle => ({
   id: createEntityId('particle'),
   position: { ...position },
-  velocity: { x: 0, y: -40 },
+  velocity: { x: 0, y: GAME_CONFIG.particles.hitMarkerVelocityY },
   radius: 0,
-  life: 0.6,
-  maxLife: 0.6,
+  life: GAME_CONFIG.particles.hitMarkerLife,
+  maxLife: GAME_CONFIG.particles.hitMarkerLife,
   color,
   kind: 'damage',
   value,
@@ -135,7 +136,7 @@ export const createMuzzleParticles = (
     y: targetPosition.y - towerPosition.y,
   });
 
-  return Array.from({ length: 4 }, () => {
+  return Array.from({ length: GAME_CONFIG.particles.muzzleCount }, () => {
     const jitter = normalize({
       x: direction.x + randomBetween(-0.25, 0.25),
       y: direction.y + randomBetween(-0.25, 0.25),
@@ -145,8 +146,8 @@ export const createMuzzleParticles = (
       id: createEntityId('particle'),
       position: { ...towerPosition },
       velocity: {
-        x: jitter.x * randomBetween(180, 250),
-        y: jitter.y * randomBetween(180, 250),
+        x: jitter.x * randomBetween(GAME_CONFIG.particles.muzzleVelocityMin, GAME_CONFIG.particles.muzzleVelocityMax),
+        y: jitter.y * randomBetween(GAME_CONFIG.particles.muzzleVelocityMin, GAME_CONFIG.particles.muzzleVelocityMax),
       },
       radius: randomBetween(4, 7),
       life: randomBetween(0.12, 0.3),
@@ -178,7 +179,7 @@ export const createRingEffect = (
 export const createSparkBurst = (
   position: Vector2,
   color: string,
-  count = 8
+  count = GAME_CONFIG.particles.sparkBurstCount
 ): Particle[] => {
   const out: Particle[] = [];
   for (let i = 0; i < count; i += 1) {
@@ -187,8 +188,8 @@ export const createSparkBurst = (
       id: createEntityId('particle'),
       position: { ...position },
       velocity: {
-        x: v.x * randomBetween(120, 180),
-        y: v.y * randomBetween(120, 180),
+        x: v.x * randomBetween(GAME_CONFIG.particles.sparkVelocityMin, GAME_CONFIG.particles.sparkVelocityMax),
+        y: v.y * randomBetween(GAME_CONFIG.particles.sparkVelocityMin, GAME_CONFIG.particles.sparkVelocityMax),
       },
       radius: randomBetween(3, 6),
       life: randomBetween(0.25, 0.45),
@@ -206,18 +207,18 @@ export const createPuddleEffect = (
   color: string,
   radius = 38
 ): Particle[] => [
-  createRingEffect(position, radius, color, 1.2, 0.45),
-  {
-    id: createEntityId('particle'),
-    position: { ...position },
-    velocity: { x: 0, y: 0 },
-    radius,
-    life: 1.1,
-    maxLife: 1.1,
-    color,
-    baseAlpha: 0.28,
-  },
-];
+    createRingEffect(position, radius, color, 1.2, 0.45),
+    {
+      id: createEntityId('particle'),
+      position: { ...position },
+      velocity: { x: 0, y: 0 },
+      radius,
+      life: 1.1,
+      maxLife: 1.1,
+      color,
+      baseAlpha: 0.28,
+    },
+  ];
 
 export const createWeakpointMarker = (position: Vector2): Particle[] => [
   createRingEffect(position, 24, 'rgba(255,90,90,0.9)', 0.5, 0.85),
@@ -304,22 +305,22 @@ export const createNapalmPuddle = (
   position: Vector2,
   radius = 48
 ): Particle[] => [
-  createRingEffect(position, radius, 'rgba(255,132,79,0.35)', 1.4, 0.6),
-  {
-    id: createEntityId('particle'),
-    position: { ...position },
-    velocity: { x: 0, y: 0 },
-    radius,
-    life: 1.5,
-    maxLife: 1.5,
-    color: '#ff6b35',
-    textureKey: 'napalm-puddle-effect',
-    frameCount: 1,
-    sizeWorld: radius * 2,
-    additive: false,
-    baseAlpha: 0.28,
-  },
-];
+    createRingEffect(position, radius, 'rgba(255,132,79,0.35)', 1.4, 0.6),
+    {
+      id: createEntityId('particle'),
+      position: { ...position },
+      velocity: { x: 0, y: 0 },
+      radius,
+      life: 1.5,
+      maxLife: 1.5,
+      color: '#ff6b35',
+      textureKey: 'napalm-puddle-effect',
+      frameCount: 1,
+      sizeWorld: radius * 2,
+      additive: false,
+      baseAlpha: 0.28,
+    },
+  ];
 
 export const createFireTrail = (position: Vector2, radius = 32): Particle[] => [
   createRingEffect(position, radius, 'rgba(255,180,120,0.4)', 0.8, 0.6),
@@ -343,25 +344,25 @@ export const createShrapnelImpact = (
   position: Vector2,
   radius = 42
 ): Particle[] => [
-  createRingEffect(position, radius, 'rgba(255,248,180,0.55)', 0.6, 0.75),
-  {
-    id: createEntityId('particle'),
-    position: { ...position },
-    velocity: { x: 0, y: 0 },
-    radius,
-    life: 0.5,
-    maxLife: 0.5,
-    color: '#fff7b2',
-    textureKey: 'shrapnel-explosion',
-    frameCount: 4,
-    cols: 2,
-    rows: 2,
-    fps: 10,
-    sizeWorld: radius * 2,
-    additive: true,
-    baseAlpha: 0.85,
-  },
-];
+    createRingEffect(position, radius, 'rgba(255,248,180,0.55)', 0.6, 0.75),
+    {
+      id: createEntityId('particle'),
+      position: { ...position },
+      velocity: { x: 0, y: 0 },
+      radius,
+      life: 0.5,
+      maxLife: 0.5,
+      color: '#fff7b2',
+      textureKey: 'shrapnel-explosion',
+      frameCount: 4,
+      cols: 2,
+      rows: 2,
+      fps: 10,
+      sizeWorld: radius * 2,
+      additive: true,
+      baseAlpha: 0.85,
+    },
+  ];
 
 export const createCryoRing = (position: Vector2, radius = 40): Particle => ({
   id: createEntityId('particle'),

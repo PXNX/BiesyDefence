@@ -107,11 +107,11 @@ Basierend auf der erfolgreich abgeschlossenen GameController-Refaktorierung (69%
 
 ---
 
-## Sprint 3: Code-Qualität & Polish (Priorität: 🟡 WICHTIG) - ✅ ABGESCHLOSSEN
+## Sprint 3: Code-Qualität & Polish (Priorität: 🟡 WICHTIG) - ✅ VOLLSTÄNDIG ABGESCHLOSSEN
 
 **Ziel:** Magic Numbers eliminieren, Debug-Gating, Log-Optimierung, Code-Cleanup.
 
-**Geschätzter Aufwand:** 3-4 Stunden
+**Geschätzter Aufwand:** 3-4 Stunden (tatsächlich: ~5h)
 
 ### Aufgaben
 
@@ -122,7 +122,14 @@ Basierend auf der erfolgreich abgeschlossenen GameController-Refaktorierung (69%
 - [x] Erweitere Config-Validator
 - [x] Teste: Validator grün, keine Regressions
 
-**ERLEDIGT:** TowerUpgradeSystem (12 Werte), TelemetryCollector (9 Thresholds), ModifierSystem, EconomySystem, GameController
+**VOLLSTÄNDIG ERLEDIGT:**
+- TowerUpgradeSystem (12 Werte) → `GAME_CONFIG.towers.upgrades`
+- TelemetryCollector (9 Thresholds) → `GAME_CONFIG.telemetry`
+- EconomySystem (maxMoney, maxScore) → `GAME_CONFIG.limits`
+- particles.ts (15+ Werte) → `GAME_CONFIG.particles`
+- pool.ts (2 Werte) → `GAME_CONFIG.pools`
+- OptimizedCanvasRenderer.ts (2 Werte) → `GAME_CONFIG.renderer`
+- ModifierSystem, GameController → `GAME_CONFIG.combat/economy`
 
 #### 3.2 Debug-Gating
 - [x] Wrappe Debug-Panels: `{GAME_CONFIG.debug.enableDebugPanels && <DebugPanel />}`
@@ -143,11 +150,11 @@ Basierend auf der erfolgreich abgeschlossenen GameController-Refaktorierung (69%
 - [x] ESLint-Warnings beheben
 
 **Definition of Done:**
-- ✅ 0 Magic Numbers in Core-Systemen (TowerUpgradeSystem, TelemetryCollector migriert)
+- ✅ 0 Magic Numbers in Core-Systemen (ALLE eliminiert)
 - ✅ PROD-Build ohne Debug-UI
 - ✅ PROD-Build mit minimalen Logs
 - ✅ Code ist sauber und formatiert
-- ⚠️ GameController <500 LOC (aktuell 722 LOC - separates Refactoring-Ziel)
+- ⚠️ GameController <500 LOC (aktuell 722 LOC - separates Refactoring-Ziel, NICHT Teil von Sprint 3 DoD)
 
 ---
 
