@@ -154,7 +154,14 @@ export const ENEMY_PROFILES: Record<EnemyType, EnemyStats> = {
 const clamp = (value: number, min: number, max: number) =>
   Math.max(min, Math.min(max, value));
 
-const getWaveScaling = (waveIndex: number) => {
+/**
+ * Wave scaling function - couples HP and Reward scaling to prevent death spiral
+ * - HP increases with wave difficulty
+ * - Reward scales proportionally with HP (same progression)
+ * - Elite waves get bonus multiplier
+ * - Min-Reward-Floor ensures base reward never drops below threshold
+ */
+export const getWaveScaling = (waveIndex: number) => {
   // Difficulty curve (Phase-based): smoother early game, controlled mid, assertive late
   const phase = waveIndex + 1;
   const hpBase =
@@ -170,7 +177,9 @@ const getWaveScaling = (waveIndex: number) => {
   const speedScale = clamp(1 + 0.02 * phase, 1, 1.45);
 
   // Rewards now synced to HP scaling (same progression) to avoid economic starvation
-  const rewardScale = hpScale;
+  // Min-Reward-Floor: reward scale never drops below 1.0 to prevent death spiral
+  const MIN_REWARD_FLOOR = 1.0;
+  const rewardScale = Math.max(MIN_REWARD_FLOOR, hpScale);
 
   // Elite boosts stay multiplicative on top
   const isEliteBoost =
@@ -200,21 +209,21 @@ export const createEnemy = (
     ...base,
     speed: Math.round(
       base.speed *
-        speedScale *
-        difficultyConfig.enemySpeedMultiplier *
-        (mapModifiers.enemySpeedMultiplier ?? 1)
+      speedScale *
+      difficultyConfig.enemySpeedMultiplier *
+      (mapModifiers.enemySpeedMultiplier ?? 1)
     ),
     health: Math.round(
       base.health *
-        hpScale *
-        difficultyConfig.enemyHealthMultiplier *
-        (mapModifiers.enemyHealthMultiplier ?? 1)
+      hpScale *
+      difficultyConfig.enemyHealthMultiplier *
+      (mapModifiers.enemyHealthMultiplier ?? 1)
     ),
     reward: Math.round(
       base.reward *
-        rewardScale *
-        difficultyConfig.enemyRewardMultiplier *
-        (mapModifiers.enemyRewardMultiplier ?? 1)
+      rewardScale *
+      difficultyConfig.enemyRewardMultiplier *
+      (mapModifiers.enemyRewardMultiplier ?? 1)
     ),
     damageToLives: base.damageToLives,
   };
