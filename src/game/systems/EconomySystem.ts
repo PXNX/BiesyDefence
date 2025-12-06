@@ -1,6 +1,9 @@
 import type { EconomyEvent, GameState } from '@/game/core/types';
 import { GAME_CONFIG } from '@/game/config/gameConfig';
 
+// Minimum reward floor to prevent death spiral
+const MIN_REWARD_PER_KILL = 5;
+
 export interface EconomyDelta {
   moneyDelta: number;
   scoreDelta: number;
@@ -42,7 +45,13 @@ const applyEvent = (state: GameState, event: EconomyEvent): EconomyDelta => {
   let livesDelta = 0;
 
   switch (event.type) {
-    case 'reward':
+    case 'reward': {
+      // Apply min-reward-floor to prevent death spiral
+      const rewardAmount = Math.max(MIN_REWARD_PER_KILL, event.amount);
+      moneyDelta += rewardAmount;
+      scoreDelta += event.score ?? 0;
+      break;
+    }
     case 'wave_bonus':
     case 'interest':
     case 'refund': {

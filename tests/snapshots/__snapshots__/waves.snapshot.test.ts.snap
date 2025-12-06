@@ -1743,6 +1743,212 @@ exports[`Snapshot: wave compositions per difficulty matches wave schedule snapsh
           "delay": 0.5,
           "type": "swift_runner"
         }
+      ],
+      [
+        {
+          "delay": 0.6,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.8,
+          "type": "regenerator"
+        },
+        {
+          "delay": 1.4,
+          "type": "regenerator"
+        },
+        {
+          "delay": 1.4,
+          "type": "regenerator"
+        },
+        {
+          "delay": 0.7,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.2,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.2,
+          "type": "stealth"
+        }
+      ],
+      [
+        {
+          "delay": 0.6,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.1,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.1,
+          "type": "splitter"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        }
+      ],
+      [
+        {
+          "delay": 1.8,
+          "type": "alien_boss"
+        },
+        {
+          "delay": 1.2,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1.5,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1.5,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1.5,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1.5,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.45,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        }
       ]
     ]
   },
@@ -3742,6 +3948,244 @@ exports[`Snapshot: wave compositions per difficulty matches wave schedule snapsh
         {
           "delay": 0.5,
           "type": "swift_runner"
+        }
+      ],
+      [
+        {
+          "delay": 0.6,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.8,
+          "type": "regenerator"
+        },
+        {
+          "delay": 1.4,
+          "type": "regenerator"
+        },
+        {
+          "delay": 1.4,
+          "type": "regenerator"
+        },
+        {
+          "delay": 0.7,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.2,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.2,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.2,
+          "type": "stealth"
+        }
+      ],
+      [
+        {
+          "delay": 0.6,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.1,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.1,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.1,
+          "type": "splitter"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        }
+      ],
+      [
+        {
+          "delay": 1.8,
+          "type": "alien_boss"
+        },
+        {
+          "delay": 1.2,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1.5,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1.5,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1.5,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1.5,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1.5,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.45,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
         }
       ]
     ]
@@ -6294,6 +6738,308 @@ exports[`Snapshot: wave compositions per difficulty matches wave schedule snapsh
         {
           "delay": 0.5,
           "type": "swift_runner"
+        }
+      ],
+      [
+        {
+          "delay": 0.6,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.8,
+          "type": "regenerator"
+        },
+        {
+          "delay": 1.4,
+          "type": "regenerator"
+        },
+        {
+          "delay": 1.4,
+          "type": "regenerator"
+        },
+        {
+          "delay": 1.4,
+          "type": "regenerator"
+        },
+        {
+          "delay": 0.7,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.2,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.2,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.2,
+          "type": "stealth"
+        },
+        {
+          "delay": 1.2,
+          "type": "stealth"
+        }
+      ],
+      [
+        {
+          "delay": 0.6,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.9,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.1,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.1,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.1,
+          "type": "splitter"
+        },
+        {
+          "delay": 1.1,
+          "type": "splitter"
+        },
+        {
+          "delay": 0.5,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        },
+        {
+          "delay": 0.6,
+          "type": "swift_runner"
+        }
+      ],
+      [
+        {
+          "delay": 1.8,
+          "type": "alien_boss"
+        },
+        {
+          "delay": 1.2,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1.5,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1.5,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1.5,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1.5,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1.5,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1.5,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 1.5,
+          "type": "armored_beetle"
+        },
+        {
+          "delay": 0.45,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
+        },
+        {
+          "delay": 0.3,
+          "type": "swarm"
         }
       ]
     ]

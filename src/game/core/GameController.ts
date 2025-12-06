@@ -33,6 +33,7 @@ import { InputManager } from '@/game/core/InputManager';
 import { RenderManager } from '@/game/core/RenderManager';
 import { useGameStore } from '@/game/store/gameStore';
 import { logger } from '@/game/utils/logger';
+import { telemetryEvents } from '@/game/systems/telemetry/TelemetryEvents';
 
 interface PlacementResult {
     success: boolean;
@@ -213,6 +214,15 @@ export class GameController {
 
         this.systemManager.registerTowers(this.state.towers);
         audioManager.playSoundEffect('tower-place', 0.6);
+
+        // Telemetry: tower_built
+        telemetryEvents.towerBuilt({
+            towerId: tower.id,
+            towerType: towerType,
+            position: { x: position.x, y: position.y },
+            cost: profile.cost,
+        });
+
         this.updateStore();
 
         return { success: true, message: `${profile.name} placed` };
@@ -249,7 +259,17 @@ export class GameController {
             reason: `upgrade:${tower.type}:${nextLevel}`,
         });
         recomputeTowerStats(tower);
-        audioManager.playSoundEffect('tower-upgrade', 0.7);
+        audioManager.playSoundEffect('tower-upgrade', 0.6);
+
+        // Telemetry: tower_upgraded
+        telemetryEvents.towerUpgraded({
+            towerId: tower.id,
+            towerType: tower.type,
+            fromLevel: tower.level - 1,
+            toLevel: tower.level,
+            cost: cost,
+        });
+
         this.updateStore();
 
         return { success: true, message: `Upgraded to level ${tower.level}` };
@@ -277,6 +297,15 @@ export class GameController {
         if (this.selectedTowerId === towerId) {
             this.selectedTowerId = null;
         }
+
+        // Telemetry: tower_sold
+        telemetryEvents.towerSold({
+            towerId: tower.id,
+            towerType: tower.type,
+            refundAmount: refund,
+            totalDamageDealt: tower.damageDealt,
+            totalKills: tower.kills,
+        });
 
         audioManager.playSoundEffect('tower-sell', 0.5);
         this.updateStore();
@@ -339,6 +368,10 @@ export class GameController {
 
         this.state.wavePhase = 'active';
         audioManager.playSoundEffect('wave_start', 0.7);
+
+        // Telemetry: wave_started
+        telemetryEvents.waveStarted(this.state.currentWaveIndex);
+
         this.updateStore();
     }
 
@@ -391,6 +424,13 @@ export class GameController {
 
         this.achievementSystem.trackWavesCleared(waveIndex + 1);
 
+        // Telemetry: wave_completed
+        telemetryEvents.waveCompleted(waveIndex, {
+            bonus,
+            enemiesKilled: this.state.enemies.filter(e => e.isDead).length,
+            towersPlaced: this.state.towers.length,
+        });
+
         if (this.autoWaveEnabled) {
             this.graceTimer = GAME_CONFIG.gameplay.autoWaveGracePeriod;
             this.graceActive = true;
@@ -433,6 +473,16 @@ export class GameController {
             this.state.status = 'lost';
             this.gameLoop.stop();
             audioManager.playSoundEffect('defeat', 1.0);
+
+            // Telemetry: player_defeated
+            telemetryEvents.playerDefeated({
+                waveIndex: this.state.currentWaveIndex,
+                livesRemaining: this.state.resources.lives,
+                moneyRemaining: this.state.resources.money,
+                towerCount: this.state.towers.length,
+                enemiesKilled: this.state.enemies.filter(e => e.isDead && !e.reachedGoal).length,
+            });
+
             this.updateStore();
         }
     }
