@@ -9,11 +9,11 @@ const SpeedChips = ({
 }) => {
   const speeds = [1, 2, 4];
   return (
-    <div className="speed-chips">
+    <div className="btn-group">
       {speeds.map(s => (
         <button
           key={s}
-          className={`speed-chip ${speed === s ? 'active' : ''}`}
+          className={`btn btn-xs ${speed === s ? 'btn-primary' : 'btn-ghost'}`}
           onClick={() => onChange(s)}
           aria-pressed={speed === s}
           aria-label={`Set game speed to ${s}x`}

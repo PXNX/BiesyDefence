@@ -36,12 +36,19 @@ const CornerStatCard = ({
     }
   }, [value, previousValue]);
 
-  const positionClasses = {
-    'top-left': 'corner-card top-left',
-    'top-right': 'corner-card top-right',
-    'bottom-left': 'corner-card bottom-left',
-    'bottom-right': 'corner-card bottom-right',
-  };
+  const positionClasses = useFixedPosition
+    ? {
+      'top-left': 'fixed top-4 left-4',
+      'top-right': 'fixed top-4 right-4',
+      'bottom-left': 'fixed bottom-24 left-4',
+      'bottom-right': 'fixed bottom-24 right-4',
+    }
+    : {
+      'top-left': '',
+      'top-right': '',
+      'bottom-left': '',
+      'bottom-right': '',
+    };
 
   const getTrendIcon = () => {
     switch (trend) {
@@ -54,198 +61,43 @@ const CornerStatCard = ({
     }
   };
 
-  const getCriticalClasses = () => {
-    let classes = '';
-    if (critical) {
-      classes += ' critical';
-    }
-    return classes;
-  };
-
   return (
     <div
-      className={`${positionClasses[position]} ${getCriticalClasses()} ${className} corner-stat-card ${useFixedPosition ? 'fixed-position' : 'flex-position'}`}
+      className={`
+        ${positionClasses[position]}
+        ${className}
+        card bg-base-200/70 backdrop-blur-md border shadow-xl
+        ${critical ? 'border-error animate-pulse' : 'border-primary/20'}
+        w-32 h-24 transition-transform hover:-translate-y-1
+        pointer-events-auto z-[85]
+      `}
       role="status"
       aria-label={`${label}: ${value}${critical ? ' (critical)' : ''}`}
     >
-      <div className="corner-stat-content">
-        <div className="corner-stat-icon" aria-hidden="true">
+      <div className="card-body p-3 flex flex-col items-center justify-center gap-1">
+        <div className="text-2xl" aria-hidden="true">
           {icon}
         </div>
-        <div className="corner-stat-value">
-          <span className={`value ${isAnimating ? 'animating' : ''}`}>
+        <div className="flex items-center gap-1">
+          <span
+            className={`
+              font-bold text-sm text-success
+              ${isAnimating ? 'text-primary scale-110' : ''}
+              transition-all duration-300 truncate max-w-full
+            `}
+          >
             {typeof value === 'number' ? value.toLocaleString() : value}
           </span>
           {trend !== 'neutral' && (
-            <span className="trend-icon" aria-hidden="true">
+            <span className="text-xs" aria-hidden="true">
               {getTrendIcon()}
             </span>
           )}
         </div>
-        <div className="corner-stat-label">{label}</div>
+        <div className="text-[10px] opacity-70 uppercase tracking-wider text-center truncate w-full">
+          {label}
+        </div>
       </div>
-      <style>{`
-        .corner-stat-card {
-          background: rgba(5, 15, 9, 0.65);
-          backdrop-filter: blur(16px);
-          border: 1px solid rgba(90, 138, 90, 0.25);
-          border-radius: 12px;
-          padding: 0.75rem;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          width: 80px;
-          height: 60px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 85;
-        }
-
-        .corner-stat-card.fixed-position {
-          position: fixed;
-        }
-
-        .corner-stat-card.flex-position {
-          position: relative;
-          width: 100%;
-          max-width: 80px;
-        }
-
-        .corner-stat-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-        }
-
-        .corner-stat-card.critical {
-          border-color: rgba(220, 53, 69, 0.5);
-          background: rgba(139, 0, 0, 0.15);
-          animation: critical-pulse 2s infinite;
-        }
-
-        .corner-stat-content {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          width: 100%;
-          height: 100%;
-        }
-
-        .corner-stat-icon {
-          font-size: 1rem;
-          margin-bottom: 0.25rem;
-        }
-
-        .corner-stat-value {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.25rem;
-          margin-bottom: 0.25rem;
-        }
-
-        .corner-stat-value .value {
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: #90EE90;
-          transition: all 0.3s ease;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .corner-stat-value .value.animating {
-          color: #4ADE80;
-          transform: scale(1.1);
-        }
-
-        .corner-stat-value .trend-icon {
-          font-size: 0.75rem;
-        }
-
-        .corner-stat-label {
-          font-size: 0.625rem;
-          color: rgba(144, 238, 144, 0.7);
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          text-align: center;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        /* Position classes for fixed positioning */
-        .top-left {
-          top: 1rem;
-          left: 1rem;
-        }
-
-        .top-right {
-          top: 1rem;
-          right: 1rem;
-        }
-
-        .bottom-left {
-          bottom: 6rem;
-          left: 1rem;
-        }
-
-        .bottom-right {
-          bottom: 6rem;
-          right: 1rem;
-        }
-
-        /* Animation keyframes */
-        @keyframes critical-pulse {
-          0%, 100% { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); }
-          50% {
-            box-shadow: 0 8px 32px rgba(220, 53, 69, 0.4),
-                       0 0 20px rgba(220, 53, 69, 0.3);
-          }
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-          .corner-stat-card {
-            width: 70px;
-            height: 55px;
-            padding: 0.5rem;
-          }
-
-          .corner-stat-value .value {
-            font-size: 0.75rem;
-          }
-
-          .corner-stat-label {
-            font-size: 0.6rem;
-          }
-
-          .corner-stat-card.fixed-position.bottom-left,
-          .corner-stat-card.fixed-position.bottom-right {
-            bottom: 4.5rem;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .corner-stat-card {
-            width: 60px;
-            height: 50px;
-            padding: 0.4rem;
-          }
-
-          .corner-stat-icon {
-            font-size: 0.875rem;
-          }
-
-          .corner-stat-value .value {
-            font-size: 0.7rem;
-          }
-
-          .corner-stat-label {
-            font-size: 0.55rem;
-          }
-        }
-      `}</style>
     </div>
   );
 };

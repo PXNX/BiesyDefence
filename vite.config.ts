@@ -3,6 +3,7 @@ import legacy from '@vitejs/plugin-legacy'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 import { visualizer } from 'rollup-plugin-visualizer'
+import Icons from 'unplugin-icons/vite'
 
 export default defineConfig(({ command, mode }) => {
   const isProduction = mode === 'production'
@@ -60,6 +61,11 @@ export default defineConfig(({ command, mode }) => {
         fastRefresh: !isProduction,
         // Optimize JSX in production
         jsxRuntime: 'automatic',
+      }),
+      Icons({
+        compiler: 'jsx',
+        jsx: 'react',
+        autoInstall: true,
       }),
       legacy({
         targets: ['defaults', 'not IE 11'],

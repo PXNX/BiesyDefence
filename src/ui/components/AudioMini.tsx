@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import IconFluentSpeaker224Filled from '~icons/fluent/speaker-2-24-filled';
+import IconFluentSpeakerMute24Filled from '~icons/fluent/speaker-mute-24-filled';
 
 const AudioMini = ({
   muted,
@@ -12,18 +14,19 @@ const AudioMini = ({
   onVolumeChange: (vol: number) => void;
 }) => {
   const [isAdjusting, setIsAdjusting] = useState(false);
-  const sliderStyle = {
-    '--volume-level': `${volume * 100}%`,
-  } as React.CSSProperties;
 
   return (
-    <div className="audio-mini">
+    <div className="flex items-center gap-2">
       <button
-        className={`audio-toggle ${muted ? 'muted' : ''}`}
+        className={`btn btn-sm btn-circle ${muted ? 'btn-error' : 'btn-ghost'}`}
         onClick={onToggleMute}
         aria-label={muted ? 'Unmute audio' : 'Mute audio'}
       >
-        {muted ? '🔇' : '🔊'}
+        {muted ? (
+          <IconFluentSpeakerMute24Filled className="w-4 h-4" />
+        ) : (
+          <IconFluentSpeaker224Filled className="w-4 h-4" />
+        )}
       </button>
       <input
         type="range"
@@ -37,8 +40,7 @@ const AudioMini = ({
         onTouchStart={() => setIsAdjusting(true)}
         onTouchEnd={() => setIsAdjusting(false)}
         data-adjusting={isAdjusting}
-        style={sliderStyle}
-        className="mini-volume-slider"
+        className="range range-xs range-primary w-20"
         aria-label="Master volume"
       />
     </div>

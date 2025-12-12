@@ -17,13 +17,14 @@ const StatsCornerLayout = () => {
   const envBanner = mapStatus?.banners?.[0];
 
   return (
-    <>
+    <div className="grid grid-cols-2 gap-3 absolute bottom-24 left-4 right-4 pointer-events-none z-10">
       <CornerStatCard
         icon="💰"
         value={`${incomeBonus >= 0 ? '+' : ''}${incomeBonus}%`}
         label={`Income • ${capturedSpecials}/${totalSpecials}`}
         position="top-left"
         critical={false}
+        useFixedPosition={false}
       />
       <CornerStatCard
         icon="📡"
@@ -31,23 +32,26 @@ const StatsCornerLayout = () => {
         label={envBanner ? envBanner.description : 'Range / Dmg'}
         position="top-right"
         critical={false}
+        useFixedPosition={false}
       />
       <CornerStatCard
-        icon="??"
+        icon="🌊"
         value={`${wave.current}/${wave.total}`}
         label="Wave"
         position="bottom-left"
         critical={false}
+        useFixedPosition={false}
       />
       <CornerStatCard
-        icon="?"
+        icon="⭐"
         value={score.toLocaleString()}
         label="Score"
         position="bottom-right"
         critical={false}
         trend={scoreTrend}
+        useFixedPosition={false}
       />
-    </>
+    </div>
   );
 };
 

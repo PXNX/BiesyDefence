@@ -1,4 +1,7 @@
 import { useGameStore } from '@/game/store/gameStore';
+import IconFluentPlay24Filled from '~icons/fluent/play-24-filled';
+import IconFluentPause24Filled from '~icons/fluent/pause-24-filled';
+import IconFluentNext24Filled from '~icons/fluent/next-24-filled';
 
 interface WaveControlProps {
   onStart: () => void;
@@ -25,141 +28,79 @@ export function WaveControl({
   const canStartNext = nextAvailable && !isRunning;
 
   return (
-    <div className="wave-control" role="group" aria-label="Wave control">
-      <div className="wave-meta">
-        <div>
-          <span className="label">Wave</span>
-          <strong>
-            {current}/{total}
-          </strong>
+    <div
+      className="card bg-base-200/80 backdrop-blur-md border border-primary/20 shadow-xl w-full max-w-xs"
+      role="group"
+      aria-label="Wave control"
+    >
+      <div className="card-body p-3 gap-3">
+        <div className="stats stats-horizontal bg-base-300/50 shadow-sm">
+          <div className="stat py-2 px-3">
+            <div className="stat-title text-xs">Wave</div>
+            <div className="stat-value text-lg">
+              {current}/{total}
+            </div>
+          </div>
+
+          <div className="stat py-2 px-3">
+            <div className="stat-title text-xs">Phase</div>
+            <div className="stat-value text-lg capitalize">{phase}</div>
+          </div>
         </div>
-        <div>
-          <span className="label">Phase</span>
-          <strong className="phase">{phase}</strong>
+
+        {graceActive && (
+          <div className="alert alert-success shadow-sm py-2">
+            <div className="flex items-center justify-between w-full">
+              <span className="text-sm">Next wave in:</span>
+              <div className="badge badge-lg badge-success font-mono font-bold">
+                {Math.ceil(graceTimer)}s
+              </div>
+              <button className="btn btn-xs btn-outline" onClick={onNext}>
+                Skip
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-col gap-2">
+          <div className="btn-group w-full">
+            <button
+              className={`btn btn-sm flex-1 ${isRunning ? 'btn-warning' : 'btn-success'}`}
+              onClick={isRunning ? onPause : onStart}
+            >
+              {isRunning ? (
+                <>
+                  <IconFluentPause24Filled className="w-4 h-4" />
+                  Pause
+                </>
+              ) : (
+                <>
+                  <IconFluentPlay24Filled className="w-4 h-4" />
+                  Start
+                </>
+              )}
+            </button>
+            <button
+              className="btn btn-sm btn-primary flex-1"
+              onClick={onNext}
+              disabled={!canStartNext}
+            >
+              <IconFluentNext24Filled className="w-4 h-4" />
+              Next Wave
+            </button>
+          </div>
+
+          <label className="label cursor-pointer justify-start gap-2 py-1">
+            <input
+              type="checkbox"
+              className="checkbox checkbox-sm checkbox-primary"
+              checked={autoEnabled}
+              onChange={e => onToggleAutoWave(e.target.checked)}
+            />
+            <span className="label-text text-sm">Auto-Wave</span>
+          </label>
         </div>
       </div>
-
-      {graceActive && (
-        <div className="grace-period">
-          <span className="grace-label">Next wave in:</span>
-          <strong className="grace-timer">{Math.ceil(graceTimer)}s</strong>
-          <button className="skip-grace" onClick={onNext}>
-            Skip
-          </button>
-        </div>
-      )}
-
-      <div className="wave-actions">
-        <button className="primary" onClick={isRunning ? onPause : onStart}>
-          {isRunning ? 'Pause' : 'Start'}
-        </button>
-        <button className="ghost" onClick={onNext} disabled={!canStartNext}>
-          Next Wave
-        </button>
-        <label className="toggle">
-          <input
-            type="checkbox"
-            checked={autoEnabled}
-            onChange={e => onToggleAutoWave(e.target.checked)}
-          />
-          <span>Auto-Wave</span>
-        </label>
-      </div>
-      <style>{`
-        .wave-control {
-          display: grid;
-          gap: 0.4rem;
-          padding: 0.6rem 0.75rem;
-          background: rgba(8, 24, 12, 0.7);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 10px;
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-        }
-        .wave-meta {
-          display: flex;
-          justify-content: space-between;
-          gap: 0.5rem;
-        }
-        .label {
-          display: block;
-          font-size: 0.75rem;
-          color: rgba(226, 232, 240, 0.72);
-          text-transform: uppercase;
-          letter-spacing: 0.03em;
-        }
-        strong {
-          color: #e2e8f0;
-          font-size: 1rem;
-        }
-        .phase {
-          text-transform: capitalize;
-        }
-        .wave-actions {
-          display: flex;
-          gap: 0.5rem;
-          align-items: center;
-        }
-        button {
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          background: rgba(255, 255, 255, 0.06);
-          color: #e2e8f0;
-          padding: 0.4rem 0.6rem;
-          border-radius: 8px;
-          cursor: pointer;
-          transition: transform 0.1s ease, background 0.2s ease;
-        }
-        button:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-        button.primary {
-          background: linear-gradient(120deg, #34d399, #16a34a);
-          border-color: rgba(52, 211, 153, 0.4);
-          color: #041109;
-          font-weight: 700;
-        }
-        button:hover:not(:disabled) {
-          transform: translateY(-1px);
-        }
-        .toggle {
-          display: flex;
-          align-items: center;
-          gap: 0.35rem;
-          color: #cbd5e1;
-          font-size: 0.9rem;
-        }
-        .grace-period {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.5rem;
-          background: rgba(52, 211, 153, 0.1);
-          border: 1px solid rgba(52, 211, 153, 0.3);
-          border-radius: 8px;
-        }
-        .grace-label {
-          font-size: 0.85rem;
-          color: rgba(226, 232, 240, 0.8);
-        }
-        .grace-timer {
-          font-size: 1.1rem;
-          color: #34d399;
-          font-weight: 700;
-          min-width: 2.5rem;
-          text-align: center;
-        }
-        .skip-grace {
-          margin-left: auto;
-          background: rgba(52, 211, 153, 0.15);
-          border-color: rgba(52, 211, 153, 0.4);
-          color: #34d399;
-          font-size: 0.85rem;
-          padding: 0.3rem 0.6rem;
-        }
-        .skip-grace:hover {
-          background: rgba(52, 211, 153, 0.25);
-        }
-      `}</style>
     </div>
   );
 }

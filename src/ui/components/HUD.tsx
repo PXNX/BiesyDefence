@@ -1,4 +1,8 @@
 import { useGameStore } from '@/game/store/gameStore';
+import IconFluentMoney24Filled from '~icons/fluent/money-24-filled';
+import IconFluentHeart24Filled from '~icons/fluent/heart-24-filled';
+import IconFluentTrophy24Filled from '~icons/fluent/trophy-24-filled';
+import IconFluentWaves24Filled from '~icons/fluent/weather-hail-night-24-filled';
 
 export function HUD() {
   const money = useGameStore(state => state.money);
@@ -7,73 +11,71 @@ export function HUD() {
   const wave = useGameStore(state => state.wave);
   const status = useGameStore(state => state.status);
 
+  const getStatusColor = () => {
+    switch (status) {
+      case 'running':
+        return 'badge-success';
+      case 'paused':
+        return 'badge-warning';
+      case 'won':
+        return 'badge-info';
+      case 'lost':
+        return 'badge-error';
+      default:
+        return 'badge-ghost';
+    }
+  };
+
   return (
-    <div className="hud-bar" role="status" aria-label="Game HUD">
-      <div className="hud-pill">
-        <span className="label">Money</span>
-        <strong>${money}</strong>
+    <div
+      className="flex flex-wrap items-center gap-2 px-4 py-2 bg-base-200/80 backdrop-blur-md border border-primary/20 rounded-2xl shadow-2xl"
+      role="status"
+      aria-label="Game HUD"
+    >
+      <div className="stats stats-horizontal shadow bg-base-300/50 backdrop-blur-sm border border-base-content/10">
+        <div className="stat py-2 px-3 min-w-[100px]">
+          <div className="stat-figure text-primary">
+            <IconFluentMoney24Filled className="w-6 h-6" />
+          </div>
+          <div className="stat-title text-xs opacity-70">Money</div>
+          <div className="stat-value text-xl text-success">${money}</div>
+        </div>
+
+        <div className="stat py-2 px-3 min-w-[100px]">
+          <div className="stat-figure text-error">
+            <IconFluentHeart24Filled className="w-6 h-6" />
+          </div>
+          <div className="stat-title text-xs opacity-70">Lives</div>
+          <div className="stat-value text-xl text-error">{lives}</div>
+        </div>
+
+        <div className="stat py-2 px-3 min-w-[100px]">
+          <div className="stat-figure text-info">
+            <IconFluentTrophy24Filled className="w-6 h-6" />
+          </div>
+          <div className="stat-title text-xs opacity-70">Score</div>
+          <div className="stat-value text-xl text-info">{score}</div>
+        </div>
+
+        <div className="stat py-2 px-3 min-w-[100px]">
+          <div className="stat-figure text-warning">
+            <IconFluentWaves24Filled className="w-6 h-6" />
+          </div>
+          <div className="stat-title text-xs opacity-70">Wave</div>
+          <div className="stat-value text-xl">
+            {wave.current}/{wave.total}
+          </div>
+        </div>
       </div>
-      <div className="hud-pill">
-        <span className="label">Lives</span>
-        <strong>{lives}</strong>
+
+      <div className="divider divider-horizontal mx-2 h-12"></div>
+
+      <div className="flex items-center gap-2">
+        <span className="text-xs opacity-70 uppercase tracking-wider">Status:</span>
+        <span className={`badge ${getStatusColor()} badge-lg font-semibold`}>
+          {status}
+        </span>
       </div>
-      <div className="hud-pill">
-        <span className="label">Score</span>
-        <strong>{score}</strong>
-      </div>
-      <div className="hud-pill">
-        <span className="label">Wave</span>
-        <strong>
-          {wave.current}/{wave.total}
-        </strong>
-      </div>
-      <div className="hud-pill status">
-        <span className="label">Status</span>
-        <strong className={`status-chip ${status}`}>{status}</strong>
-      </div>
-      <style>{`
-        .hud-bar {
-          display: flex;
-          gap: 0.5rem;
-          padding: 0.5rem 0.75rem;
-          background: rgba(8, 24, 12, 0.72);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 12px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-          backdrop-filter: blur(14px);
-          align-items: center;
-          flex-wrap: wrap;
-        }
-        .hud-pill {
-          display: grid;
-          gap: 0.15rem;
-          padding: 0.4rem 0.6rem;
-          border-radius: 10px;
-          background: rgba(255, 255, 255, 0.06);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          min-width: 80px;
-        }
-        .hud-pill .label {
-          font-size: 0.75rem;
-          color: rgba(226, 232, 240, 0.7);
-          letter-spacing: 0.03em;
-          text-transform: uppercase;
-        }
-        .hud-pill strong {
-          color: #e2e8f0;
-          font-size: 0.95rem;
-        }
-        .status-chip {
-          padding: 0.15rem 0.4rem;
-          border-radius: 999px;
-          text-transform: capitalize;
-        }
-        .status-chip.running { background: rgba(34, 197, 94, 0.16); color: #22c55e; }
-        .status-chip.paused { background: rgba(234, 179, 8, 0.16); color: #facc15; }
-        .status-chip.idle { background: rgba(59, 130, 246, 0.16); color: #60a5fa; }
-        .status-chip.lost,
-        .status-chip.won { background: rgba(248, 113, 113, 0.18); color: #f87171; }
-      `}</style>
     </div>
   );
 }
