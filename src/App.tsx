@@ -34,7 +34,7 @@ import {
   type Language,
 } from '@/localization';
 import { useGameStore } from '@/game/store/gameStore';
-import { selectSelectedTowerId, selectFeedback } from '@/game/store/selectors';
+
 import { GAME_CONFIG } from '@/game/config/gameConfig';
 
 const initialTower: TowerType = 'indica';
@@ -54,8 +54,8 @@ function App() {
 
   // Use store instead of local state
   const snapshot = useGameStore(state => state);
-  const selectedTower = selectSelectedTowerId() as TowerType | null;
-  const feedback = selectFeedback();
+  const selectedTower = useGameStore(state => state.selectedTowerId) as TowerType | null;
+  const feedback = useGameStore(state => state.feedback);
   const setFeedback = useGameStore(state => state.setFeedback);
   const setSelectedTower = useGameStore(state => state.setSelectedTower);
   const updateSnapshot = useGameStore(state => state.updateSnapshot);
@@ -118,7 +118,7 @@ function App() {
       controller.destroy();
       audioManager.destroy();
     };
-  }, [updateSnapshot]);
+  }, []);
 
   const unlockAudioContext = useCallback(async () => {
     if (audioContextUnlocked) {

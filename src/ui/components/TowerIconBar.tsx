@@ -7,11 +7,6 @@ import {
   TOWER_DETAILS_PANEL_WIDTH,
 } from './TowerDetailsPanel';
 import { useGameStore } from '@/game/store/gameStore';
-import {
-  selectMoney,
-  selectSelectedTowerId,
-  selectFeedback,
-} from '@/game/store/selectors';
 
 const TOWER_ART_PATHS: Record<TowerType, string> = {
   indica: '/towers/tower_indica_shop.png',
@@ -45,9 +40,9 @@ export function TowerIconBar({
     {} as Record<TowerType, HTMLButtonElement | null>
   );
 
-  const money = selectMoney();
-  const selectedTower = selectSelectedTowerId();
-  const feedback = selectFeedback();
+  const money = useGameStore(state => state.money);
+  const selectedTower = useGameStore(state => state.selectedTowerId);
+  const feedback = useGameStore(state => state.feedback);
   const setSelectedTower = useGameStore(state => state.setSelectedTower);
   const setFeedback = useGameStore(state => state.setFeedback);
 

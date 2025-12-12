@@ -1,16 +1,12 @@
 import { CornerStatCard } from './CornerStatCard';
-import {
-  selectResources,
-  selectWave,
-  selectMapStatus,
-  selectScore,
-} from '@/game/store/selectors';
+import { useGameStore } from '@/game/store/gameStore';
 
 const StatsCornerLayout = () => {
-  const { money, lives } = selectResources();
-  const score = selectScore();
-  const wave = selectWave();
-  const mapStatus = selectMapStatus();
+  const money = useGameStore(state => state.money);
+  const lives = useGameStore(state => state.lives);
+  const score = useGameStore(state => state.score);
+  const wave = useGameStore(state => state.wave);
+  const mapStatus = useGameStore(state => state.mapStatus);
 
   const scoreTrend = score > 0 ? 'up' : 'neutral';
   const incomeBonus = mapStatus?.incomeBonusPct ?? 0;

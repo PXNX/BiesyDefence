@@ -2,10 +2,6 @@ import { useState } from 'react';
 import { TOWER_PROFILES } from '@/game/config/constants';
 import type { TowerProfile } from '@/game/config/constants';
 import type { TowerType } from '@/game/core/types';
-import {
-  selectSelectedTowerId,
-  selectCanAffordTower,
-} from '@/game/store/selectors';
 import { useGameStore } from '@/game/store/gameStore';
 import { TowerTooltip } from './TowerTooltip';
 
@@ -16,7 +12,8 @@ interface TowerShopProps {
 }
 
 export function TowerShop({ onSelect }: TowerShopProps) {
-  const selectedTower = selectSelectedTowerId();
+  const selectedTower = useGameStore(state => state.selectedTowerId);
+  const money = useGameStore(state => state.money);
   const setSelectedTower = useGameStore(state => state.setSelectedTower);
   const [hovered, setHovered] = useState<TowerType | null>(null);
 
@@ -29,7 +26,7 @@ export function TowerShop({ onSelect }: TowerShopProps) {
     <div className="tower-shop">
       <div className="shop-grid" role="listbox" aria-label="Tower shop">
         {ENTRIES.map(([type, profile]) => {
-          const canAfford = selectCanAffordTower(profile.cost);
+          const canAfford = money >= profile.cost;
           const isSelected = selectedTower === type;
 
           return (

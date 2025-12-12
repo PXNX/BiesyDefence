@@ -3,11 +3,7 @@ import { SpeedChips } from './SpeedChips';
 import { PauseButton } from './PauseButton';
 import { AudioMini } from './AudioMini';
 import type { AudioConfig } from '@/game/audio/AudioManager';
-import {
-  selectGameSpeed,
-  selectIsPaused,
-  selectHoverTower,
-} from '@/game/store/selectors';
+import { useGameStore } from '@/game/store/gameStore';
 
 interface GameControlPanelProps {
   onSpeedChange: (speed: number) => void;
@@ -26,9 +22,9 @@ const GameControlPanel = ({
   onMasterVolumeChange,
   t,
 }: GameControlPanelProps) => {
-  const speed = selectGameSpeed();
-  const isPaused = selectIsPaused();
-  const hoverTower = selectHoverTower();
+  const speed = useGameStore(state => state.gameSpeed);
+  const isPaused = useGameStore(state => state.status === 'paused');
+  const hoverTower = useGameStore(state => state.hoverTower);
 
   return (
     <div

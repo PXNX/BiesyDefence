@@ -1,11 +1,5 @@
 import type { ChangeEvent } from 'react';
-import {
-  selectShowRanges,
-  selectShowHitboxes,
-  selectFPS,
-  selectWave,
-  selectTelemetry,
-} from '@/game/store/selectors';
+import { useGameStore } from '@/game/store/gameStore';
 
 interface DebugPanelProps {
   quickWaveIndex: number;
@@ -22,11 +16,11 @@ export function DebugPanel({
   onToggleRanges,
   onToggleHitboxes,
 }: DebugPanelProps) {
-  const showRanges = selectShowRanges();
-  const showHitboxes = selectShowHitboxes();
-  const fps = selectFPS();
-  const wave = selectWave();
-  const telemetry = selectTelemetry();
+  const showRanges = useGameStore(state => state.showRanges);
+  const showHitboxes = useGameStore(state => state.showHitboxes);
+  const fps = useGameStore(state => state.fps);
+  const wave = useGameStore(state => state.wave);
+  const telemetry = useGameStore(state => state.telemetry);
 
   const handleRangeChange = (event: ChangeEvent<HTMLInputElement>) => {
     onSetQuickWave(Number(event.target.value) - 1);

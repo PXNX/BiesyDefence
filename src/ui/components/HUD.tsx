@@ -1,13 +1,11 @@
-import {
-  selectResources,
-  selectWave,
-  selectStatus,
-} from '@/game/store/selectors';
+import { useGameStore } from '@/game/store/gameStore';
 
 export function HUD() {
-  const { money, lives, score } = selectResources();
-  const wave = selectWave();
-  const status = selectStatus();
+  const money = useGameStore(state => state.money);
+  const lives = useGameStore(state => state.lives);
+  const score = useGameStore(state => state.score);
+  const wave = useGameStore(state => state.wave);
+  const status = useGameStore(state => state.status);
 
   return (
     <div className="hud-bar" role="status" aria-label="Game HUD">

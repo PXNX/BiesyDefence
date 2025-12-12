@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import {
-  selectNextSpawnCountdown,
-  selectNextSpawnDelay,
-} from '@/game/store/selectors';
+import { useGameStore } from '@/game/store/gameStore';
 
 const SpawnTicker = () => {
-  const countdown = selectNextSpawnCountdown();
-  const delay = selectNextSpawnDelay();
+  const countdown = useGameStore(state => state.nextSpawnCountdown);
+  const delay = useGameStore(state => state.nextSpawnDelay);
   const [isVisible, setIsVisible] = useState(false);
 
   // Show/hide animation

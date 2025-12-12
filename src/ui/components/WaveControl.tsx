@@ -1,4 +1,3 @@
-import { selectWaveProgress } from '@/game/store/selectors';
 import { useGameStore } from '@/game/store/gameStore';
 
 interface WaveControlProps {
@@ -14,12 +13,16 @@ export function WaveControl({
   onNext,
   onToggleAutoWave,
 }: WaveControlProps) {
-  const wave = selectWaveProgress();
-  const graceActive = useGameStore((state) => state.graceActive);
-  const graceTimer = useGameStore((state) => state.graceTimer);
+  const current = useGameStore(state => state.wave.current);
+  const total = useGameStore(state => state.wave.total);
+  const phase = useGameStore(state => state.wavePhase);
+  const nextAvailable = useGameStore(state => state.nextWaveAvailable);
+  const autoEnabled = useGameStore(state => state.autoWaveEnabled);
+  const graceActive = useGameStore(state => state.graceActive);
+  const graceTimer = useGameStore(state => state.graceTimer);
 
-  const isRunning = wave.phase !== 'idle' && wave.phase !== 'completed' && wave.phase !== 'finalized';
-  const canStartNext = wave.nextAvailable && !isRunning;
+  const isRunning = phase !== 'idle' && phase !== 'completed' && phase !== 'finalized';
+  const canStartNext = nextAvailable && !isRunning;
 
   return (
     <div className="wave-control" role="group" aria-label="Wave control">
@@ -27,12 +30,12 @@ export function WaveControl({
         <div>
           <span className="label">Wave</span>
           <strong>
-            {wave.current}/{wave.total}
+            {current}/{total}
           </strong>
         </div>
         <div>
           <span className="label">Phase</span>
-          <strong className="phase">{wave.phase}</strong>
+          <strong className="phase">{phase}</strong>
         </div>
       </div>
 
@@ -56,7 +59,7 @@ export function WaveControl({
         <label className="toggle">
           <input
             type="checkbox"
-            checked={wave.autoEnabled}
+            checked={autoEnabled}
             onChange={e => onToggleAutoWave(e.target.checked)}
           />
           <span>Auto-Wave</span>
